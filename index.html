@@ -1016,6 +1016,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">vtg-ns-compare · NS OAuth 2.0 M2M</div>
       </div>
       <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">El Nova Flask server returning 404 since July 11 — 34 failed deliveries</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body">El Nova's Flask server at <code>flask.vectortechgroup.com/AddProjectProducts</code> has been returning 404 since July 11 2026 — 34 failed product delivery attempts confirmed. This is Austin Novakowski's server. Needs to be flagged to Austin for investigation and fix.</div>
+        <div class="gap-worker">flask.vectortechgroup.com/AddProjectProducts · Austin Novakowski</div>
+      </div>
+      <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">vtg-scopestack-doc-sync: multiple button clicks create duplicate SOW docs</div><div class="pri pri-m">Medium</div></div>
         <div class="gap-body">Each click of the Generate SOW button on Bids #3 triggers a new ScopeStack document generation — no idempotency or deduplication logic yet. A rep clicking twice creates two documents in ScopeStack. Fix: write a KV lock key on first /generate call per item, clear after webhook confirms delivery.</div>
         <div class="gap-worker">vtg-scopestack-doc-sync · /generate endpoint · KV lock needed</div>
@@ -1272,6 +1277,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Template</strong><span>ScopeStack eRate Template V2 (ID: 5270) → Bids #3 file_mm6wm4hn; other templates → El Nova Leads file_mkw7hy4z</span></div>
         <div class="worker-meta-row"><strong>Auth</strong><span>ScopeStack service account: worker-service@vtgus.com · Client ID: SH0E9m3bedl_efy_QWjXICH3… · slug: vector</span></div>
         <div class="worker-meta-row"><strong>New Bids #3 cols</strong><span>SOW Document (file_mm6wm4hn) · Generate SOW button (button_mm70vvrb)</span></div>
+        <div class="worker-meta-row"><strong>Confirmed</strong><span>First end-to-end delivery confirmed: North Branch Area Schools, 470# 260005778 — .docx uploaded to Bids #3 SOW Document column successfully</span></div>
         <div class="worker-meta-row"><strong>Gap</strong><span>Multiple button clicks create multiple ScopeStack documents — idempotency/dedup not yet built</span></div>
         <div class="worker-meta-row"><strong>Future</strong><span>AI executive summaries · vtg-sow-builder pricing sheet integration · blueprint → datasheet auto-selection</span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flowstg-scopestack-doc-sync\</span></div>
@@ -1598,6 +1604,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
 
     <div class="glossary-card">
+      <div class="glossary-term">monday.com File Upload (multipart spec)</div>
+      <div class="glossary-def">Uploading files to monday.com requires the <strong>GraphQL multipart spec</strong> with exactly four form fields: <code>query</code> (the GraphQL mutation), <code>variables</code> (JSON with <code>{"file": null}</code>), <code>map</code> (JSON with <code>{"0": ["variables.file"]}</code>), and the file itself as field <code>"0"</code>. The simpler <code>variables[file]</code> form-append approach silently returns a 200 OK but does not actually persist the file. Endpoint: <code>https://api.monday.com/v2/file</code> (not the standard <code>/v2</code> endpoint). Used by vtg-scopestack-doc-sync to attach SOW .docx files to board items.</div>
+    </div>
+
+    <div class="glossary-card">
       <div class="glossary-term">Idempotent</div>
       <div class="glossary-def">An operation that produces the same result no matter how many times it runs. VTG Workers use idempotency to prevent double-fires: vtg-cs-form checks a KV key before creating the CSOP, vtg-materials-log sets a lock key (materials_lock:{item_id}) after first submission. Critical for webhook-triggered Workers that may fire more than once.</div>
     </div>
@@ -1750,6 +1761,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="auto-board-id">ID: 18176633000 · Subitem board: 18176633598</div>
     <div class="auto-board-count">37 legacy + 2 workflows · 3 integrations</div>
   </div>
+  <div style="font-size:11px;color:var(--yellow);background:var(--yellow-dim);padding:6px 10px;border-radius:4px;margin-bottom:8px;">📋 Planned: Blueprints column to be added to Bids #3 for projects that originate directly on the board (not via El Nova) — will enable Generate SOW button to work without a Leads board blueprint selection.</div>
   <table class="auto-table">
     <thead><tr><th>ID</th><th>Trigger</th><th>Action</th><th>Notes</th></tr></thead>
     <tbody>
