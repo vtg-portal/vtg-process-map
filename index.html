@@ -287,6 +287,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="badges"><span class="badge b-live">Live</span></div>
         <div class="wchip">⚡ El Nova integration</div>
       </div>
+      <div class="step" onclick="sd('sf-account-sync')" style="margin-top:5px;">
+        <div class="s-title">Salesforce Account Sync</div>
+        <div class="s-sub">Account + Contact upserted to SF · UID written back to monday</div>
+        <div class="badges"><span class="badge b-live">Live</span></div>
+        <div class="wchip">⚡ vtg-sf-account-sync</div>
+      </div>
     </div>
     <!-- Ph1 — split into ScopeStack trigger + bid intake -->
     <div class="cell shade">
@@ -703,7 +709,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
 
     <div class="sop-ph">
-      <div class="sop-ph-hdr"><div class="sop-ph-num">0</div><div><div class="sop-ph-title">CRM Setup — Account &amp; Contact Creation</div><div class="sop-ph-sub">Runs independently · El Nova integration · E-Rate only</div></div></div>
+      <div class="sop-ph-hdr"><div class="sop-ph-num">0</div><div><div class="sop-ph-title">CRM Setup — Account &amp; Contact Creation</div><div class="sop-ph-sub">Runs independently · El Nova integration + vtg-sf-account-sync · E-Rate only</div></div></div>
       <div class="sop-steps">
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">0.1 · El Nova Pushes Account + Contact Records</span><span class="sop-owner">Automation (El Nova)</span><span class="badge b-live">Live</span></div>
@@ -714,6 +720,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div class="sop-step-hdr"><span class="sop-step-title">0.2 · vtg-bid-intake Waits for These Records</span><span class="sop-owner">Automation</span><span class="badge b-live">Live</span></div>
           <div class="sop-body">When vtg-bid-intake fires after accept_470, it performs a district name search to auto-link the Account and Contact to the new Bids #3 item. The <strong>5-second retry loop</strong> in vtg-bid-intake exists specifically because El Nova may not have written the Account/Contact yet at the exact moment the bid item is being created. This is the dependency between Phase 0 and Phase 1.</div>
           <div class="auto-row gap">⚠ Note: Commercial / MSP portal track does not create Accounts or Contacts — E-Rate only</div>
+        </div>
+        <div class="sop-step">
+          <div class="sop-step-hdr"><span class="sop-step-title">0.3 · vtg-sf-account-sync Upserts Account + Contact to Salesforce</span><span class="sop-owner">Automation</span><span class="badge b-live">Live — Sep 8 2026</span></div>
+          <div class="sop-body">When an Account or Contact is created or updated on their respective monday.com boards, <strong>vtg-sf-account-sync</strong> fires via webhook. It upserts both the <strong>Account</strong> and <strong>Contact</strong> objects into Salesforce using <code>Monday_Item_ID__c</code> as the external ID — creating new SF records or updating existing ones idempotently. After the SF upsert, the Worker writes the <strong>Salesforce Account ID</strong> back to the <code>UID</code> column (<code>text_mm6s8adk</code>) on the monday.com Accounts board, completing the cross-system link. A <strong>backfill script</strong> (backfill.mjs) ran against all 791 existing accounts to populate Salesforce and stamp the UID column. Complements vtg-monday-sf-sync which syncs Bids — this Worker handles the CRM Account/Contact layer.</div>
+          <div class="auto-row">⚡ vtg-sf-account-sync · SF Client Credentials OAuth · Monday_Item_ID__c external ID · KV: SF_ACCOUNT_TOKEN_KV</div>
         </div>
       </div>
     </div>
@@ -2188,6 +2199,12 @@ const D = {
     outputs:['Account record on Accounts board (ID 18176632844)','Contact record on Contacts board (ID 18176633260)'],
     workers:['El Nova integration (Austin Novakowski\'s original webhook automations)'],
     notes:['vtg-bid-intake has a 5s retry loop specifically because El Nova may not have written Account/Contact yet when the bid item is being created','Commercial (MSP portal) track does NOT create Accounts or Contacts — E-Rate only','Records are auto-populated — sales reps do not manually create them']},
+  'sf-account-sync':{title:'Salesforce Account + Contact Sync',phase:'E-Rate · Phase 0 · CRM Setup',status:'live',
+    triggers:['monday.com webhook on Account created or updated (Accounts board 18176632844)','monday.com webhook on Contact created or updated (Contacts board 18176633260)'],
+    inputs:['Account/Contact monday.com item data','Monday_Item_ID__c as external ID for upsert'],
+    outputs:['Salesforce Account object created/updated','Salesforce Contact object created/updated','SF Account ID written back to UID column (text_mm6s8adk) on Accounts board'],
+    workers:['vtg-sf-account-sync (LIVE Sep 8 2026)'],
+    notes:['Uses Monday_Item_ID__c as external ID on both SF Account and Contact — idempotent upserts','SF auth: integration@vtgus.com.prod · Client Credentials OAuth · VTG Integration Permissions permission set','KV: SF_ACCOUNT_TOKEN_KV for token cache','backfill.mjs ran against all 791 existing accounts — requires MONDAY_TOKEN env var set before running','Complements vtg-monday-sf-sync which handles Bids — this Worker handles the CRM Account/Contact layer']},
   'erate-deals-create':{title:'E-Rate Deals Item Created',phase:'E-Rate Op System · Phase 1 · Post-Monday',status:'live',
     triggers:['Bids #3 item enters Post-Monday group'],
     inputs:['Bid name','District, FRN, Contract Value, Funding Year, Category, Sales Owner from bid'],
