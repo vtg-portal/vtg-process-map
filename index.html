@@ -976,6 +976,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">vtg-monday-cpq · vtg-ns-mcp-sync · vtg-cs-form (fire-and-forget)</div>
       </div>
       <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">vtg-sf-account-sync: SF Account ID write-back needs verification at scale</div><div class="pri pri-l">Low</div></div>
+        <div class="gap-body">Backfill.mjs ran against 791 accounts. UID column (text_mm6s8adk) should now be populated on all Accounts board items. Verify spot-check that SF Account IDs are correctly written back and that no items were skipped due to MONDAY_TOKEN auth issues (backfill.mjs requires MONDAY_TOKEN env var set explicitly before running).</div>
+        <div class="gap-worker">vtg-sf-account-sync · backfill.mjs · Accounts board text_mm6s8adk</div>
+      </div>
+      <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">vtg-monday-cpq fire-and-forget not reliable</div><div class="pri pri-h">High</div></div>
         <div class="gap-body">vtg-cs-form's server-side call to vtg-monday-cpq is not consistently triggering — likely caused by CF dashboard paste deployment. CPQ quotes not being reliably created. Fix: redeploy vtg-monday-cpq via wrangler CLI. Only relevant if Path A (CPQ) is chosen.</div>
         <div class="gap-worker">vtg-monday-cpq · vtg-cs-form</div>
@@ -1253,6 +1258,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
     </div>
 
+
+    <div class="worker-card">
+      <div class="worker-card-hdr">
+        <div><div class="worker-name">vtg-sf-account-sync</div><div class="worker-url">vtg-sf-account-sync.vectorfi-admin.workers.dev</div></div>
+        <span class="badge b-live worker-status">Live — Sep 8 2026</span>
+      </div>
+      <div class="worker-desc">Syncs monday.com Accounts (#1) and Contacts (#2) to Salesforce as Account and Contact objects. Uses <strong>Monday_Item_ID__c</strong> as the external ID for idempotent upserts on both objects. After upserting, writes the Salesforce Account ID back to the <strong>UID column</strong> (<code>text_mm6s8adk</code>) on the Accounts board. A backfill script (<code>backfill.mjs</code>) ran against all 791 existing accounts to populate Salesforce and stamp the UID column. Complements <code>vtg-monday-sf-sync</code> which syncs Bids — this Worker handles the CRM Account/Contact layer.</div>
+      <div class="worker-meta">
+        <div class="worker-meta-row"><strong>Trigger</strong><span>monday.com webhook on Account/Contact creation or change</span></div>
+        <div class="worker-meta-row"><strong>Auth</strong><span>SF Client Credentials OAuth · integration@vtgus.com.prod · VTG Integration Permissions permission set</span></div>
+        <div class="worker-meta-row"><strong>KV</strong><span class="worker-kv">SF_ACCOUNT_TOKEN_KV — token cache for SF OAuth</span></div>
+        <div class="worker-meta-row"><strong>SF fields</strong><span>Monday_Item_ID__c (External ID, Text 20, Unique) on both Account and Contact objects</span></div>
+        <div class="worker-meta-row"><strong>Write-back</strong><span>SF Account ID → Accounts board UID column (text_mm6s8adk)</span></div>
+        <div class="worker-meta-row"><strong>Backfill</strong><span>backfill.mjs ran against all 791 accounts — requires MONDAY_TOKEN env var set before running</span></div>
+        <div class="worker-meta-row"><strong>Files</strong><span>VTG Flowstg-sf-account-sync\ · worker.js + wrangler.toml + backfill.mjs</span></div>
+      </div>
+    </div>
+
 </div>
 </div>
 
@@ -1370,7 +1393,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
     </div>
 
-  </div>
+  
+    <div class="worker-card" style="border-color:var(--purple-dim);">
+      <div class="worker-card-hdr">
+        <div><div class="worker-name">vsz-lldp-neighbors.py</div><div class="worker-url">Local Python script (not a Cloudflare Worker)</div></div>
+        <span class="badge b-live worker-status">Live — Sep 4 2026</span>
+      </div>
+      <div class="worker-desc">Local Python script that SSHes into a Ruckus SmartZone controller and runs LLDP neighbor discovery across all APs in a selected zone. Queries all APs via SmartZone REST API, runs <code>remote ap-cli &lt;MAC&gt; "get lldp neighbors"</code> on each via SSH, parses output to extract switch hostname, port, chassis MAC, and management IP, displays as a formatted console table, exports to a timestamped CSV, and optionally writes LLDP data back to each AP's description field via controller CLI. Built to run locally because remote sites lack public-facing IPs on the controller. Uses prompt-based SSH waiting (<code>_wait_for()</code>) rather than blind sleeps. Added to VTG portal as tool #23.</div>
+      <div class="worker-meta">
+        <div class="worker-meta-row"><strong>Runtime</strong><span>Local Python — requires SSH access to SmartZone controller</span></div>
+        <div class="worker-meta-row"><strong>Auth</strong><span>SmartZone SSH credentials + separate enable password + REST API credentials entered at runtime</span></div>
+        <div class="worker-meta-row"><strong>Pagination fix</strong><span>Fetches all APs with no zone filter using start/limit as URL query params, then filters client-side by zoneId</span></div>
+        <div class="worker-meta-row"><strong>Write-back</strong><span>AP description field updated via controller CLI (config → ap &lt;MAC&gt; → description → exit); REST API PATCH returns 403</span></div>
+        <div class="worker-meta-row"><strong>Portal</strong><span>vtg-portal tool #23 — listed as local script with GitHub repo link</span></div>
+      </div>
+    </div>
+
+</div>
 </div>
 </div><!-- /view-workers -->
 
@@ -1519,6 +1558,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="glossary-card">
       <div class="glossary-term">SPI / BEAR Subitem (N/A)</div>
       <div class="glossary-def">Several Post-Sale subitems are conditionally applicable depending on payment method. For <strong>BEAR</strong> bids, tasks related to FCDL filing and SPI invoicing are marked <strong>N/A</strong> — this triggers the N/A automation (482374711) which clears the assignee and due date, effectively removing the task from the active queue.</div>
+    </div>
+
+    <div class="glossary-card">
+      <div class="glossary-term">UID (Salesforce Account ID)</div>
+      <div class="glossary-def">The Salesforce Account ID written back to the monday.com <strong>Accounts board</strong> UID column (<code>text_mm6s8adk</code>) by the <code>vtg-sf-account-sync</code> Worker after a successful Account upsert. Serves as the permanent cross-system identifier linking a monday.com Account record to its Salesforce counterpart. The external ID field <code>Monday_Item_ID__c</code> on the SF Account object is the join key used for idempotent upserts — UID is what comes back.</div>
     </div>
 
     <div class="glossary-card">
@@ -1671,6 +1715,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <td class="auto-trigger">When column text_mkxpgyv6 (website URL) changes</td>
         <td class="auto-action">Send a webhook</td>
         <td class="auto-note">Re-triggers logo fetch when El Nova website URL is updated on an existing Account</td>
+      </tr>
+      <tr>
+        <td class="auto-id">SF sync webhook</td>
+        <td class="auto-trigger">When Account created or updated</td>
+        <td class="auto-action">Send webhook → vtg-sf-account-sync</td>
+        <td class="auto-note">LIVE Sep 8 2026 — upserts Account + Contact to Salesforce via Monday_Item_ID__c external ID; writes SF Account ID back to UID column (text_mm6s8adk)</td>
       </tr>
     </tbody>
   </table>
