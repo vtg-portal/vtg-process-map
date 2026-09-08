@@ -1016,11 +1016,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">vtg-ns-compare · NS OAuth 2.0 M2M</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">El Nova Flask server returning 404 since July 11 — 34 failed deliveries</div><div class="pri pri-h">High</div></div>
-        <div class="gap-body">El Nova's Flask server at <code>flask.vectortechgroup.com/AddProjectProducts</code> has been returning 404 since July 11 2026 — 34 failed product delivery attempts confirmed. This is Austin Novakowski's server. Needs to be flagged to Austin for investigation and fix.</div>
-        <div class="gap-worker">flask.vectortechgroup.com/AddProjectProducts · Austin Novakowski</div>
-      </div>
-      <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">vtg-scopestack-doc-sync: multiple button clicks create duplicate SOW docs</div><div class="pri pri-m">Medium</div></div>
         <div class="gap-body">Each click of the Generate SOW button on Bids #3 triggers a new ScopeStack document generation — no idempotency or deduplication logic yet. A rep clicking twice creates two documents in ScopeStack. Fix: write a KV lock key on first /generate call per item, clear after webhook confirms delivery.</div>
         <div class="gap-worker">vtg-scopestack-doc-sync · /generate endpoint · KV lock needed</div>
