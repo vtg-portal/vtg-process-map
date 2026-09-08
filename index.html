@@ -170,6 +170,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .ds ul li{font-size:11.5px;color:var(--text-muted);display:flex;gap:5px;align-items:flex-start;}
 .ds ul li::before{content:'›';color:var(--accent);flex-shrink:0;}
 .hint{font-size:11px;color:var(--text-dim);font-style:italic;text-align:center;padding:6px 0 0;}
+
+/* ── SLIDE-OUT DETAIL PANEL ── */
+.panel-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:998;opacity:0;pointer-events:none;transition:opacity .25s;}
+.panel-overlay.open{opacity:1;pointer-events:all;}
+.panel-drawer{position:fixed;top:0;right:0;width:420px;max-width:95vw;height:100vh;background:var(--surface);border-left:1px solid var(--border);z-index:999;transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;overflow:hidden;}
+.panel-drawer.open{transform:translateX(0);}
+.panel-header{display:flex;align-items:flex-start;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid var(--border);gap:12px;flex-shrink:0;}
+.panel-header-left{display:flex;flex-direction:column;gap:4px;}
+.panel-title{font-size:14px;font-weight:700;color:var(--text);line-height:1.3;}
+.panel-phase{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);}
+.panel-close{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--surface2);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:background .15s,color .15s;}
+.panel-close:hover{background:var(--red-dim);color:var(--red);border-color:var(--red);}
+.panel-body{padding:18px 20px;overflow-y:auto;flex:1;}
+.panel-status{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.panel-section{margin-bottom:16px;}
+.panel-section h4{font-size:9.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);margin-bottom:7px;padding-bottom:4px;border-bottom:1px solid var(--border-light);}
+.panel-section ul{list-style:none;display:flex;flex-direction:column;gap:4px;}
+.panel-section ul li{font-size:12px;color:var(--text-muted);display:flex;gap:6px;align-items:flex-start;line-height:1.5;}
+.panel-section ul li::before{content:"›";color:var(--accent);flex-shrink:0;}
+.panel-empty{font-size:12px;color:var(--text-dim);font-style:italic;}
+[data-theme="light"] .panel-overlay{background:rgba(0,0,0,.3);}
 .detail-empty{font-size:12px;color:var(--text-dim);font-style:italic;}
 .status-bar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
 
@@ -684,11 +705,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </div><!-- /diagram -->
 </div><!-- /scroll-wrap -->
 
-<p class="hint">Click any step to see detail · Scroll right if needed · Two tracks share the same invoicing lane</p>
-
-<div class="detail" id="detail-panel">
-  <div class="detail-empty">Click any step above to see triggers, inputs, outputs, and automation notes.</div>
-</div>
+<p class="hint">Click any step to open detail panel →</p>
 </div><!-- /view-diagram -->
 
 
@@ -2141,6 +2158,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
 </div><!-- /view-dashboards -->
 
+<!-- ── SLIDE-OUT DETAIL DRAWER ── -->
+<div class="panel-overlay" id="panel-overlay" onclick="closePanel()"></div>
+<div class="panel-drawer" id="panel-drawer">
+  <div class="panel-header">
+    <div class="panel-header-left">
+      <div class="panel-title" id="panel-title">—</div>
+      <div class="panel-phase" id="panel-phase">—</div>
+    </div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body" id="panel-body">
+    <div class="panel-empty">Click any step in the diagram to see details.</div>
+  </div>
+</div>
+
 </div><!-- /main -->
 
 <script>
@@ -2358,25 +2390,35 @@ const D = {
     workers:[],notes:['Jon is PM for commercial projects #4 — same as E-Rate delivery','No Josh involvement in Projects #4 for either track']}
 };
 
-const statusMap={live:'<span class="badge b-live">Live</span>',progress:'<span class="badge b-prog">In Progress</span>',planned:'<span class="badge b-plan">Planned</span>',manual:'<span class="badge b-man">Manual</span>',gap:'<span class="badge b-gap">Gap</span>',decision:'<span class="badge b-dec">Decision Point</span>'};
+/* statusMap moved into sd() */
 
 function sd(id){
   const d=D[id]; if(!d) return;
   document.querySelectorAll('.step,.decision').forEach(s=>s.classList.remove('sel'));
   event.currentTarget.classList.add('sel');
-  const wHtml=d.workers.length?d.workers.map(w=>`<li>${w}</li>`).join(''):'<li style="font-style:italic;color:var(--text-dim)">No Worker — manual step</li>';
-  const nHtml=d.notes.length?`<div class="ds" style="margin-top:12px;"><h4>Notes</h4><ul>${d.notes.map(n=>`<li>${n}</li>`).join('')}</ul></div>`:'';
-  document.getElementById('detail-panel').innerHTML=`
-    <div class="status-bar">${statusMap[d.status]||''}</div>
-    <h3>${d.title}</h3>
-    <div class="detail-phase">${d.phase}</div>
-    <div class="detail-grid">
-      <div class="ds"><h4>Triggers</h4><ul>${d.triggers.map(t=>`<li>${t}</li>`).join('')}</ul></div>
-      <div class="ds"><h4>Inputs</h4><ul>${d.inputs.map(i=>`<li>${i}</li>`).join('')}</ul></div>
-      <div class="ds"><h4>Outputs</h4><ul>${d.outputs.map(o=>`<li>${o}</li>`).join('')}</ul></div>
-      <div class="ds"><h4>Workers / Integrations</h4><ul>${wHtml}</ul></div>
-    </div>${nHtml}`;
+  const sm={live:'<span class="badge b-live">Live</span>',progress:'<span class="badge b-prog">In Progress</span>',planned:'<span class="badge b-plan">Planned</span>',manual:'<span class="badge b-man">Manual</span>',gap:'<span class="badge b-gap">Gap</span>',decision:'<span class="badge b-dec">Decision Point</span>'};
+  const wHtml=d.workers.length?d.workers.map(w=>`<li>${w}</li>`).join(''):`<li style="font-style:italic;color:var(--text-dim)">No Worker — manual step</li>`;
+  const nHtml=d.notes.length?`<div class="panel-section"><h4>Notes</h4><ul>${d.notes.map(n=>`<li>${n}</li>`).join('')}</ul></div>`:'';
+  document.getElementById('panel-title').textContent=d.title;
+  document.getElementById('panel-phase').textContent=d.phase;
+  document.getElementById('panel-body').innerHTML=`
+    <div class="panel-status">${sm[d.status]||''}</div>
+    <div class="panel-section"><h4>Triggers</h4><ul>${d.triggers.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+    <div class="panel-section"><h4>Inputs</h4><ul>${d.inputs.map(i=>`<li>${i}</li>`).join('')}</ul></div>
+    <div class="panel-section"><h4>Outputs</h4><ul>${d.outputs.map(o=>`<li>${o}</li>`).join('')}</ul></div>
+    <div class="panel-section"><h4>Workers / Integrations</h4><ul>${wHtml}</ul></div>
+    ${nHtml}`;
+  document.getElementById('panel-drawer').classList.add('open');
+  document.getElementById('panel-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
 }
+function closePanel(){
+  document.getElementById('panel-drawer').classList.remove('open');
+  document.getElementById('panel-overlay').classList.remove('open');
+  document.body.style.overflow='';
+  document.querySelectorAll('.step,.decision').forEach(s=>s.classList.remove('sel'));
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
 </script>
 </body>
 </html>
