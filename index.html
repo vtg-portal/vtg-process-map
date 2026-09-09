@@ -267,6 +267,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <div class="tab" onclick="showView('glossary',this)">Glossary</div>
   <div class="tab" onclick="showView('automations',this)">Automations</div>
   <div class="tab" onclick="showView('dashboards',this)">Dashboards</div>
+  <div class="tab" onclick="showView('changelog',this)">Changelog</div>
 </div>
 
 <div class="main">
@@ -2157,6 +2158,234 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </div>
 
 </div><!-- /view-dashboards -->
+
+<!-- ════════════════════════════════════════════
+     CHANGELOG
+════════════════════════════════════════════ -->
+<div class="view" id="view-changelog">
+<style>
+.cl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.cl-header-left h2{font-size:16px;font-weight:700;color:var(--text);}
+.cl-header-left p{font-size:12px;color:var(--text-muted);margin-top:3px;}
+.cl-version-pill{font-size:11px;font-weight:700;font-family:var(--font-mono);background:var(--accent-dim);color:var(--accent);padding:4px 10px;border-radius:20px;border:1px solid var(--accent);}
+.cl-table{width:100%;border-collapse:collapse;font-size:12px;}
+.cl-table thead th{text-align:left;padding:8px 12px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);border-bottom:2px solid var(--border);background:var(--surface2);white-space:nowrap;}
+.cl-table tbody tr{border-bottom:1px solid var(--border-light);transition:background .1s;}
+.cl-table tbody tr:hover{background:var(--surface2);}
+.cl-table td{padding:10px 12px;vertical-align:top;line-height:1.5;}
+.cl-date{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);white-space:nowrap;}
+.cl-ver{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--text-dim);white-space:nowrap;}
+.cl-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
+.cl-new-worker{background:var(--green-dim);color:var(--green);}
+.cl-process{background:var(--accent-dim);color:var(--accent);}
+.cl-fix{background:var(--orange-dim);color:var(--orange);}
+.cl-resolved{background:var(--green-dim);color:var(--green);}
+.cl-infra{background:var(--purple-dim);color:var(--purple);}
+.cl-update{background:var(--yellow-dim);color:var(--yellow);}
+.cl-doc{background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);}
+.cl-desc{color:var(--text-muted);}
+.cl-desc strong{color:var(--text);font-weight:500;}
+.cl-section-row td{background:var(--surface);padding:6px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--text-dim);border-bottom:1px solid var(--border);}
+</style>
+
+<div class="cl-header">
+  <div class="cl-header-left">
+    <h2>Changelog</h2>
+    <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
+  </div>
+  <div class="cl-version-pill">Current: v1.7</div>
+</div>
+
+<table class="cl-table">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Version</th>
+      <th>Type</th>
+      <th>Change</th>
+    </tr>
+  </thead>
+  <tbody>
+
+    <!-- ── Sep 8 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">September 8, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Sep 8</td>
+      <td class="cl-ver">v1.7</td>
+      <td><span class="cl-badge cl-infra">UI</span></td>
+      <td class="cl-desc"><strong>Slide-out detail panel</strong> — replaced bottom-of-page detail section with a slide-in drawer. Click any step card in the diagram to open the panel from the right. Close with ✕, Escape, or clicking the overlay.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 8</td>
+      <td class="cl-ver">v1.6</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-sf-account-sync</strong> — syncs monday.com Accounts (#1) and Contacts (#2) to Salesforce as Account and Contact objects using Monday_Item_ID__c as external ID. Writes SF Account ID back to UID column (text_mm6s8adk) on Accounts board. Backfill ran against all 791 existing accounts.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 8</td>
+      <td class="cl-ver">v1.6</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-scopestack-doc-sync</strong> — two-endpoint Worker. Endpoint 1: catches ScopeStack document_status_changed webhook, downloads .docx SOW, routes by template to Bids #3 SOW Document column (file_mm6wm4hn) or El Nova Leads. Endpoint 2: triggered by Generate SOW button (button_mm70vvrb) on Bids #3 to programmatically trigger SOW generation. First confirmed delivery: North Branch Area Schools, 470# 260005778.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 8</td>
+      <td class="cl-ver">v1.6</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Fortinet catalog added to SKU_CATALOG KV</strong> — 318 SKUs (54 HW, 132 UTP bundles, 132 UTP licenses) covering FortiGate FG-30G through FG-900G at MSRP. Added via vtg-sov-builder /admin/skus.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 8</td>
+      <td class="cl-ver">v1.6</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Live on vtg-process-map.pages.dev</strong> — process map deployed to Cloudflare Pages via GitHub (vtg-portal/vtg-process-map). Auto-redeploys within ~30 seconds of any push. URL is permanent and shareable.</td>
+    </tr>
+
+    <!-- ── Sep 4–5 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">September 4–5, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Sep 4</td>
+      <td class="cl-ver">v1.5</td>
+      <td><span class="cl-badge cl-new-worker">New Tool</span></td>
+      <td class="cl-desc"><strong>vsz-lldp-neighbors.py</strong> — local Python script that SSHes into Ruckus SmartZone, runs LLDP neighbor discovery across all APs in a zone, exports to timestamped CSV, optionally writes back to AP description. Added to vtg-portal as tool #23.</td>
+    </tr>
+
+    <!-- ── Sep 3 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">September 3, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Sep 3</td>
+      <td class="cl-ver">v1.4</td>
+      <td><span class="cl-badge cl-process">Process Change</span></td>
+      <td class="cl-desc"><strong>Intake form redesigned</strong> — Sales Executive and ScopeStack Blueprint(s) are now entered inside the vtg-bid-intake form (after accept_470), not before. Blueprint selection in the form triggers ScopeStack proposal creation. Eliminates the pre-accept manual entry step.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 3</td>
+      <td class="cl-ver">v1.4</td>
+      <td><span class="cl-badge cl-fix">Bug Fix</span></td>
+      <td class="cl-desc"><strong>vtg-bid-intake patched</strong> — fixed Account/Contact lookup (replaced unreliable items_by_multiple_column_values with items_page + contains_text). Fixed SOV Builder link not being written on form submit. Bond section redesigned with Surety bond read-only. Retries bumped 3→4.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 3</td>
+      <td class="cl-ver">v1.4</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-tdsynnex</strong> — TD Synnex Partner API OAuth 2.0 integration. Exposes /api/lookup for live contracted pricing. Called internally by vtg-sov-builder via service binding. Falls back to SKU_CATALOG KV for non-TD Synnex items. TOKEN_CACHE KV with auto-refresh.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 3</td>
+      <td class="cl-ver">v1.4</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>vtg-sov-builder enhanced</strong> — live TD Synnex pricing with LIVE badge, category filter bar (All / Switches / Wireless / Transceivers / Cables / Licensing / Accessories / Labor), /admin/skus catalog admin UI, N1C UPS (121 SKUs) and Ruckus catalogs loaded.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 3</td>
+      <td class="cl-ver">v1.4</td>
+      <td><span class="cl-badge cl-process">Process Change</span></td>
+      <td class="cl-desc"><strong>Bids #3 column restructure</strong> — new 📊 SOV Builder column (link_mm6vbks) created; all 156 existing bids backfilled. Customer Intake Form column (link_mm591mdg) now dedicated to intake form links only. vtg-bid-intake stamps both columns on new bid creation.</td>
+    </tr>
+
+    <!-- ── Aug 25–30 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">August 25–30, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Aug 30</td>
+      <td class="cl-ver">v1.3</td>
+      <td><span class="cl-badge cl-doc">Doc</span></td>
+      <td class="cl-desc"><strong>Process map published</strong> — initial 7-tab HTML document covering E-Rate, Commercial, and E-Rate Op System tracks. Includes Flow Diagram, Written SOP, Gap Analysis, Workers, Glossary, Automations, and Dashboards tabs.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Aug 27</td>
+      <td class="cl-ver">v1.2</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>vtg-materials-log v2</strong> — Save Draft system with daily accumulation, timestamped log view, running totals, confirmation modal before final submission, 3-second countdown auto-close after successful submit.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Aug 27</td>
+      <td class="cl-ver">v1.2</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-revenue-month-sync</strong> — fires on Projects #4 Timeline column change, extracts end date, writes to Revenue Month (date_mm39fh8x). Skips Closed items and cleared timelines.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Aug 27</td>
+      <td class="cl-ver">v1.2</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-msp-csop</strong> — Commercial/non-E-Rate CSOP form deployed. Bypasses Bids #3 and El Nova entirely. Creates Projects #4 item directly with task list subitems built from form fields.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Aug 27</td>
+      <td class="cl-ver">v1.2</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Cabling Install Scheduler board</strong> — new monday.com board (ID 18427983069) for 10-person crew scheduling. 4 stage groups, 33 jobs pre-loaded, 2 automations (tomorrow reminder + crew assignment notification).</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Aug 25</td>
+      <td class="cl-ver">v1.1</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-po-sync</strong> — syncs NetSuite PO numbers and approval status back to Projects #4. Webhook on NS SO# column change + cron every 4h. KV: PO_SYNC_KV.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Aug 25</td>
+      <td class="cl-ver">v1.1</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-ns-so-backfill</strong> — one-time utility Worker to backfill NetSuite Sales Order numbers into Projects #4 text_mm6hv20b column for historical records.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Aug 25</td>
+      <td class="cl-ver">v1.1</td>
+      <td><span class="cl-badge cl-resolved">Gap Resolved</span></td>
+      <td class="cl-desc"><strong>NS process documentation</strong> — vtg-ns-audit Node.js tool built. First-ever NetSuite process documentation for VTG via OAuth 2.0 M2M + SuiteQL. Generated self-contained HTML report tying NS data to each process step.</td>
+    </tr>
+
+    <!-- ── Pre-Aug 25 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">Prior to August 25, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Aug 13</td>
+      <td class="cl-ver">v1.0</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-monday-sf-sync</strong> — Bids #3 stage changes sync to Salesforce as Opportunity upserts via Monday_Item_ID__c external ID. First SF record: Shaker Heights City School District.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Aug 13</td>
+      <td class="cl-ver">v1.0</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>vtg-ns-mcp-sync auth live</strong> — NetSuite production OAuth 2.0 M2M auth established. Six bidirectional sync flows coded. Blocked on customer ID mapping (vtg-ns-compare) and NS service item ID.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Ongoing</td>
+      <td class="cl-ver">v1.0</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-cs-form</strong> — CS Order Processing form generated and emailed to erateops@vtgus.com when Bids #3 moves to Post-Sale. KV-based deduplication. monday subitem auto-created.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Ongoing</td>
+      <td class="cl-ver">v1.0</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-sov-builder</strong> — SOV quoting tool for sales. Multi-tab buildings, SKU catalog, section types, per-row labor, markup overrides, jsPDF generation, upload to Bids #3 Files column.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Ongoing</td>
+      <td class="cl-ver">v1.0</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-bid-intake</strong> — triggered by accept_470. Creates Bids #3 item, auto-links Account/Contact, serves intake form, handles bond creation. Core of the E-Rate lead intake flow.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Ongoing</td>
+      <td class="cl-ver">v1.0</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-materials-log</strong> — cabling materials accounting for Projects #4. PM submits fiber/copper parts on stage → Installing. Auto-advances to Ready for Invoicing and fires billing notification email.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Ongoing</td>
+      <td class="cl-ver">v1.0</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-account-logo</strong> — scrapes district website for logo, falls back to Clearbit, uploads to Accounts board logo column. Backfill ran against 786 existing accounts.</td>
+    </tr>
+
+  </tbody>
+</table>
+</div><!-- /view-changelog -->
 
 <!-- ── SLIDE-OUT DETAIL DRAWER ── -->
 <div class="panel-overlay" id="panel-overlay" onclick="closePanel()"></div>
