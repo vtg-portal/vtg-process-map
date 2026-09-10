@@ -1060,6 +1060,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-body">All Workers send via SMTP2GO / noreply@vtgus.com. DKIM not set up — deliverability risk on billing notifications, CSOP emails, bond emails as volume grows.</div>
         <div class="gap-worker">SMTP2GO · vtgus.com DNS</div>
       </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">vtg-scopestack-doc-sync: template routing hardcoded to V2</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">vtg-scopestack-doc-sync currently routes by template name "ScopeStack eRate Template V2". When V3 is uploaded to ScopeStack, the Worker code must be updated to route by the new V3 template name. Until then, generated SOWs will not auto-deliver to Bids #3. Also: vtg-cs-form subitem creation needs 6 PM task subitems added (Project Kickoff Meeting, Site Access Coordination, Installation Scheduling, Weekly Status Updates, Project Documentation, Project Closeout) to match the new PM-ERATE ScopeStack blueprint.</div>
+        <div class="gap-worker">vtg-scopestack-doc-sync · vtg-cs-form · ScopeStack eRate Template V3</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">SOV Builder discount tier selector not yet built</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">All 4 Ruckus discount tiers (Bidder VAR RKS-0436, Driver VAR RKS-0437, RSD VAR RKS-0438, E-Rate Takeout IDC017) are now stored per-SKU in vtg-sku-catalog. However, the SOV Builder UI has no bid-level selector to switch between tiers — it currently always uses Bidder as the default. A per-bid program selector needs to be added to the SOV Builder header so reps can flip to Driver/RSD/Takeout pricing for the right deal type.</div>
+        <div class="gap-worker">vtg-sov-builder · SKU_CATALOG KV · discTier field</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Vertiv and TP-Link Omada catalogs pending</div><div class="pri pri-l">Low</div></div>
+        <div class="gap-body">Both are on VTG's approved manufacturer list for this year but price lists have not yet been received. Once available, they merge into vtg-sku-catalog (single push, no Worker changes needed). Vertiv covers UPS/PDU/thermal; TP-Link Omada covers APs and switches for smaller-budget bids.</div>
+        <div class="gap-worker">vtg-sku-catalog KV · vtg-sov-builder /admin/skus</div>
+      </div>
     </div>
   </div>
 
@@ -1318,7 +1333,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div><div class="worker-name">vtg-scopestack-doc-sync</div><div class="worker-url">vtg-scopestack-doc-sync.vectorfi-admin.workers.dev</div></div>
         <span class="badge b-live worker-status">Live — Sep 8 2026</span>
       </div>
-      <div class="worker-desc">Two-endpoint Worker that fully automates ScopeStack SOW delivery into monday.com Bids #3. <strong>Endpoint 1 (POST /):</strong> catches ScopeStack <code>document_status_changed</code> webhook when a SOW finishes generating, downloads the <code>.docx</code>, and routes by template name — "Vector eRate SOW" (ID 7085) uploads to Bids #3 SOW Document column (<code>file_mm6wm4hn</code>); anything else goes to El Nova Leads Customer Summary (<code>file_mkw7hy4z</code>). <strong>Endpoint 2 (POST /generate):</strong> triggered by a "Generate SOW" button click on a Bids #3 item — reads the 470# from the item, finds the matching ScopeStack project, and triggers programmatic SOW generation; the webhook then auto-delivers the doc. 470# extracted from filename or via project API lookup when filename is null.</div>
+      <div class="worker-desc">Two-endpoint Worker that fully automates ScopeStack SOW delivery into monday.com Bids #3. <strong>Endpoint 1 (POST /):</strong> catches ScopeStack <code>document_status_changed</code> webhook when a SOW finishes generating, downloads the <code>.docx</code>, and routes by template name — currently hardcoded to <em>ScopeStack eRate Template V2</em>; needs update to V3 template name once V3 is uploaded to ScopeStack. Uploads to Bids #3 SOW Document column (<code>file_mm6wm4hn</code>); anything else goes to El Nova Leads Customer Summary (<code>file_mkw7hy4z</code>). <strong>Endpoint 2 (POST /generate):</strong> triggered by a "Generate SOW" button click on a Bids #3 item — reads the 470# from the item, finds the matching ScopeStack project, and triggers programmatic SOW generation; the webhook then auto-delivers the doc. 470# extracted from filename or via project API lookup when filename is null. <strong>⚠ Pending:</strong> template routing update to V3; vtg-cs-form needs 6 PM task subitems added (Project Kickoff, Site Access, Install Scheduling, Weekly Status, Documentation, Closeout).</div>
       <div class="worker-meta">
         <div class="worker-meta-row"><strong>Webhook trigger</strong><span>ScopeStack Settings → Webhooks → Document Status Changed</span></div>
         <div class="worker-meta-row"><strong>Button trigger</strong><span>Bids #3 Generate SOW button (button_mm70vvrb) → monday.com automation → POST /generate</span></div>
@@ -2194,7 +2209,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v1.7</div>
+  <div class="cl-version-pill">Current: v1.8</div>
 </div>
 
 <table class="cl-table">
@@ -2207,6 +2222,34 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </tr>
   </thead>
   <tbody>
+
+    <!-- ── Sep 10 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">September 10, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Sep 10</td>
+      <td class="cl-ver">v1.8</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>SKU Catalog architecture revised</strong> — vtg-sku-catalog is now the single master key containing all vendors merged into one JSON array. Worker reads only this key. Separate vendor keys remain in KV as backups but are not read by loadSKUs(). Fixes disappearing-catalog bug where pushes to individual vendor keys weren't appearing in the SOV Builder.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 10</td>
+      <td class="cl-ver">v1.8</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Ruckus catalog rebuilt from full Sep 2026 price list</strong> — 3,631 SKUs (692 wireless, 1,389 switches, 1,415 licensing, 89 transceivers, 46 accessories). All 4 Ruckus discount tiers now stored per SKU: Bidder VAR (RKS-0436), Driver VAR (RKS-0437), RSD VAR (RKS-0438), E-Rate Takeout (IDC017). Bidder VAR is the default; others selectable at bid time. Actual AP hardware units (R370, R670, R750, R770, T350, T670, T750, etc.) now in catalog with correct pricing.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 10</td>
+      <td class="cl-ver">v1.8</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>vtg-sku-catalog total: 5,042 SKUs</strong> — Ruckus 3,631 · VTG Cabling 1,031 · Fortinet 318 · N1C 62. Juniper/Mist excluded (single-customer, not worth catalog maintenance). Vertiv and TP-Link Omada pending price lists.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 10</td>
+      <td class="cl-ver">v1.8</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>ScopeStack eRate SOW Template V3 built</strong> — updated company branding (Vector Powered by VTG), FY2027 labor rates (Cabling $110, L1 $195, L2 $225, L3 $265, L4 Negotiated), five office locations in footer. New "Project Management — E-Rate" service (ID 471786) and blueprint (PM-ERATE, ID 6702) created in ScopeStack under eRate > Professional Services. PM blueprint applies to all installation bids; skip for equipment-only. vtg-scopestack-doc-sync template routing still hardcoded to V2 — needs update when V3 is uploaded.</td>
+    </tr>
 
     <!-- ── Sep 8 2026 ── -->
     <tr class="cl-section-row"><td colspan="4">September 8, 2026</td></tr>
@@ -2277,7 +2320,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <td class="cl-date">Sep 3</td>
       <td class="cl-ver">v1.4</td>
       <td><span class="cl-badge cl-update">Update</span></td>
-      <td class="cl-desc"><strong>vtg-sov-builder enhanced</strong> — live TD Synnex pricing with LIVE badge, category filter bar (All / Switches / Wireless / Transceivers / Cables / Licensing / Accessories / Labor), /admin/skus catalog admin UI, N1C UPS (121 SKUs) and Ruckus catalogs loaded.</td>
+      <td class="cl-desc"><strong>vtg-sov-builder enhanced</strong> — live TD Synnex pricing with LIVE badge, category filter bar (All / Switches / Wireless / Transceivers / Cables / Licensing / Accessories / Labor), /admin/skus catalog admin UI. <strong>Sep 10 2026:</strong> SKU catalog rebuilt — 5,042 SKUs across Ruckus (3,631), VTG Cabling (1,031), Fortinet (318), N1C (62). All 4 Ruckus discount tiers (Bidder/Driver/RSD/Takeout VAR) stored per SKU. Full AP hardware catalog now loaded.</td>
     </tr>
     <tr>
       <td class="cl-date">Sep 3</td>
