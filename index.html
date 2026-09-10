@@ -2405,6 +2405,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </div><!-- /main -->
 
 <script>
+function measureTracks() {
+  document.querySelectorAll('.track-body').forEach(el => {
+    if (!el.classList.contains('collapsed')) {
+      el.style.maxHeight = el.scrollHeight + 'px';
+    }
+  });
+}
+
 function toggleTrack(bodyId, toggleId) {
   const body = document.getElementById(bodyId);
   const toggle = document.getElementById(toggleId);
@@ -2413,17 +2421,20 @@ function toggleTrack(bodyId, toggleId) {
   if (isCollapsed) {
     body.classList.remove('collapsed');
     if (toggle) toggle.classList.remove('collapsed');
+    // Re-measure after layout so scrollHeight is accurate
+    setTimeout(() => { body.style.maxHeight = body.scrollHeight + 'px'; }, 10);
   } else {
-    body.classList.add('collapsed');
-    if (toggle) toggle.classList.add('collapsed');
+    body.style.maxHeight = body.scrollHeight + 'px';
+    setTimeout(() => {
+      body.classList.add('collapsed');
+      if (toggle) toggle.classList.add('collapsed');
+    }, 0);
   }
 }
 
-// Set initial max-height on all track bodies so CSS transition works
+// Measure on DOMContentLoaded with a small delay so layout is ready
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.track-body').forEach(el => {
-    el.style.maxHeight = el.scrollHeight + 'px';
-  });
+  setTimeout(measureTracks, 80);
 });
 
 function toggleTheme() {
@@ -2451,6 +2462,7 @@ function showView(id, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('view-' + id).classList.add('active');
   el.classList.add('active');
+  if (id === 'diagram') { setTimeout(measureTracks, 30); }
 }
 
 const D = {
