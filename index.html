@@ -101,8 +101,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .track-label:hover{background:var(--surface2);}
 .track-toggle{margin-left:auto;font-size:14px;color:var(--text-dim);transition:transform .2s;flex-shrink:0;line-height:1;}
 .track-toggle.collapsed{transform:rotate(-90deg);}
-.track-body{overflow:hidden;transition:max-height .3s ease;}
-.track-body.collapsed{max-height:0 !important;}
+.track-body{display:grid;grid-template-rows:1fr;transition:grid-template-rows .3s ease;}
+.track-body>*{overflow:hidden;min-height:0;}
+.track-body.collapsed{grid-template-rows:0fr;}
 .track-pip{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 
 /* Swim row */
@@ -2405,37 +2406,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </div><!-- /main -->
 
 <script>
-function measureTracks() {
-  document.querySelectorAll('.track-body').forEach(el => {
-    if (!el.classList.contains('collapsed')) {
-      el.style.maxHeight = el.scrollHeight + 'px';
-    }
-  });
-}
-
 function toggleTrack(bodyId, toggleId) {
   const body = document.getElementById(bodyId);
   const toggle = document.getElementById(toggleId);
   if (!body) return;
-  const isCollapsed = body.classList.contains('collapsed');
-  if (isCollapsed) {
-    body.classList.remove('collapsed');
-    if (toggle) toggle.classList.remove('collapsed');
-    // Re-measure after layout so scrollHeight is accurate
-    setTimeout(() => { body.style.maxHeight = body.scrollHeight + 'px'; }, 10);
-  } else {
-    body.style.maxHeight = body.scrollHeight + 'px';
-    setTimeout(() => {
-      body.classList.add('collapsed');
-      if (toggle) toggle.classList.add('collapsed');
-    }, 0);
-  }
+  body.classList.toggle('collapsed');
+  if (toggle) toggle.classList.toggle('collapsed');
 }
-
-// Measure on DOMContentLoaded with a small delay so layout is ready
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(measureTracks, 80);
-});
 
 function toggleTheme() {
   const html = document.documentElement;
@@ -2462,7 +2439,6 @@ function showView(id, el) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.getElementById('view-' + id).classList.add('active');
   el.classList.add('active');
-  if (id === 'diagram') { setTimeout(measureTracks, 30); }
 }
 
 const D = {
