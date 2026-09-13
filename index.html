@@ -2260,6 +2260,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <td class="cl-desc"><strong>vtg-materials-log copper SKU catalog complete &amp; in use</strong> — 951 copper SKUs (C- prefix) loaded from Mark's inventory list; catalog now 1,031 total (+ 80 fiber F- prefix); all SKUs merged into <code>vtg-sku-catalog</code> KV key. Gap closed.</td>
     </tr>
 
+    <tr>
+      <td class="cl-date">Sep 13</td>
+      <td class="cl-ver">v1.9</td>
+      <td><span class="cl-badge cl-fix">Fix</span></td>
+      <td class="cl-desc"><strong>vtg-monday-sf-sync patched</strong> — <code>RecordTypeId</code> hardcoded to Erate record type (<code>012aZ00000BHkT7QAL</code>); <code>Cross_Sell_Opp__c</code> set to <code>"NO"</code> on all records; stage logic finalized: SKIP stages (no SF upsert, fields-only update if record exists) = New Bid Folder Creation, Folder Creation, Deal Reg, Email, Bid Compilation, Bid Submittal, Bidding, Wins Archive; ACTIVE stages (full upsert incl. StageName) = Bid Building, Awaiting Results, Post-Sale, Post-Monday, Lost. Worker.js moved to VTG Flows\vtg-monday-sf-sync\.</td>
+    </tr>
+
+    <tr>
+      <td class="cl-date">Sep 13</td>
+      <td class="cl-ver">v1.9</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Salesforce Opportunity record types confirmed</strong> — Erate: <code>012aZ00000BHkT7QAL</code>, Commercial: <code>012fo000000XSojAAG</code>, RFP: <code>012fo000000XSqLAAW</code>, VTG RFP: <code>012fo000000XSrxAAG</code>. <code>Cross_Sell_Opp__c</code> picklist confirmed: --None--, NO, YES.</td>
+    </tr>
+
     <!-- ── Sep 10 2026 ── -->
     <tr class="cl-section-row"><td colspan="4">September 10, 2026</td></tr>
 
