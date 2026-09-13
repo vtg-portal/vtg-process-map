@@ -861,7 +861,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">4.2 · Field Installation</span><span class="sop-owner">Field Crew / Jon</span><span class="badge b-man">Manual</span></div>
           <div class="sop-body">Field crew installs. When stage → Installing, automation (ID 7922447604) auto-populates the Materials Log link column (link_mm6mhdcx). Jon or PM opens vtg-materials-log, selects fiber/copper parts from SKU_CATALOG, and submits.</div>
-          <div class="auto-row">⚡ vtg-materials-log · 81 fiber SKUs loaded · copper SKUs pending from Mark</div>
+          <div class="auto-row">⚡ vtg-materials-log · 1,031 SKUs loaded (951 copper C- prefix + 80 fiber F- prefix) · catalog: vtg-sku-catalog KV</div>
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">4.3 · Stage → Ready for Invoicing</span><span class="sop-owner">Automation</span><span class="badge b-live">Live</span></div>
@@ -1042,8 +1042,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-body">Automation 482374746 creates a "Create Contract in ConnectWise Sell for order processing" subitem on every Post-Sale bid. It's unassigned, marked N/A, and has no owner — a dead task while CPQ direction is unresolved. Should be either removed, reassigned to NS, or left as a reminder pending the CPQ/NS decision.</div>
         <div class="gap-worker">automation 482374746 · Bids #3 subitem board 18176633598</div>
       </div>
-      <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">vtg-materials-log copper SKUs not loaded</div><div class="pri pri-m">Medium</div></div>
+      
         <div class="gap-body">81 fiber SKUs (F- prefix) loaded. Copper SKUs (C- prefix) pending from Mark. No Worker changes needed — provide the CSV to import-catalog.mjs and push to SKU_CATALOG KV.</div>
         <div class="gap-worker">vtg-materials-log · import-catalog.mjs · SKU_CATALOG KV</div>
       </div>
@@ -1215,7 +1214,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Trigger</strong><span>Manual — PM opens from Projects #4 link column (link_mm6mhdcx)</span></div>
         <div class="worker-meta-row"><strong>KV</strong><span class="worker-kv">MATERIALS_LOG (7694ae82ef4540799e64aa3ade3ad10e) · SKU_CATALOG (17083b01a7524801a236dd4a71f50164, key: catalog:cabling)</span></div>
         <div class="worker-meta-row"><strong>Email</strong><span>eratebilling@vtgus.com via SMTP2GO</span></div>
-        <div class="worker-meta-row"><strong>Gap</strong><span>Copper SKUs (C- prefix) not yet loaded — pending from Mark</span></div>
+        <div class="worker-meta-row"><strong>Catalog</strong><span>1,031 SKUs live — 951 copper (C- prefix) + 80 fiber (F- prefix) · key: vtg-sku-catalog in SKU_CATALOG KV</span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flowstg-materials-log\ · worker.js + import-catalog.mjs + backfill-links.mjs</span></div>
       </div>
     </div>
@@ -2251,6 +2250,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   </thead>
   <tbody>
 
+    <!-- ── Sep 13 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">September 13, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Sep 13</td>
+      <td class="cl-ver">v1.9</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>vtg-materials-log copper SKU catalog complete &amp; in use</strong> — 951 copper SKUs (C- prefix) loaded from Mark's inventory list; catalog now 1,031 total (+ 80 fiber F- prefix); all SKUs merged into <code>vtg-sku-catalog</code> KV key. Gap closed.</td>
+    </tr>
+
     <!-- ── Sep 10 2026 ── -->
     <tr class="cl-section-row"><td colspan="4">September 10, 2026</td></tr>
 
@@ -2644,7 +2653,7 @@ const D = {
     inputs:['Fiber + copper SKUs + quantities (SKU_CATALOG KV)'],
     outputs:['MATERIALS_LOG KV entry (idempotent lock per item)','stage → Ready for Invoicing','date_mm54qwps stamped','Thread update','Billing email → eratebilling@vtgus.com'],
     workers:['vtg-materials-log','vtg-billing-ready'],
-    notes:['KV: MATERIALS_LOG (7694ae82…) · SKU_CATALOG (17083b01…)','⚠ Copper SKUs (C- prefix) not yet loaded — pending Mark']},
+    notes:['KV: MATERIALS_LOG (7694ae82…) · SKU_CATALOG (17083b01…)','1,031 SKUs live — 951 copper (C-) + 80 fiber (F-) · vtg-sku-catalog KV']},
   billingnotif:{title:'Billing Notification Email',phase:'Phase 4 → 5 · Delivery to Invoice',status:'live',
     triggers:['Projects #4 stage → Ready for Invoicing','Automations: 7920569056, 7920172789, 7917999463, 7920230690'],
     inputs:['Project item data','Ready for Invoicing Date'],
