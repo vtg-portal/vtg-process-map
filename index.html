@@ -1313,7 +1313,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="worker-card">
       <div class="worker-card-hdr">
         <div><div class="worker-name">vtg-sf-account-sync</div><div class="worker-url">vtg-sf-account-sync.vectorfi-admin.workers.dev</div></div>
-        <span class="badge b-live worker-status">Live — Sep 8 2026</span>
+        <span class="badge b-live worker-status">Live — Sep 14 2026</span>
       </div>
       <div class="worker-desc">Syncs monday.com Accounts (#1) and Contacts (#2) to Salesforce as Account and Contact objects. Uses <strong>Monday_Item_ID__c</strong> as the external ID for idempotent upserts on both objects. After upserting, writes the Salesforce Account ID back to the <strong>UID column</strong> (<code>text_mm6s8adk</code>) on the Accounts board. A backfill script (<code>backfill.mjs</code>) ran against all 791 existing accounts to populate Salesforce and stamp the UID column. Complements <code>vtg-monday-sf-sync</code> which syncs Bids — this Worker handles the CRM Account/Contact layer.</div>
       <div class="worker-meta">
@@ -1396,14 +1396,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="worker-card">
       <div class="worker-card-hdr">
         <div><div class="worker-name">vtg-proposal-builder</div><div class="worker-url">vtg-proposal-builder.vectorfi-admin.workers.dev</div></div>
-        <span class="badge b-live worker-status">Live — Sep 12 2026</span>
+        <span class="badge b-live worker-status">Live — Sep 14 2026</span>
       </div>
-      <div class="worker-desc">Triggered by "Generate Proposal" button on Bids #3. Fetches the ScopeStack SOW PDF from monday.com via assets API, fetches the client logo from Accounts #1, and injects the logo + bid due date directly onto page 1 of the SOW PDF using pdf-lib. Uploads the finished PDF to the Proposal PDF column (<code>file_mm739vxe</code>). Updates a Proposal Status column (orange → green/red) so reps can see progress without re-clicking.<br><br>
+      <div class="worker-desc">Triggered by "Generate Proposal" button on Bids #3. Fetches the ScopeStack SOW PDF via assets API, fetches the client logo from Accounts #1, and injects the logo + bid due date onto the SOW cover page using pdf-lib. If a SOV PDF exists in column file_mm749nna, fetches it and merges SOW+SOV via iLoveAPI. Uploads final PDF to Proposal PDF column (<code>file_mm739vxe</code>). Updates a Proposal Status column (orange → green/red) so reps can see progress without re-clicking.<br><br>
       <strong>Trigger:</strong> button_mm732fyx → automation 636065801 → POST /generate<br>
       <strong>Logo box:</strong> 192×144pt, centered between district name and "Statement of Work" on cover<br>
       <strong>Status column:</strong> color_mm74qsfe ("Working on it" / "Done" / "Stuck")<br>
       <strong>Vector logo:</strong> hardcoded base64 JPEG in Worker — no network dependency<br>
-      <strong>Phase 2:</strong> SOV pricing injection &nbsp;|&nbsp; <strong>Phase 3:</strong> SharePoint standard docs + data sheets</div>
+      <strong>SOV PDF:</strong> uploads to file_mm749nna via SOV Builder submit &nbsp;|&nbsp; <strong>Phase 3:</strong> SharePoint standard docs + data sheets</div>
       <div class="worker-meta">
         <div class="meta-row"><span class="meta-k">Secrets</span><span class="meta-v">MONDAY_TOKEN, ILOVEAPI_SECRET_KEY, SHAREPOINT_CLIENT_ID/TENANT_ID/SECRET</span></div>
         <div class="meta-row"><span class="meta-k">KV</span><span class="meta-v">SOV_FORMS (7a5b99d8bc134fd6959cc481752ede56)</span></div>
