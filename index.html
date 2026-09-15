@@ -860,8 +860,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">4.2 · Field Installation</span><span class="sop-owner">Field Crew / Jon</span><span class="badge b-man">Manual</span></div>
-          <div class="sop-body">Field crew installs. When stage → Installing, automation (ID 7922447604) auto-populates the Materials Log link column (link_mm6mhdcx). Jon or PM opens vtg-materials-log, selects fiber/copper parts from SKU_CATALOG, and submits.</div>
-          <div class="auto-row">⚡ vtg-materials-log · 1,031 SKUs loaded (951 copper C- prefix + 80 fiber F- prefix) · catalog: vtg-sku-catalog KV</div>
+          <div class="sop-body">Field crew installs. When stage → Installing, automation (ID 7922447604) auto-populates the Materials Log link column (link_mm6mhdcx). Jon or PM opens vtg-materials-log, selects fiber/copper parts from SKU_CATALOG, and submits. The project card shows Client, Stage, UID, NS Sales Order #, and Monday Item ID pulled live from Projects #4.</div>
+          <div class="auto-row">⚡ vtg-materials-log · 1,031 SKUs loaded (951 copper C- prefix + 80 fiber F- prefix) · catalog: vtg-sku-catalog KV · On Hand from NS (location 41) via INVENTORY_CACHE KV</div>
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">4.3 · Stage → Ready for Invoicing</span><span class="sop-owner">Automation</span><span class="badge b-live">Live</span></div>
@@ -2393,7 +2393,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <td class="cl-date">Aug 27</td>
       <td class="cl-ver">v1.2</td>
       <td><span class="cl-badge cl-update">Update</span></td>
-      <td class="cl-desc"><strong>vtg-materials-log v2</strong> — Save Draft system with daily accumulation, timestamped log view, running totals, confirmation modal before final submission, 3-second countdown auto-close after successful submit.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 15 2026</td>
+      <td class="cl-desc"><strong>vtg-ns-mcp-sync — inventory cache endpoints live</strong> — /api/inventory (location 41, feeds vtg-materials-log On Hand column) and /api/inventory/all (all locations, feeds vtg-inventory dashboard) added. INVENTORY_CACHE KV (ID: 0233a14225194cbd81a49601f448963b) shared between both consumers. Cron refreshes both keys every 15 min. NS VTG API Sync role permissions added: Lists → Items (Full), Lists → Locations (View), Reports → Inventory (View).</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 15 2026</td>
+      <td class="cl-desc"><strong>vtg-inventory dashboard live</strong> — Company-wide NS inventory dashboard at vtg-inventory.pages.dev (Cloudflare Pages, GitHub repo vtg-portal/vtg-inventory). Password protected (VTG2026, Azure AD SSO planned). All NS locations: 41 Cabling Warehouse, 42 Secondary Warehouse, 4 Grand Rapids Office. Features: search, location filter pills, sortable columns, light/dark mode toggle, CSV export. Fetches live from vtg-ns-mcp-sync /api/inventory/all.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 15 2026</td>
+      <td class="cl-desc"><strong>vtg-materials-log v3</strong> — NS Inventory On Hand column added to parts table; color-coded badges (green/yellow/red) from NS location 41 (Cabling Warehouse) via shared INVENTORY_CACHE KV; UID (text_mm76zvbz) and NS Sales Order # (text_mm6hv20b) added to project card; On Hand loading from KV — no direct NS API call on page load.</td>
     </tr>
     <tr>
       <td class="cl-date">Aug 27</td>
