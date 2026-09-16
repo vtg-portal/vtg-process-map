@@ -242,7 +242,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="hdr">
   <div>
     <div class="hdr-title">VTG · Lead → Invoice Process Map</div>
-    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Sep 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
+    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Sep 16 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
   </div>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
     <div class="legend">
@@ -826,7 +826,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div class="sop-steps">
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">3.1 · CS Order Form Generated</span><span class="sop-owner">Automation</span><span class="badge b-live">Live</span></div>
-          <div class="sop-body">When Bids #3 → Post-Sale (webhooks 562741747 + 483153616), vtg-cs-form generates a CSOP PDF, emails to erateops@vtgus.com (CC: sales@vtgus.com) with KV deduplication, and auto-creates a monday subitem checklist. On form submit, vtg-cs-form also creates a Projects #4 item and appends <strong>6 PM subitems</strong> (Project Kickoff Meeting, Site Access Coordination, Installation Scheduling, Weekly Status Updates, Project Documentation, Project Closeout) tagged 'Project Management — E-Rate' — skipped only for Equipment Only bids or when Network Infrastructure Deployment – PM is already selected. <em>Updated Sep 10 2026.</em> Simultaneously, automation 482374746 creates <strong>6 Post-Sale subitems</strong> on the bid item: (1) Letter of Intent signed + uploaded to SharePoint (Jon), (2) Create Contract in ConnectWise Sell — <em>gap: dead task, CPQ direction uncertain</em>, (3) If SPI: FCDL uploaded to SharePoint or N/A if BEAR (Alan+Jake), (4) If SPI: FCDL templated email sent or N/A if BEAR (Alan+Jake), (5) Purchase Order issued by customer + uploaded to SharePoint (Alan+Jake), (6) Update SOV, get Disty quote to match, upload to SharePoint (Alan+Jake).</div>
+          <div class="sop-body">When Bids #3 → Post-Sale (webhooks 562741747 + 483153616), vtg-cs-form generates a CSOP PDF, emails to erateops@vtgus.com (CC: sales@vtgus.com) with KV deduplication, and auto-creates a monday subitem checklist. On form submit, vtg-cs-form creates a Projects #4 item, appends <strong>6 PM subitems</strong> (Project Kickoff Meeting, Site Access Coordination, Installation Scheduling, Weekly Status Updates, Project Documentation, Project Closeout) tagged 'Project Management — E-Rate' — skipped only for Equipment Only bids or when Network Infrastructure Deployment – PM is already selected — and <strong>stamps the UID</strong> on the new Projects #4 item by reading the Account's UID (text_mm6s8adk) and writing it to text_mm76zvbz. <em>Updated Sep 10 2026; UID stamp added Sep 14 2026.</em> Simultaneously, automation 482374746 creates <strong>6 Post-Sale subitems</strong> on the bid item: (1) Letter of Intent signed + uploaded to SharePoint (Jon), (2) Create Contract in ConnectWise Sell — <em>gap: dead task, CPQ direction uncertain</em>, (3) If SPI: FCDL uploaded to SharePoint or N/A if BEAR (Alan+Jake), (4) If SPI: FCDL templated email sent or N/A if BEAR (Alan+Jake), (5) Purchase Order issued by customer + uploaded to SharePoint (Alan+Jake), (6) Update SOV, get Disty quote to match, upload to SharePoint (Alan+Jake).</div>
           <div class="auto-row">⚡ vtg-cs-form · SMTP2GO via noreply@vtgus.com · automation 482374746 (6 Post-Sale subitems)</div>
           <div class="auto-row gap">⚠ Gap: "Create Contract in ConnectWise Sell" subitem is unassigned and N/A — dead task while CPQ direction is unresolved</div>
         </div>
@@ -860,8 +860,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">4.2 · Field Installation</span><span class="sop-owner">Field Crew / Jon</span><span class="badge b-man">Manual</span></div>
-          <div class="sop-body">Field crew installs. When stage → Installing, automation (ID 7922447604) auto-populates the Materials Log link column (link_mm6mhdcx). Jon or PM opens vtg-materials-log, selects fiber/copper parts from SKU_CATALOG, and submits. The project card shows Client, Stage, UID, NS Sales Order #, and Monday Item ID pulled live from Projects #4.</div>
-          <div class="auto-row">⚡ vtg-materials-log · 1,031 SKUs loaded (951 copper C- prefix + 80 fiber F- prefix) · catalog: vtg-sku-catalog KV · On Hand from NS (location 41) via INVENTORY_CACHE KV</div>
+          <div class="sop-body">Field crew installs. When stage → Installing, automation (ID 7922447604) auto-populates the Materials Log link column (link_mm6mhdcx). Jon or PM opens vtg-materials-log, selects fiber/copper parts from SKU_CATALOG, and submits. The project card shows Client, Stage, UID, NS Sales Order #, and Monday Item ID pulled live from Projects #4. <strong>v4 (Sep 16 2026):</strong> On submit, cabling lines are PATCHed directly onto the NS Sales Order and an Item Fulfillment is created — drop-ship SOs get a warehouse note instead. NS result (IF# or confirmation) is posted to the monday thread and stored in KV. Re-push to NS button available on the locked page for retries.</div>
+          <div class="auto-row">⚡ vtg-materials-log v4 · 1,031 SKUs (951 copper C- + 80 fiber F-) · vtg-sku-catalog KV · On Hand badges from INVENTORY_CACHE KV (NS location 41) · NS SO writeback via OAuth M2M (same cert as vtg-ns-mcp-sync)</div>
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">4.3 · Stage → Ready for Invoicing</span><span class="sop-owner">Automation</span><span class="badge b-live">Live</span></div>
@@ -1042,9 +1042,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-body">Automation 482374746 creates a "Create Contract in ConnectWise Sell for order processing" subitem on every Post-Sale bid. It's unassigned, marked N/A, and has no owner — a dead task while CPQ direction is unresolved. Should be either removed, reassigned to NS, or left as a reminder pending the CPQ/NS decision.</div>
         <div class="gap-worker">automation 482374746 · Bids #3 subitem board 18176633598</div>
       </div>
-      
-        <div class="gap-body">81 fiber SKUs (F- prefix) loaded. Copper SKUs (C- prefix) pending from Mark. No Worker changes needed — provide the CSV to import-catalog.mjs and push to SKU_CATALOG KV.</div>
-        <div class="gap-worker">vtg-materials-log · import-catalog.mjs · SKU_CATALOG KV</div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">vtg-materials-log: copper SKU catalog + NS item sync — resolved</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
+        <div class="gap-body">✅ Resolved Sep 13–16 2026. 951 copper SKUs (C- prefix) loaded from Mark's inventory list — catalog now 1,031 total (+ 80 fiber F- prefix). All merged into vtg-sku-catalog KV key. 621 missing NS inventory items bulk-written via vtg-ns-sku-writer.mjs (template item C-101017BK) on Sep 16 2026 — 96% SKU match rate achieved. 40 partial matches remain for review.</div>
+        <div class="gap-worker">vtg-materials-log · vtg-ns-sku-writer.mjs · vtg-sku-catalog KV</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">customworkflow42 not in NS production</div><div class="pri pri-m">Medium</div></div>
@@ -1067,7 +1068,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">SMTP2GO · vtgus.com DNS</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">vtg-scopestack-doc-sync: template routing hardcoded to V2</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-card-hdr"><div class="gap-title">vtg-scopestack-doc-sync: template routing updated to V3 — resolved</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
         <div class="gap-body">vtg-scopestack-doc-sync currently routes by template name "ScopeStack eRate Template V2". When V3 is uploaded to ScopeStack, the Worker code must be updated to route by the new V3 template name. Until then, generated SOWs will not auto-deliver to Bids #3. Also: vtg-cs-form subitem creation needs 6 PM task subitems added (Project Kickoff Meeting, Site Access Coordination, Installation Scheduling, Weekly Status Updates, Project Documentation, Project Closeout) to match the new PM-ERATE ScopeStack blueprint.</div>
         <div class="gap-worker">vtg-scopestack-doc-sync · vtg-cs-form · ScopeStack eRate Template V3</div>
       </div>
@@ -1207,14 +1208,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="worker-card">
       <div class="worker-card-hdr">
         <div><div class="worker-name">vtg-materials-log</div><div class="worker-url">vtg-materials-log.vectorfi-admin.workers.dev</div></div>
-        <span class="badge b-live worker-status">Live — Aug 27 2026</span>
+        <span class="badge b-live worker-status">Live — v4 Sep 16 2026</span>
       </div>
-      <div class="worker-desc">Cabling materials accounting tool for Projects #4. PM opens via a link column on a Projects #4 item (auto-populated when stage → Installing by automation 7922447604). PM selects fiber/copper parts and quantities from the SKU catalog and submits once — locked after. On submit: saves log to KV, advances stage to Ready for Invoicing, writes link back, posts thread update, and sends billing notification email.</div>
+      <div class="worker-desc">Cabling materials accounting tool for Projects #4. PM opens via a link column on a Projects #4 item (auto-populated when stage → Installing by automation 7922447604). <strong>v4 (Sep 16 2026):</strong> NS SO writeback live — cabling lines are PATCHed onto the NetSuite Sales Order and an Item Fulfillment is created on submit. Drop-ship SOs skip fulfillment and leave a warehouse note. Re-push to NS button on locked page for retries. NS result (IF# or lines-added confirmation) posted to monday thread. <strong>v3 (Sep 15):</strong> NS Inventory On Hand badges (green/yellow/red) from NS location 41 via INVENTORY_CACHE KV; UID + NS SO# on project card. <strong>v2:</strong> Save Draft system with daily accumulation, running totals, confirmation modal.</div>
       <div class="worker-meta">
         <div class="worker-meta-row"><strong>Trigger</strong><span>Manual — PM opens from Projects #4 link column (link_mm6mhdcx)</span></div>
-        <div class="worker-meta-row"><strong>KV</strong><span class="worker-kv">MATERIALS_LOG (7694ae82ef4540799e64aa3ade3ad10e) · SKU_CATALOG (17083b01a7524801a236dd4a71f50164, key: catalog:cabling)</span></div>
+        <div class="worker-meta-row"><strong>KV</strong><span class="worker-kv">MATERIALS_LOG (7694ae82ef4540799e64aa3ade3ad10e) · SKU_CATALOG (17083b01a7524801a236dd4a71f50164) · INVENTORY_CACHE (0233a14225194cbd81a49601f448963b, shared with vtg-ns-mcp-sync)</span></div>
+        <div class="worker-meta-row"><strong>NS Auth</strong><span>OAuth 2.0 M2M — same cert as vtg-ns-mcp-sync · Secrets: NS_CLIENT_ID, NS_CERTIFICATE_ID, NS_PRIVATE_KEY_PEM · Role perms: Transactions → Sales Order / Fulfill Orders / Item Fulfillment (Full)</span></div>
         <div class="worker-meta-row"><strong>Email</strong><span>eratebilling@vtgus.com via SMTP2GO</span></div>
-        <div class="worker-meta-row"><strong>Catalog</strong><span>1,031 SKUs live — 951 copper (C- prefix) + 80 fiber (F- prefix) · key: vtg-sku-catalog in SKU_CATALOG KV</span></div>
+        <div class="worker-meta-row"><strong>Catalog</strong><span>1,031 SKUs live — 951 copper (C- prefix) + 80 fiber (F- prefix) · key: vtg-sku-catalog in SKU_CATALOG KV · 96% NS item match rate after Sep 16 bulk write of 621 missing SKUs via vtg-ns-sku-writer.mjs</span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flowstg-materials-log\ · worker.js + import-catalog.mjs + backfill-links.mjs</span></div>
       </div>
     </div>
@@ -1274,10 +1276,26 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div><div class="worker-name">vtg-ns-so-backfill</div><div class="worker-url">vectorfi-admin.workers.dev</div></div>
         <span class="badge b-live worker-status">Live</span>
       </div>
-      <div class="worker-desc">Backfills NetSuite Sales Order numbers into the NS SO# column (text_mm6hv20b) on existing Projects #4 items. One-time utility Worker used to populate historical records.</div>
+      <div class="worker-desc">Syncs NetSuite Sales Order numbers into the NS SO# column (text_mm6hv20b) on Projects #4 items. <strong>v2 (Sep 14 2026):</strong> Rewritten with UID-exact matching as the primary strategy — reads Projects #4 UID (text_mm76zvbz) → matches NS customer.custentity_acs_unique_entity_identifier → joins salesOrder.entity → writes tranId to NS SO# column. Fuzzy name match as fallback. First sync wrote 43 SO numbers. Cron every 4h. HTML tool includes Run Auto-Sync Now button, filter pills, and score badges.</div>
       <div class="worker-meta">
-        <div class="worker-meta-row"><strong>Target board</strong><span>Projects #4 (18176626554) · column: text_mm6hv20b</span></div>
+        <div class="worker-meta-row"><strong>Target board</strong><span>Projects #4 (18176626554) · NS SO# column: text_mm6hv20b · UID column: text_mm76zvbz</span></div>
+        <div class="worker-meta-row"><strong>NS query</strong><span>salesOrder WHERE custbody_acs_vector_erate='T' AND tranDate >= 2023-01-01 · eRate only</span></div>
+        <div class="worker-meta-row"><strong>Cron</strong><span>Every 4h</span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flowstg-ns-so-backfill\</span></div>
+      </div>
+    </div>
+
+    <div class="worker-card">
+      <div class="worker-card-hdr">
+        <div><div class="worker-name">vtg-inventory</div><div class="worker-url">vtg-inventory.pages.dev</div></div>
+        <span class="badge b-live worker-status">Live — Sep 15 2026</span>
+      </div>
+      <div class="worker-desc">Company-wide NetSuite inventory dashboard hosted on Cloudflare Pages (GitHub repo vtg-portal/vtg-inventory). Fetches live from vtg-ns-mcp-sync <code>/api/inventory/all</code> and displays all NS locations: 41 Cabling Warehouse (blue), 42 Secondary Warehouse (green), 4 Grand Rapids Office (yellow). Password protected (VTG2026 — Azure AD SSO planned). Features: search, location filter pills, sortable columns, light/dark mode toggle, CSV export.</div>
+      <div class="worker-meta">
+        <div class="worker-meta-row"><strong>Data source</strong><span>vtg-ns-mcp-sync /api/inventory/all · INVENTORY_CACHE KV (0233a14225194cbd81a49601f448963b) refreshed every 15 min</span></div>
+        <div class="worker-meta-row"><strong>Auth</strong><span>Password: VTG2026 (placeholder) · Azure AD SSO planned</span></div>
+        <div class="worker-meta-row"><strong>Files</strong><span>GitHub: vtg-portal/vtg-inventory · single index.html, auto-deploys on push to main</span></div>
+        <div class="worker-meta-row"><strong>Note</strong><span>After any vtg-ns-mcp-sync redeployment, seed INVENTORY_CACHE with: curl /api/inventory/all</span></div>
       </div>
     </div>
 
@@ -1358,7 +1376,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div><div class="worker-name">vtg-ns-mcp-sync</div><div class="worker-url">vtg-ns-mcp-sync.vectorfi-admin.workers.dev</div></div>
         <span class="badge b-prog worker-status">In Progress</span>
       </div>
-      <div class="worker-desc">Bidirectional monday.com ↔ NetSuite sync. Auth is live in production as of Aug 13 2026. Six flows coded: (1) Bid Win → NS Sales Order, (2) Ready to Invoice → NS Invoice, (3) NS Invoice Paid → monday Closed, (4) NS SO Created → monday SO#, (5) NS PO → monday PO#, (6) NS Customer → monday Account. Cron every 15 min + webhook triggers. Blocked on customer ID mapping (vtg-ns-compare paused) and NS service item internal ID.</div>
+      <div class="worker-desc">Bidirectional monday.com ↔ NetSuite sync. Auth is live in production as of Aug 13 2026. Six flows coded: (1) Bid Win → NS Sales Order, (2) Ready to Invoice → NS Invoice, (3) NS Invoice Paid → monday Closed, (4) NS SO Created → monday SO#, (5) NS PO → monday PO#, (6) NS Customer → monday Account. Cron every 15 min + webhook triggers. Blocked on customer ID mapping (vtg-ns-compare paused) and NS service item internal ID. <strong>Sep 15 2026:</strong> Inventory cache endpoints added — /api/inventory (location 41, feeds vtg-materials-log On Hand) and /api/inventory/all (all locations, feeds vtg-inventory dashboard). INVENTORY_CACHE KV shared with vtg-materials-log. Cron refreshes both every 15 min.</div>
       <div class="worker-meta">
         <div class="worker-meta-row"><strong>Auth</strong><span>OAuth 2.0 M2M · CLIENT_ID: d7bb3d03… · Cert ID: _Xm9jPsUb1H7DX…</span></div>
         <div class="worker-meta-row"><strong>Cron</strong><span>Every 15 min + webhook on stage changes</span></div>
@@ -2163,6 +2181,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 </div>
 
 <div class="sec-block">
+  <div class="sec-title">📊 Standalone Dashboards &amp; Tools (Cloudflare Pages)</div>
+  <div class="dash-grid">
+
+    <div class="dash-card">
+      <div class="dash-card-hdr">
+        <div>
+          <div class="dash-name">VTG Inventory Dashboard</div>
+          <div class="dash-workspace">vtg-inventory.pages.dev</div>
+        </div>
+        <span class="dash-audience aud-ops">Ops / Warehouse</span>
+      </div>
+      <div class="dash-desc">Company-wide NetSuite inventory dashboard. Fetches live from vtg-ns-mcp-sync /api/inventory/all and displays all NS locations: <strong>41 Cabling Warehouse</strong>, <strong>42 Secondary Warehouse</strong>, <strong>4 Grand Rapids Office</strong>. Color-coded by location. Password protected (VTG2026 — Azure AD SSO planned). Features: search, location filter pills, sortable columns, light/dark mode, CSV export. Data refreshes every 15 min via vtg-ns-mcp-sync cron.</div>
+      <div class="dash-feeds">
+        <div class="dash-feed">vtg-ns-mcp-sync /api/inventory/all · INVENTORY_CACHE KV (0233a14225194cbd81a49601f448963b)</div>
+        <div class="dash-feed">GitHub: vtg-portal/vtg-inventory · Cloudflare Pages auto-deploy on push</div>
+      </div>
+      <div class="dash-note">⚠ After vtg-ns-mcp-sync redeploy: seed cache with curl .../api/inventory/all before dashboard will load</div>
+    </div>
+
+  </div>
+
   <div class="sec-title">📊 VTG Portal — Tool &amp; Doc Hub</div>
   <div class="dash-grid">
 
@@ -2236,7 +2275,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v1.9</div>
+  <div class="cl-version-pill">Current: v2.1</div>
 </div>
 
 <table class="cl-table">
@@ -2249,6 +2288,64 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </tr>
   </thead>
   <tbody>
+
+    <!-- ── Sep 14–16 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">September 14–16, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Sep 16</td>
+      <td class="cl-ver">v2.1</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>vtg-materials-log v4 — NS SO writeback live</strong> — On submit, cabling lines PATCHed onto the NS Sales Order and an Item Fulfillment created. Drop-ship SOs skip fulfillment and leave a warehouse note. Re-push to NS button on locked page for retries. NS result (IF# or lines-added confirmation) stored in KV as materials_ns_result:{item_id} and posted to monday thread. NS role perms added: Transactions → Sales Order / Fulfill Orders / Item Fulfillment (Full).</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 16</td>
+      <td class="cl-ver">v2.1</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>621 missing NS inventory items bulk-written</strong> — vtg-ns-sku-writer.mjs wrote 621 items to NetSuite as InvtPart using template item C-101017BK (ID 23323). 96% SKU match rate achieved between vtg-sku-catalog and NS. 40 partial matches remain for review (10 need catalog SKU updates, 25 false matches correctly created, 5 need Mark's review). vtg-sku-compare.mjs and vtg-sku-partial-review.mjs used for analysis.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 14</td>
+      <td class="cl-ver">v2.0</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Cloudflare Workers plan upgraded to Workers Paid</strong> — $5/month. Cron limit raised from 5 (free) to 1,000 workers. All existing cron jobs now within limits.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 14</td>
+      <td class="cl-ver">v2.0</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>vtg-ns-so-backfill v2 live</strong> — Rewritten with UID-exact matching as primary strategy: Projects #4 UID (text_mm76zvbz) → NS customer.custentity_acs_unique_entity_identifier → salesOrder.entity → tranId written to text_mm6hv20b. Fuzzy name as fallback. First sync wrote 43 SO numbers. Cron every 4h. HTML tool has Run Auto-Sync Now button, filter pills, score badges.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 14</td>
+      <td class="cl-ver">v2.0</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Projects #4 UID column added</strong> — text_mm76zvbz created on Projects #4 board (18176626554). backfill-project-uid.mjs ran Sep 14 2026 — name-matched to Accounts board UID (text_mm6s8adk). 6 active E-Rate projects stamped manually. Remaining blanks: commercial/non-eRate (no Account in system) and closed projects.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 14</td>
+      <td class="cl-ver">v2.0</td>
+      <td><span class="cl-badge cl-fix">Fix</span></td>
+      <td class="cl-desc"><strong>vtg-cs-form: UID stamp on Projects #4 creation</strong> — /api/submit-pdf handler now reads Account UID (text_mm6s8adk from board_relation3 on Bid item) and writes to text_mm76zvbz on the new Projects #4 item at creation time. Going-forward fix — all new projects get UID stamped automatically. Deployed Sep 14 2026.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 14</td>
+      <td class="cl-ver">v2.0</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>vtg-proposal-builder v4.1 live</strong> — Bid due date y-position fixed (y=540, below district/470# line). SOV PDF column: file_mm749nna. Status column: color_mm74qsfe. Deployed at vtg-proposal-builder.vectorfi-admin.workers.dev.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 14</td>
+      <td class="cl-ver">v2.0</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>ScopeStack Template V5 fixes</strong> — Rate Adjustments section font corrected from Times New Roman to Calibri (36 occurrences). current_version.name merge field removed (was crashing generator). Blank page after Scope of Work is a ScopeStack limitation — not fixable.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 14</td>
+      <td class="cl-ver">v2.0</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>vtg-sov-builder PDF updates</strong> — Meta bar removed from PDF pages. Summary tab header "Location" → "Bid Item". Section headers full-width. Type column: IC for most sections, BMIC for BMIC section. SOV PDF uploads to file_mm749nna on Bids #3 (was wrong column).</td>
+    </tr>
 
     <!-- ── Sep 13 2026 ── -->
     <tr class="cl-section-row"><td colspan="4">September 13, 2026</td></tr>
@@ -2434,7 +2531,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <td class="cl-date">Aug 25</td>
       <td class="cl-ver">v1.1</td>
       <td><span class="cl-badge cl-new-worker">New Worker</span></td>
-      <td class="cl-desc"><strong>vtg-ns-so-backfill</strong> — one-time utility Worker to backfill NetSuite Sales Order numbers into Projects #4 text_mm6hv20b column for historical records.</td>
+      <td class="cl-desc"><strong>vtg-ns-so-backfill v2</strong> — ongoing sync Worker (cron every 4h) for NetSuite Sales Order numbers into Projects #4. v2 uses UID-exact matching (text_mm76zvbz → NS custentity_acs_unique_entity_identifier) as primary strategy; fuzzy name fallback. First sync wrote 43 SO numbers on Sep 14 2026.</td>
     </tr>
     <tr>
       <td class="cl-date">Aug 25</td>
