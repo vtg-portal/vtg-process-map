@@ -242,7 +242,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="hdr">
   <div>
     <div class="hdr-title">VTG · Lead → Invoice Process Map</div>
-    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Sep 17 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
+    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Sep 20 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
   </div>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
     <div class="legend">
@@ -953,6 +953,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div class="sop-ph-hdr"><div class="sop-ph-num">1</div><div><div class="sop-ph-title">Lead Intake via MSP Portal</div><div class="sop-ph-sub">Bypasses El Nova and Bids #3 entirely · Automation</div></div></div>
       <div class="sop-steps">
         <div class="sop-step">
+          <div class="sop-step-hdr"><span class="sop-step-title">1.0 · System of Record — Salesforce</span><span class="sop-owner">Sales</span><span class="badge b-live">Policy — Sep 18 2026</span></div>
+          <div class="sop-body"><strong>Salesforce is VTG's system of record for commercial (non-E-Rate) pipeline.</strong> The rule the sales team works to: <em>"If it's not in Salesforce, it didn't happen."</em> Routing — no E-Rate / FCC funding → the deal lives in <strong>Salesforce</strong>; E-Rate work → <strong>monday.com</strong>; on a split-funded deal the non-E-Rate portion is tracked in Salesforce separately from the E-Rate side. Reps do not double-enter: <code>vtg-sf-account-sync</code> pushes Accounts and Contacts, and <code>vtg-monday-sf-sync</code> pushes Bids as Opportunities, both keyed on <code>Monday_Item_ID__c</code>. Written up in full in the VTG Salesforce SOP (<code>VTG_Salesforce_SOP.html</code>, v2.1 — Sep 9 2026).</div>
+          <div class="auto-row">⚡ vtg-sf-account-sync · vtg-monday-sf-sync · UID written back to monday</div>
+        </div>
+        <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">1.1 · CSOP Form Submitted via MSP Portal</span><span class="sop-owner">Automation</span><span class="badge b-live">Live</span></div>
           <div class="sop-body">Commercial leads come through the MSP portal, which triggers the <strong>vtg-msp-csop</strong> Worker. Unlike E-Rate, this flow bypasses Bids #3 entirely and lands directly in <strong>Projects #4</strong>. The CSOP form auto-builds the task list (subitems) for the project.</div>
           <div class="auto-row">⚡ vtg-msp-csop · Projects #4 item created with task list subitems</div>
@@ -1004,8 +1009,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="gap-grid">
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">No automated monday → NS invoice creation</div><div class="pri pri-h">High</div></div>
-        <div class="gap-body">vtg-billing-ready fires but finance still creates the NS invoice manually. vtg-ns-mcp-sync has auth live and the invoice flow coded — needs to be wired to the Ready for Invoicing stage-change webhook. Blocked by: customer ID mapping (vtg-ns-compare paused) + NS service item internal ID from Kevin/Cari.</div>
+        <div class="gap-body">vtg-billing-ready fires but finance still creates the NS invoice manually. vtg-ns-mcp-sync has auth live and the invoice flow coded — needs to be wired to the Ready for Invoicing stage-change webhook. Blocked by: customer ID mapping (vtg-ns-compare paused) + NS service item internal ID from Kevin/Cari. <em>Sep 18: the customer ID mapping blocker is expected to fall out of the planned monday → NS order push — see the Planned section.</em></div>
         <div class="gap-worker">vtg-ns-mcp-sync · Ready to Invoice → NS Invoice flow</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Customer PO # is optional on the CS Order form</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">The CS Order form and the Projects #4 item it creates already carry a customer PO number, but nothing enforces it. <strong>Direction (Sep 18):</strong> make the PO number required on the form and use it as the verification key against the NetSuite order — a second, human-readable check alongside UID matching, and the field finance already looks for when reconciling. Until it is required, orders reach Projects #4 with no PO to verify against.</div>
+        <div class="gap-worker">vtg-cs-form · Projects #4 · NetSuite order verification</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Legacy monday records predate the UID standard</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body"><strong>UID (the Salesforce Account ID) is the source of truth going forward</strong> — every new cross-system link keys on it, not on customer name. The monday ↔ Salesforce sync that produces it is reliable; the problem is history. Older Accounts, Bids and Projects records carry a blank or stale UID, which is what forces the fuzzy-name fallback in vtg-ns-so-backfill and friends. Cleanup of those legacy records is outstanding; the standard itself is settled — stick to the UID.</div>
+        <div class="gap-worker">UID · Accounts text_mm6s8adk · Projects #4 text_mm76zvbz</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">NetSuite data cleanup has no owner</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">NetSuite needs significant cleanup — customer records, item data, duplicate and stale entities — before anything downstream of it can be fully trusted. This is not a program Jon owns or intends to own. It needs an owner on the finance / NS side; until it has one, every monday ↔ NS matching strategy is working around known-dirty data.</div>
+        <div class="gap-worker">NetSuite · ownership decision needed</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">CPQ / quoting path not decided or stable</div><div class="pri pri-h">High</div></div>
@@ -1089,6 +1109,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="sec-title">🟣 Planned / Not Yet Started</div>
     <div class="gap-grid">
       <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Push the order from monday.com directly into NetSuite</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body"><strong>The structural fix for monday ↔ NS matching.</strong> Today the link between a monday project and its NetSuite order is reconstructed <em>after the fact</em> — vtg-ns-so-backfill matches UID to <code>custentity_acs_unique_entity_identifier</code> and falls back to fuzzy name; vtg-po-sync reads back from whatever it finds. That is a stopgap, and it is only as good as the name and UID data on both sides. Planned direction: <strong>create the order in NetSuite from monday at order time</strong>, so the NS record carries the monday item and UID identity from creation. Matching then becomes 100% accurate by construction, the backfill and reconciliation Workers drop back to being a safety net rather than the mechanism, and the customer ID mapping that currently blocks the invoice flow stops being a separate problem. Pairs with making the customer PO # required on the CS Order form as the verification key.</div>
+        <div class="gap-worker">vtg-ns-mcp-sync · vtg-cs-form · retires the vtg-ns-so-backfill fuzzy path</div>
+      </div>
+      <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">SharePoint folder auto-creation on bid stage</div><div class="pri pri-l">Low</div></div>
         <div class="gap-body">vtg-sp-folders scoped but not built. Would create per-client SharePoint folders in ERATE-Projects on bid stage change.</div>
         <div class="gap-worker">vtg-sp-folders · SharePoint ERATE-Projects list</div>
@@ -1137,11 +1162,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div><div class="worker-name">vtg-bid-intake</div><div class="worker-url">vtg-bid-intake.vectorfi-admin.workers.dev</div></div>
         <span class="badge b-live worker-status">Live</span>
       </div>
-      <div class="worker-desc">Triggered when a rep clicks <strong>accept_470</strong> on the El Nova Leads board. Opens the intake form in a new browser tab. Rep fills: <strong>Sales Executive, ScopeStack Blueprint(s), delivery method, partner, manufacturer, distributor, bid due date, bond required</strong> — all in one form. Blueprint selection triggers ScopeStack API to auto-create a proposal. On submit: patches all bid columns to Bids #3, auto-links Account and Contact via district name search, writes the SOV Builder link to <code>link_mm591mdg</code>, and creates a bond subitem + email if required. <strong>Patched Sep 3 2026</strong>: fixed Account/Contact lookup (items_page + contains_text — previously used unreliable items_by_multiple_column_values), fixed SOV Builder link not being written, bond section redesigned (Surety bond read-only), retries bumped 3→4.</div>
+      <div class="worker-desc">Triggered when a rep clicks <strong>accept_470</strong> on the El Nova Leads board. Opens the intake form in a new browser tab. Rep fills: <strong>Sales Executive, ScopeStack Blueprint(s), delivery method, partner, manufacturer, distributor, bid due date, bond required</strong> — all in one form. Blueprint selection triggers ScopeStack API to auto-create a proposal. On submit: patches all bid columns to Bids #3, links Account and Contact, generates a PDF of the completed intake form onto <code>file_mm5bhcw7</code>, writes the SOV Builder link to <code>link_mm591mdg</code>, and creates a bond subitem + email if required. <strong>Patched Sep 19–20 2026</strong>: the Account/Contact lookup declared its GraphQL variable as <code>[ItemsQuery!]</code> where monday expects <code>[ItemsQueryRule!]</code> — every lookup failed validation, an empty <code>catch</code> swallowed it, and bids were created with both relations blank. Contact selection was then rewritten to draw candidates from the Account's own Contacts relation, drop <code>billed_entity</code> placeholders, collapse duplicate emails keeping the most recently updated, and score the rest. The E-Rate Primary Contact dropdown now reads its options live from the Bids #3 column instead of a hardcoded list.</div>
       <div class="worker-meta">
         <div class="worker-meta-row"><strong>Trigger</strong><span>accept_470 → Status → Accepted → monday webhook 608965294</span></div>
-        <div class="worker-meta-row"><strong>Outputs</strong><span>Bids #3 item, Account/Contact linked, SOV Builder link written, ScopeStack proposal created, bond subitem + email (if needed)</span></div>
-        <div class="worker-meta-row"><strong>Bug fix</strong><span>Sep 3 2026 — Account/Contact lookup API call replaced; SOV link write added; bond type locked to Surety bond</span></div>
+        <div class="worker-meta-row"><strong>Outputs</strong><span>Bids #3 item, Account/Contact linked, completed intake form PDF, SOV Builder link written, ScopeStack proposal created, bond subitem + email (if needed)</span></div>
+        <div class="worker-meta-row"><strong>Bug fix</strong><span>Sep 19–20 2026 — GraphQL type error broke every Account/Contact lookup; contact selection rewritten and scored; dropdown reads from monday; intake PDF added</span></div>
+        <div class="worker-meta-row"><strong>Logging</strong><span>Emits <code>[contact-match]</code> and <code>[intake-pdf]</code> per submit — visible in <code>wrangler tail</code></span></div>
         <div class="worker-meta-row"><strong>Email</strong><span>bonds@vtgus.com + CHC-Surety@alliant.com (bond only)</span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-bid-intake\</span></div>
       </div>
@@ -1267,10 +1293,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div><div class="worker-name">vtg-account-logo</div><div class="worker-url">vectorfi-admin.workers.dev</div></div>
         <span class="badge b-live worker-status">Live</span>
       </div>
-      <div class="worker-desc">Scrapes the district website for a logo, falls back to Clearbit, and uploads to the Account <code>logo</code> file column. Sets <code>logo_status</code> to Logo Found / Needs Manual Logo / No Website. Triggered on Account creation. Companion script <code>vtg-logo-backfill</code> (backfill.mjs) ran against all 786 existing Accounts.</div>
+      <div class="worker-desc">Scrapes the district website for a logo and uploads it to the Account <code>logo</code> file column, setting <code>logo_status</code> to Logo Found / Needs Manual Logo / No Website. Fires on Account creation <em>and</em> when <code>website_url</code> changes, so an account that arrives without a website gets a second attempt once El Nova fills it in. <strong>Rewritten Sep 20 2026</strong> — the original only read <code>&lt;img src&gt;</code>, which Finalsite and ParentSquare sites never emit (the URLs sit in <code>data-image-sizes</code> as percent-encoded JSON), and its Clearbit fallback had been dead since 8 Dec 2025. In two months it had found 6 logos. The replacement reads lazy-load attributes, scores candidates, prefers a wordmark over an icon mark, and only writes at 70+ — anything less confident is flagged Needs Manual Logo rather than guessed at.</div>
       <div class="worker-meta">
-        <div class="worker-meta-row"><strong>Trigger</strong><span>monday.com automation on Account creation</span></div>
-        <div class="worker-meta-row"><strong>Outputs</strong><span>logo (file column) + logo_status (status column) on Accounts #1</span></div>
+        <div class="worker-meta-row"><strong>Trigger</strong><span>Webhook 615242921 (item created) + 615244207 (<code>website_url</code> changed)</span></div>
+        <div class="worker-meta-row"><strong>Outputs</strong><span>logo (file column) + Logo Status on Accounts #1</span></div>
+        <div class="worker-meta-row"><strong>Measured</strong><span>331 accounts need a logo and have a website; the new extractor finds one for 242</span></div>
+        <div class="worker-meta-row"><strong>Logging</strong><span>Emits <code>[logo-match]</code> with URL, score and reasons on every path</span></div>
+        <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-account-logo-live\</span></div>
       </div>
     </div>
 
@@ -2262,6 +2291,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .cl-ver{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--text-dim);white-space:nowrap;}
 .cl-badge{display:inline-block;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
 .cl-new-worker{background:var(--green-dim);color:var(--green);}
+.cl-new{background:var(--green-dim);color:var(--green);}
 .cl-process{background:var(--accent-dim);color:var(--accent);}
 .cl-fix{background:var(--orange-dim);color:var(--orange);}
 .cl-resolved{background:var(--green-dim);color:var(--green);}
@@ -2278,7 +2308,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.2</div>
+  <div class="cl-version-pill">Current: v2.4</div>
 </div>
 
 <table class="cl-table">
@@ -2291,6 +2321,74 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </tr>
   </thead>
   <tbody>
+
+    <!-- ── Sep 20 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">September 20, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Sep 20</td>
+      <td class="cl-ver">v2.4</td>
+      <td><span class="cl-badge cl-fix">Fix</span></td>
+      <td class="cl-desc"><strong>vtg-bid-intake — every bid was being created with no Account and no Contact</strong> — The lookup declared its GraphQL variable as <code>[ItemsQuery!]</code> where monday expects <code>[ItemsQueryRule!]</code>, so the query failed validation before it ever ran. An empty <code>catch (_) {}</code> swallowed the error, the function retried four times with 5-second sleeps and returned nulls, and the bid was created successfully with both relations blank. The tell was a consistent 17-second gap between form submit and the bid appearing — three sleeps of five seconds. Reproduced on two controlled runs, fixed, and verified in production on bid 13089254247.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 20</td>
+      <td class="cl-ver">v2.4</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Contact selection rewritten and scored</strong> — Candidates now come from the Account's own Contacts relation rather than a board-wide name search, which had been returning the USAC <code>billed_entity</code> placeholder — a record named after the district, with no email and no person behind it. Duplicate emails collapse to the most recently updated record (El Nova creates a fresh contact per bid instead of updating the existing one, so 8% of accounts carry duplicates). Survivors are scored on email domain vs the Account website, Customer status, USAC <code>technical</code> type and job title, with consultants penalised heavily. Below the bar the field is left blank on purpose — a blank gets noticed, a confidently wrong contact does not.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 20</td>
+      <td class="cl-ver">v2.4</td>
+      <td><span class="cl-badge cl-fix">Fix</span></td>
+      <td class="cl-desc"><strong>Automatic district logos — 6 found in two months, now 242 of 331</strong> — <code>vtg-account-logo</code> and <code>vtg-logo-backfill</code> shared a scraper that only read <code>&lt;img src&gt;</code>. Finalsite, ParentSquare and similar K-12 platforms emit no <code>src</code> at all in served HTML; the real URLs sit in <code>data-image-sizes</code> as percent-encoded JSON. Its Clearbit fallback had been dead since HubSpot shut the free Logo API on 8 Dec 2025, and its favicon guard didn't work — a favicon scored 14 and passed. The replacement reads lazy-load attributes, scores candidates by filename, alt text, CSS class and position, prefers a wordmark over an icon mark, and writes only at 70+. Measured read-only across all 331 addressable accounts before anything was written.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 20</td>
+      <td class="cl-ver">v2.4</td>
+      <td><span class="cl-badge cl-new">New</span></td>
+      <td class="cl-desc"><strong>Completed Intake Form PDF on Bids #3</strong> — The intake form now builds a PDF of everything submitted and attaches it to <code>file_mm5bhcw7</code> on the new bid, using the same client-side jsPDF approach as vtg-cs-form. PDF generation can never block a submission; if it fails the bid is still created and the failure is logged. Note <code>add_file_to_column</code> appends rather than overwrites, so a future resubmit path would stack PDFs.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 20</td>
+      <td class="cl-ver">v2.4</td>
+      <td><span class="cl-badge cl-fix">Fix</span></td>
+      <td class="cl-desc"><strong>E-Rate Primary Contact dropdown and the blueprint mirror</strong> — The intake form's contact dropdown was a hardcoded <code>['Jake','Alan','Ruckus']</code> that had drifted from the monday column, so "John" could never be selected. It now reads the column's labels live and honours deactivated ones, meaning the list is managed in monday and cannot drift again. Separately, <code>blueprint_name</code> on Bids #3 was a mirror pointing at a Leads column that no longer exists (<code>dropdown_mkw331zh</code>); repointed to ScopeStack Blueprint(s). The Worker was never at fault there — it links the lead correctly.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 20</td>
+      <td class="cl-ver">v2.4</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Silent failure treated as the real defect</strong> — Every bug above shared one cause: the failing path was the only one with no logging. The Account/Contact lookup, the logo scraper and the logo upload all swallowed their errors into empty catch blocks, which is why a 100%-reproducible bug survived months of production. Each now emits a tagged line — <code>[contact-match]</code>, <code>[intake-pdf]</code>, <code>[logo-match]</code> — naming what it chose, what it scored and why. <code>vtg-account-logo</code> already has observability with persisted logs enabled, so its output is visible in the Cloudflare dashboard, not only in a live tail.</td>
+    </tr>
+
+    <!-- ── Sep 18 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">September 18, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Sep 18</td>
+      <td class="cl-ver">v2.3</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>monday → NetSuite order push adopted as the direction</strong> — The monday ↔ NS record link is today reconstructed after the fact (UID-exact match with a fuzzy-name fallback in vtg-ns-so-backfill, read-back in vtg-po-sync). That is now formally a <em>stopgap</em>. The direction of travel is to create the order in NetSuite from monday at order time, so the NS record carries the monday/UID identity from creation and matching is accurate by construction. Added as a High item under Planned; the customer ID mapping blocker on the invoice flow is expected to fall out of it.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 18</td>
+      <td class="cl-ver">v2.3</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Customer PO # to be required on the CS Order form</strong> — The form and the Projects #4 item it creates already carry a customer PO number, but it is optional. Plan: make it required and use it as the verification key against the NetSuite order, alongside UID matching. Logged as a Medium gap.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 18</td>
+      <td class="cl-ver">v2.3</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>UID confirmed as the cross-system source of truth · two new gaps logged</strong> — The UID (Salesforce Account ID, produced by the reliable monday ↔ Salesforce sync) is the standard going forward for every cross-system link; name matching is fallback only. Two consequences written onto the map: <em>legacy monday records predate the standard</em> and still need cleanup (Medium), and <em>NetSuite data cleanup has no owner</em> (Medium) — NS needs significant cleanup but is not a program Jon owns, so it needs an owner on the finance/NS side.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 18</td>
+      <td class="cl-ver">v2.3</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Salesforce system-of-record rule added to the Commercial track</strong> — New step 1.0: Salesforce is the system of record for commercial (non-E-Rate) pipeline — "if it's not in Salesforce, it didn't happen." Routing rule documented: no E-Rate/FCC funding → Salesforce; E-Rate → monday.com; the non-E-Rate portion of a split-funded deal is tracked in Salesforce separately. vtg-sf-account-sync and vtg-monday-sf-sync are what keep reps from double-entering. Source: VTG Salesforce SOP v2.1 (Sep 9 2026).</td>
+    </tr>
 
     <!-- ── Sep 17 2026 ── -->
     <tr class="cl-section-row"><td colspan="4">September 17, 2026</td></tr>
