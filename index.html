@@ -242,7 +242,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="hdr">
   <div>
     <div class="hdr-title">VTG · Lead → Invoice Process Map</div>
-    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Sep 20 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
+    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Sep 21 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
   </div>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
     <div class="legend">
@@ -1008,13 +1008,43 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="sec-title">🔴 Active Gaps — Need Resolution</div>
     <div class="gap-grid">
       <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Subitem task schedule never activates</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body"><code>formula8</code> computes every subitem's due date correctly, but <code>date3</code> "Task Due Date - Manual" — the column <strong>seven active automations</strong> actually trigger on — is empty on every subitem. monday formula columns cannot fire automations, so the due-today notification, the three per-person row highlights and the three auto-assign rules can never run. Fix without touching Dylan's automations: one more Autoboost recipe writing the computed date into <code>date3</code>, mirroring what 483152942 already does for Bid Due Date Mirror. Backfilling in bulk would trigger the three auto-assigns, so apply to new subitems first.</div>
+        <div class="gap-worker">Bids #3 subitems · date3 · Autoboost · 7 automations</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Salesforce CloseDate is always in the past</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body">vtg-monday-sf-sync populates the Opportunity's <code>CloseDate</code> from <code>deal_creation_date</code>, the day the bid was created — so every E-Rate Opportunity is created with an expected close date that has already passed. Bids #3 has an unused <code>date_mm2c6t1k</code> "Expected Award Date" column which is exactly this field. <code>Amount</code> is likewise taken straight from Bid Value, so a placeholder bid value becomes a real forecast number. Quietly wrong on every Opportunity the sync has touched, not just the test bid.</div>
+        <div class="gap-worker">vtg-monday-sf-sync · CloseDate · date_mm2c6t1k</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">vtg-monday-sf-sync endpoint is unauthenticated</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body">Every request logs <code>HMAC mismatch — sig received: &lt;empty&gt;</code> and is processed regardless, so the public Workers URL will write to a Salesforce Opportunity for anyone who knows it. Either monday's plain webhook action never signs the body, or the secret is unreachable — check the latter first, since vtg-sf-account-sync has a binding named <code>WEBHOOK_SECRETvtg-sf-sync-2026-xK9mQpL3</code> that looks like a secret pasted into the name field.</div>
+        <div class="gap-worker">vtg-monday-sf-sync · vtg-sf-account-sync · WEBHOOK_SECRET</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Salesforce stage map is incomplete</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">Bid Building sends <code>StageName: "Stage 3: Bid Building"</code>, but Folder Creation, Deal Reg and Bid Compilation send no stage at all — they log <code>active: false</code> and the field is omitted. So the Opportunity keeps reporting the last mapped stage while monday has moved on. If sales reads stage off Salesforce, they are looking at a bid one or more steps behind reality. Separately, <code>skip: true</code> only suppresses StageName; the Opportunity is still written on every column change, which produced 14 writes in one morning.</div>
+        <div class="gap-worker">vtg-monday-sf-sync · stage map · skip logic</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Generate SOW reports nothing while it runs</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">Generate Proposal sets <em>Working on it</em>, produces the PDF and sets <em>Done</em> in nine seconds. Generate SOW has no status column, takes around three and a half minutes, and is indistinguishable from a failure while running — it was mistaken for one during the 21 Sep walkthrough. Needs a SOW Status column and the same pattern. Its filename also doubles the district name. Neither generator closes its own <em>Create SOW</em> / <em>Create SOV</em> subitem, so both have to be ticked by hand.</div>
+        <div class="gap-worker">Generate SOW · file_mm6wm4hn · Create SOW subitem</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">SOV Builder link not written on new bids</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body"><code>link_mm6vbks</code> is described as auto-populated, but nothing in the current creation path writes it — Ionia arrived with its intake link set and no SOV link. The ten older bids that have one look backfilled. Format is <code>…/?item=&lt;itemId&gt;</code>, note <code>?item=</code> where vtg-cs-form uses <code>?bid=</code>. vtg-bid-intake already writes the intake link at the same moment, so this is a small addition to a function that is already running.</div>
+        <div class="gap-worker">vtg-bid-intake · link_mm6vbks · vtg-sov-builder</div>
+      </div>
+      <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">No automated monday → NS invoice creation</div><div class="pri pri-h">High</div></div>
         <div class="gap-body">vtg-billing-ready fires but finance still creates the NS invoice manually. vtg-ns-mcp-sync has auth live and the invoice flow coded — needs to be wired to the Ready for Invoicing stage-change webhook. Blocked by: customer ID mapping (vtg-ns-compare paused) + NS service item internal ID from Kevin/Cari. <em>Sep 18: the customer ID mapping blocker is expected to fall out of the planned monday → NS order push — see the Planned section.</em></div>
         <div class="gap-worker">vtg-ns-mcp-sync · Ready to Invoice → NS Invoice flow</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">Customer PO # is optional on the CS Order form</div><div class="pri pri-m">Medium</div></div>
-        <div class="gap-body">The CS Order form and the Projects #4 item it creates already carry a customer PO number, but nothing enforces it. <strong>Direction (Sep 18):</strong> make the PO number required on the form and use it as the verification key against the NetSuite order — a second, human-readable check alongside UID matching, and the field finance already looks for when reconciling. Until it is required, orders reach Projects #4 with no PO to verify against.</div>
+        <div class="gap-card-hdr"><div class="gap-title">Customer PO # required on the CS Order form — resolved</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
+        <div class="gap-body">✅ Resolved Sep 20 2026. Customer PO Number is now a hard block on vtg-cs-form — no PO, no submission — validated before anything reaches monday, alongside the existing Target / Deadline Date check. Both required fields now carry a visible asterisk; neither did before. Placeholder answers are rejected as well as blanks: the value is compared on letters and digits only, so <code>N/A</code>, <code>n.a.</code>, <code>N / A</code>, TBD, pending, XXXX and 0000 are all refused. A PO of "N/A" is worse than an empty one — it looks like a value and verifies nothing. The PO is the human-readable key finance reconciles the NetSuite order against, alongside UID matching.</div>
         <div class="gap-worker">vtg-cs-form · Projects #4 · NetSuite order verification</div>
       </div>
       <div class="gap-card">
@@ -2297,6 +2327,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .cl-resolved{background:var(--green-dim);color:var(--green);}
 .cl-infra{background:var(--purple-dim);color:var(--purple);}
 .cl-update{background:var(--yellow-dim);color:var(--yellow);}
+.cl-gap{background:var(--red-dim);color:var(--red);}
 .cl-doc{background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);}
 .cl-desc{color:var(--text-muted);}
 .cl-desc strong{color:var(--text);font-weight:500;}
@@ -2308,7 +2339,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.4</div>
+  <div class="cl-version-pill">Current: v2.5</div>
 </div>
 
 <table class="cl-table">
@@ -2322,9 +2353,73 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   </thead>
   <tbody>
 
+    <!-- ── Sep 21 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">September 21, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Sep 21</td>
+      <td class="cl-ver">v2.5</td>
+      <td><span class="cl-badge cl-fix">Fix</span></td>
+      <td class="cl-desc"><strong>SOV Builder — a building could not be renamed</strong> — Renaming was implemented, as a double-click on the tab label, but nothing advertised it: no tooltip, no pencil, no affordance. The only tab control carrying a <code>title</code> was the harmless duplicate button; the <code>×</code> that deletes a building had none. Worse, the handler called <code>window.prompt()</code>, which browsers suppress in sandboxed and embedded contexts and which Chrome disables for the rest of a page's life once "prevent additional dialogs" is ticked — so for some users the double-click did nothing at all. It now reuses the in-page modal that <em>Add building</em> already used, prefilled and selected, with the mode and heading reset on cancel. Both tab buttons gained tooltips.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 21</td>
+      <td class="cl-ver">v2.5</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>vtg-sov-builder deploys <code>worker-combined.js</code>, not <code>index.js</code></strong> — Recorded because three patch attempts changed nothing before this was noticed. <code>wrangler.toml</code> sets <code>main = "worker-combined.js"</code> in the folder root (~108&nbsp;KB); <code>index.js</code> is a dead file from 14 Aug that nothing deploys, and two further stale copies of worker-combined.js sit under <code>files\</code> (20 Aug) and <code>Archive\files\</code> (14 Aug). Patch scripts for this worker must resolve the target from wrangler's <code>main</code> rather than guessing filenames. The first failure was initially misread as a line-ending problem, which cost four no-op deploys.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 21</td>
+      <td class="cl-ver">v2.5</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Bid Building walked end to end on a real bid</strong> — Ionia Public Schools (470# 270000574, bid 13089254247) taken from Folder Creation through Bid Compilation with a live tail running. SharePoint folder linked, deal reg created by automation 482374704, and all three artifacts produced: SOW (asset 3261375108), SOV PDF (3261392198) and Proposal PDF (3261481236). Fourteen Bid Building subitems closed. Every finding below came out of that walk.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 21</td>
+      <td class="cl-ver">v2.5</td>
+      <td><span class="cl-badge cl-gap">Gap</span></td>
+      <td class="cl-desc"><strong>The subitem task schedule is computed and then ignored</strong> — <code>formula8</code> "Task Due Date Formula" correctly derives each subitem's due date (<code>FORMAT_DATE(SUBTRACT_DAYS({date},{numbers0}))</code>), but <code>date3</code> "Task Due Date - Manual" is empty on every subitem — and <code>date3</code> is what <strong>seven active automations</strong> trigger on: the due-today notification, the three per-person row highlights, and the three auto-assign rules. monday formula columns cannot trigger automations, so the whole subitem reminder system is inert, which is almost certainly why the overdue reminder was switched off rather than fixed. Autoboost recipe 483152942 already writes a formula result into a real date column, so one more recipe of the same shape fixes it without editing anyone's automations. Caution: the three auto-assigns fire on that column <em>changing</em>, so a bulk backfill would trigger a wave of reassignments.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 21</td>
+      <td class="cl-ver">v2.5</td>
+      <td><span class="cl-badge cl-gap">Gap</span></td>
+      <td class="cl-desc"><strong>Salesforce receives almost nothing, fourteen times</strong> — One morning's walkthrough produced 14 updates to Opportunity <code>006aZ00000jC0OvQAK</code>, every payload identical but for the timestamp. None of the work reached Salesforce: not the SOW, the SOV, the Proposal, the SharePoint folder, the deal reg, the 470 number, the account or the contact. Three separate problems sit behind that. <code>skip: true</code> only suppresses <code>StageName</code> — the Opportunity is still written on every column change at every stage. The stage map is incomplete, so Folder Creation, Deal Reg and Bid Compilation send no stage at all and Salesforce reads one or more steps behind monday. And <code>CloseDate</code> is populated from <code>deal_creation_date</code>, so every E-Rate Opportunity is created with a close date already in the past — Bids #3 has an unused <code>date_mm2c6t1k</code> "Expected Award Date" column that is the correct source.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 21</td>
+      <td class="cl-ver">v2.5</td>
+      <td><span class="cl-badge cl-gap">Gap</span></td>
+      <td class="cl-desc"><strong>vtg-monday-sf-sync accepts unsigned requests</strong> — Every invocation logs <code>HMAC mismatch — sig received: &lt;empty&gt;</code> and then processes the request anyway, so the public endpoint will write to a Salesforce Opportunity for anyone who knows the URL. The signature arriving empty has two plausible causes: monday's plain "send a webhook" action does not HMAC-sign its body, so the check may be for something that never arrives; or the secret is unreachable. The second is worth checking first — <code>vtg-sf-account-sync</code> carries a binding named <code>WEBHOOK_SECRETvtg-sf-sync-2026-xK9mQpL3</code>, which looks like a secret value pasted into the name field, leaving <code>WEBHOOK_SECRET</code> undefined and the comparison unable to succeed.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 21</td>
+      <td class="cl-ver">v2.5</td>
+      <td><span class="cl-badge cl-gap">Gap</span></td>
+      <td class="cl-desc"><strong>Generate SOW runs silently for three and a half minutes</strong> — Generate Proposal sets its status column to <em>Working on it</em>, produces the PDF and sets <em>Done</em>, the whole run taking nine seconds. Generate SOW has no status column at all: it goes quiet and a file appears some minutes later, which is indistinguishable from a failure and was in fact mistaken for one during this walkthrough. It needs a SOW Status column and the same pattern. Its filename also doubles the district name — <code>Ionia-Public-Schools-Ionia-Public-Schools-470_-270000574-…</code> — because the account name is prepended to a bid name that already starts with it. Separately, neither generator closes its own <em>Create SOW</em> / <em>Create SOV</em> subitem, so the artifact exists while the task still says it does not.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 21</td>
+      <td class="cl-ver">v2.5</td>
+      <td><span class="cl-badge cl-gap">Gap</span></td>
+      <td class="cl-desc"><strong>The SOV Builder link is not written at bid creation</strong> — <code>link_mm6vbks</code> is described on the board as auto-populated, but nothing in the current creation path writes it. Ionia arrived through vtg-bid-intake with its Customer Intake Form link set and no SOV Builder link; the ten older bids that have one most likely got it from a one-off backfill. Every new bid this season will arrive without it. The format is <code>https://vtg-sov-builder.vectorfi-admin.workers.dev/?item=&lt;itemId&gt;</code> — note <code>?item=</code>, where vtg-cs-form uses <code>?bid=</code>. The intake worker already writes the intake link at the same moment, so this is a couple of lines in a function that is already running.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 21</td>
+      <td class="cl-ver">v2.5</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Board mechanics worth knowing before touching a bid</strong> — There is <strong>no group-move automation for Bid Stage → Folder Creation</strong>; every other stage has one, because the first stage was only ever reached at item creation. Sending a bid back to the start leaves stage and group disagreeing until someone drags it. Subitem status <em>Create Item</em> is the starting state for the five steps that produce an artifact, not a decoration. Setting a subitem's Status to <em>N/A</em> triggers automation 482374711, which clears its columns and deletes it — the intended way to strip Post-Sale subitems off a bid that was sent back. And monday's API will not return webhook target URLs, so a worker's name has to come from wrangler or the automation UI.</td>
+    </tr>
+
     <!-- ── Sep 20 2026 ── -->
     <tr class="cl-section-row"><td colspan="4">September 20, 2026</td></tr>
 
+    <tr>
+      <td class="cl-date">Sep 20</td>
+      <td class="cl-ver">v2.4</td>
+      <td><span class="cl-badge cl-resolved">Gap Resolved</span></td>
+      <td class="cl-desc"><strong>Customer PO # is now required on the CS Order form</strong> — Closes the Medium gap logged Sep 18. A hard block: no PO, no submission. Placeholders are refused too — the value is normalised to letters and digits, so <code>N/A</code>, <code>n.a.</code>, TBD, pending, XXXX and 0000 all bounce, because a PO of "N/A" looks like a value and verifies nothing against NetSuite. Both required fields on the form now show an asterisk; previously nothing indicated that Target / Deadline Date was mandatory either.</td>
+    </tr>
     <tr>
       <td class="cl-date">Sep 20</td>
       <td class="cl-ver">v2.4</td>
