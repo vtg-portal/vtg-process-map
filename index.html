@@ -242,7 +242,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="hdr">
   <div>
     <div class="hdr-title">VTG · Lead → Invoice Process Map</div>
-    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Sep 21 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
+    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Sep 24 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
   </div>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
     <div class="legend">
@@ -763,6 +763,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div class="sop-body">El Nova pushes inbound Form 470 opportunities to the <strong>El Nova Leads board (ID 18181651809)</strong>. Each lead carries a district name, 470#, and Opportunity Score extracted from the USAC PDF via two-layer decode (ASCII85 + FlateDecode).</div>
         </div>
         <div class="sop-step">
+          <div class="sop-step-hdr"><span class="sop-step-title">1.1a · Addendum Screen — Is This Lead Actually a New Opportunity?</span><span class="sop-owner">Automation</span><span class="badge b-live">Live — Sep 24 2026</span><span class="badge b-plan">Dry run</span></div>
+          <div class="sop-body">Every new Leads item is screened before anyone works it. <strong>vtg-bid-intake</strong> <code>POST /lead-created</code> compares the lead name (the bare 470 number) against Bids #3 <code>470__</code>. <strong>One 470 never covers two separately-bid RFPs</strong> — so a 470 already on a live bid means this lead is an <em>addendum</em>, not a new opportunity, and working it produces a duplicate bid. On a match the Worker attaches the addendum document to the bid’s Addenda column, increments Addendum #, stamps Last Addendum Date and sets Addendum Status to <em>Received - Unreviewed</em>, then posts a courtesy update on the lead so nobody clicks accept_470 on it. <strong>The bid’s stage never moves</strong> — it stays where it is and gets flagged. If a district cancels a 470 it issues a whole new one, which is a genuine new opportunity (old bid → Lost); and by law no addendum can arrive after the submittal date, so there is no post-submittal path. Currently running with <code>ADDENDUM_DRY_RUN = true</code>: matches are logged, nothing is written.</div>
+          <div class="auto-row">⚡ monday webhook 642139356 (Leads create_item) → vtg-bid-intake /lead-created</div>
+        </div>
+        <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">1.2 · Rep Clicks accept_470 → vtg-bid-intake Form Opens</span><span class="sop-owner">Sales Rep (Alan / Jake / Kevin)</span><span class="badge b-man">Manual</span></div>
           <div class="sop-body">Rep clicks <strong>accept_470</strong>. A monday.com automation sets Status → Accepted, which fires a webhook to vtg-bid-intake. The Worker opens the intake form in a <strong>new browser tab</strong>. Rejected leads simply close the lead — no webhook fires, no Bids item created.</div>
           <div class="auto-row">⚡ Automation 7920733007 → Status → Accepted → webhook 608965294 → vtg-bid-intake</div>
@@ -1113,6 +1118,26 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">vtg-scopestack-doc-sync · /generate endpoint · KV lock needed</div>
       </div>
       <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Hardcoded credentials in vtg_sov_import_v4.py — rotate</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body">Four credentials sit in plaintext in <code>vtg_sov_import_v4.py</code>, and there are <strong>three copies of that file</strong> in a OneDrive-synced folder — so they are replicated to every machine the folder syncs to and to OneDrive’s version history. Rotate all four, move them to environment variables or <code>wrangler secret</code>, and delete the stale copies rather than editing them.</div>
+        <div class="gap-worker">vtg_sov_import_v4.py · ×3 copies · VTG Flows (OneDrive-synced)</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Addendum detection is running in dry-run</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body"><code>ADDENDUM_DRY_RUN</code> is still <code>true</code>, so matches are logged and nothing is written. Two things to close before flipping it: confirm a real addendum’s document actually lands in the lead’s <code>RFP Documents</code> column (the dry run answers this the first time one arrives — the tail names the file), and build the notifications, which are not written yet. The intent is to notify both the bid owner and whoever would have picked up the lead.</div>
+        <div class="gap-worker">vtg-bid-intake · /lead-created · ADDENDUM_DRY_RUN</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">vtg-bid-intake pins a deprecated monday API version</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">File uploads still send <code>API-Version: 2024-01</code>. Current is <code>2026-07</code>. Deprecated versions are retired on monday’s schedule, not VTG’s — when it goes, every intake PDF, bond form and addendum attachment fails at once, in season. Bump and re-test the upload path.</div>
+        <div class="gap-worker">vtg-bid-intake · file upload · API-Version header</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">vtg-logo-probe still deployed</div><div class="pri pri-l">Low</div></div>
+        <div class="gap-body">Temporary read-only diagnostic built Sep 20 to work out why the logo extractor was only finding six logos. It mutates nothing, but it is a live endpoint with no purpose. Delete when the backfill work is done: <code>npx wrangler delete --name vtg-logo-probe</code>.</div>
+        <div class="gap-worker">vtg-logo-probe · diagnostic · delete when done</div>
+      </div>
+      <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">DKIM not configured for vtgus.com</div><div class="pri pri-l">Low</div></div>
         <div class="gap-body">All Workers send via SMTP2GO / noreply@vtgus.com. DKIM not set up — deliverability risk on billing notifications, CSOP emails, bond emails as volume grows.</div>
         <div class="gap-worker">SMTP2GO · vtgus.com DNS</div>
@@ -1129,7 +1154,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">Vertiv and TP-Link Omada catalogs pending</div><div class="pri pri-l">Low</div></div>
-        <div class="gap-body">Both are on VTG's approved manufacturer list for this year but price lists have not yet been received. Once available, they merge into vtg-sku-catalog (single push, no Worker changes needed). Vertiv covers UPS/PDU/thermal; TP-Link Omada covers APs and switches for smaller-budget bids.</div>
+        <div class="gap-body"><strong>Sep 22 2026: TP-Link/Omada is unblocked</strong> — it is a carried VTG line and the price list is now in hand, so it can be merged into vtg-sku-catalog (single push, no Worker changes needed). <strong>Vertiv is still pending</strong> a price list. Vertiv covers UPS/PDU/thermal; TP-Link Omada covers APs and switches for smaller-budget bids.</div>
         <div class="gap-worker">vtg-sku-catalog KV · SKU_CATALOG</div>
       </div>
     </div>
@@ -1145,8 +1170,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">SharePoint folder auto-creation on bid stage</div><div class="pri pri-l">Low</div></div>
-        <div class="gap-body">vtg-sp-folders scoped but not built. Would create per-client SharePoint folders in ERATE-Projects on bid stage change.</div>
-        <div class="gap-worker">vtg-sp-folders · SharePoint ERATE-Projects list</div>
+        <div class="gap-body"><strong>Designed Sep 23 2026, not yet built.</strong> Cloudflare Worker → Microsoft Graph off a monday webhook. Folder name = bid name minus the colon; standard subfolders (1-Cover Page … 9-Product Support Info) copied with their files from the <code>Base Bid Docs</code> template; Worker fills the SharePoint Link column, closes both Folder Creation subitems and uploads the Lead’s 470/RFP PDFs. <strong>Blocker:</strong> Entra app registration + SharePoint site grant from the M365 administrator — request email drafted, not yet actioned.</div>
+        <div class="gap-worker">vtg-sp-folders · Microsoft Graph · Entra app registration</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">TD Synnex live pricing not wired into SOV Builder</div><div class="pri pri-h">High</div></div>
@@ -1199,7 +1224,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Bug fix</strong><span>Sep 19–20 2026 — GraphQL type error broke every Account/Contact lookup; contact selection rewritten and scored; dropdown reads from monday; intake PDF added</span></div>
         <div class="worker-meta-row"><strong>Logging</strong><span>Emits <code>[contact-match]</code> and <code>[intake-pdf]</code> per submit — visible in <code>wrangler tail</code></span></div>
         <div class="worker-meta-row"><strong>Email</strong><span>bonds@vtgus.com + CHC-Surety@alliant.com (bond only)</span></div>
-        <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-bid-intake\</span></div>
+        <div class="worker-meta-row"><strong>Addendum detection</strong><span><em>Shipped Sep 24 2026.</em> New <code>POST /lead-created</code> endpoint, fired by monday webhook <strong>642139356</strong> on Leads <code>create_item</code>. Matches the Leads item name (the bare 470 number) against Bids #3 <code>470__</code> — one 470 never covers two separately-bid RFPs, so a repeat 470 is an addendum, not a new opportunity. On a match it attaches the document, stamps the addendum columns and posts a courtesy update on the lead so nobody clicks Accept 470 on it. <strong>It never moves the bid’s stage.</strong> Acts only on exactly one match in a live stage; zero matches, closed-stage matches and multiple live matches all log and do nothing. Dedupe strips monday’s <code>&lt;assetId&gt;-</code> filename prefix, without which each lead’s copy of the same certified 470 PDF re-copies forever. Gated by <code>ADDENDUM_DRY_RUN</code> in wrangler.toml.</span></div>
+        <div class="worker-meta-row"><strong>New Bids #3 columns</strong><span><code>file_mm7get0y</code> Addenda · <code>numeric_mm7gj7zz</code> Addendum # · <code>date_mm7gbfs7</code> Last Addendum Date · <code>color_mm7ghh94</code> Addendum Status (Received - Unreviewed / Reviewed) · <code>email_mm7gr1ce</code> Bid Delivery Email · <code>date_mm7gj5zp</code> Delivery Contact Confirmed — all created Sep 24 2026</span></div>
+        <div class="worker-meta-row"><strong>Bid Delivery Contact</strong><span><em>Shipped Sep 24 2026.</em> The form now suggests the delivery contact from the account record and hard-blocks submit until the rep confirms it — required whatever the delivery method, because that contact also fields bid questions. Three states: suggestion with Yes/No radios, consultant suggestion with a warning, or no contact on file (radios gone, email required). <code>contactCandidates()</code> was split out of <code>pickContact()</code> so the form’s suggestion and the contact linked at submit use the same scorer; the candidate fetch is single-pass with no retries so a missing account record can never hang the form. Validated in the browser and again in <code>/submit</code> — format plus placeholder rejection, same pattern as vtg-cs-form’s PO number. The confirmed address lands in the archived intake PDF.</span></div>
+        <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-bid-intake\ · wrangler <code>main = "worker.js"</code> · pre-patch copy kept as <code>worker.pre-addendum.js</code></span></div>
       </div>
     </div>
 
@@ -1517,9 +1545,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div><div class="worker-name">vtg-sp-folders</div><div class="worker-url">vectorfi-admin.workers.dev</div></div>
         <span class="badge b-plan worker-status">Planned</span>
       </div>
-      <div class="worker-desc">Would auto-create per-client SharePoint folders in the ERATE-Projects list (vtgus.sharepoint.com/sites/cust_&lt;ClientName&gt;) on bid stage change. Not yet built.</div>
+      <div class="worker-desc">Auto-creates the SharePoint bid folder from the monday Bids board. <strong>Design settled Sep 23 2026:</strong> a Cloudflare Worker calling Microsoft Graph off a monday webhook — chosen over Zapier/Make or a marketplace app. Folder name is the bid name with the colon removed (SharePoint will not accept &quot;:&quot;), e.g. <em>Noblesville Schools - 470# 270000673</em>. The standard subfolders are copied — with their files — from the template at <code>ERATE 2027 RFPs - Documents\1- STANDARD BID FORMS AND DOCS\Base Bid Docs</code> (1-Cover Page … 9-Product Support Info), so every bid folder starts with VTG’s standard bid documents in place. The Worker then writes the SharePoint Link column, completes <strong>both</strong> Folder Creation subitems, and uploads the Lead’s 470/RFP PDFs. Not yet built — blocked on the Entra app registration and site grant from whoever administers M365.</div>
       <div class="worker-meta">
-        <div class="worker-meta-row"><strong>Trigger</strong><span>Bids #3 stage change</span></div>
+        <div class="worker-meta-row"><strong>Trigger</strong><span>Bids #3 stage change → monday webhook</span></div>
+        <div class="worker-meta-row"><strong>API</strong><span>Microsoft Graph (app-only) — needs Entra app registration + SharePoint site grant</span></div>
+        <div class="worker-meta-row"><strong>Writes</strong><span>SharePoint Link column · both Folder Creation subitems → done · Lead 470/RFP PDFs uploaded</span></div>
+        <div class="worker-meta-row"><strong>Future</strong><span>A <code>10-Addenda</code> folder in the template would give addendum documents a home — see vtg-bid-intake</span></div>
       </div>
     </div>
 
@@ -1598,6 +1629,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="glossary-card">
       <div class="glossary-term">Form 470 <span class="glossary-abbr">470</span></div>
       <div class="glossary-def">The <strong>Description of Services Requested and Certification Form.</strong> Filed by a school or library to announce they are seeking competitive bids for E-Rate eligible services. VTG discovers these via El Nova and responds with a Form 471. The 470# is the unique identifier for each opportunity.</div>
+    </div>
+
+    <div class="glossary-card">
+      <div class="glossary-term">RFP Addendum <span class="glossary-abbr">Addendum</span></div>
+      <div class="glossary-def">A revision or clarification issued by the applicant against an <strong>existing</strong> 470 — corrected specs, an extended due date, answers to bidder questions. It arrives on the Leads board looking like a fresh opportunity, which is how one 470 used to end up worked as two bids. <strong>The 470 number is the constant:</strong> one 470 never covers two separately-bid RFPs, so a repeat 470 is an addendum. A cancelled 470 is different — the district issues a whole new number, that is a genuine new opportunity, and the old bid moves to Lost. By law an addendum cannot arrive after the submittal date. Screened automatically at lead creation by vtg-bid-intake’s <code>/lead-created</code> endpoint (webhook 642139356); an addendum flags the existing bid and never moves its stage.</div>
     </div>
 
     <div class="glossary-card">
@@ -1909,6 +1945,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <td class="auto-trigger">When Status → Accepted (color_mm599ptd)</td>
         <td class="auto-action">Send webhook</td>
         <td class="auto-note">Fires vtg-bid-intake Worker to create the Bids #3 item; also sends El Nova accept trigger</td>
+      </tr>
+      <tr>
+        <td class="auto-id">642139356</td><td class="auto-trigger">El Nova Leads · create_item (webhook)</td><td class="auto-action">POST /lead-created on vtg-bid-intake — addendum screen</td><td class="auto-note">Live Sep 24 2026 — matches lead name (470#) against Bids #3 470__; on a single live-stage match attaches the addendum, stamps the addendum columns and posts a courtesy update. Never moves the bid stage. Behind ADDENDUM_DRY_RUN</td>
       </tr>
       <tr>
         <td class="auto-id">615218876 / 615223909</td>
@@ -2339,7 +2378,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.5</div>
+  <div class="cl-version-pill">Current: v2.6</div>
 </div>
 
 <table class="cl-table">
@@ -2352,6 +2391,46 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </tr>
   </thead>
   <tbody>
+
+    <!-- ── Sep 22–24 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">September 22–24, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Sep 24</td>
+      <td class="cl-ver">v2.6</td>
+      <td><span class="cl-badge cl-new">New</span></td>
+      <td class="cl-desc"><strong>vtg-bid-intake — RFP addendum detection live</strong> — An addendum used to arrive on the Leads board looking like a brand-new opportunity and get worked as a second bid. New <code>POST /lead-created</code> endpoint, monday webhook <strong>642139356</strong> on Leads <code>create_item</code>, matches the lead name (the bare 470) against Bids #3 <code>470__</code>: one 470 never covers two separately-bid RFPs, so a repeat is an addendum. It attaches the document, stamps the new addendum columns and posts a courtesy update on the lead so nobody clicks Accept 470 — and <strong>never moves the bid’s stage</strong>. Guards: acts only on exactly one match in a live stage; zero, closed-stage and multiple-live matches log and do nothing. Dedupe strips monday’s <code>&lt;assetId&gt;-</code> prefix, without which the same certified 470 re-copies on every lead. Errors are swallowed so a new lead is never held up. Shipped behind <code>ADDENDUM_DRY_RUN</code>. Two API notes worth keeping: <code>compare_value</code> takes the <code>CompareValue</code> scalar, not <code>[String!]</code>; and only all-digit 470 values are matchable, which excludes the <code>CBR4…</code> / <code>Non ERATE</code> / <code>No 470</code> bids.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 24</td>
+      <td class="cl-ver">v2.6</td>
+      <td><span class="cl-badge cl-new">New</span></td>
+      <td class="cl-desc"><strong>Bid Delivery Contact confirmation on the intake form</strong> — The form pulls the contact email, asks whether that is who the bid should be delivered to, keeps it editable, and hard-blocks submit until it is confirmed — required whatever the delivery method, because that contact is also who bid questions go to. Three states: suggestion with Yes/No radios, consultant suggestion with a warning, no contact on file (radios gone, email required). <code>contactCandidates()</code> split out of <code>pickContact()</code> so the suggestion and the contact linked at submit use one scorer; candidate fetch is single-pass with no retries so a missing account record cannot hang the form. Validated in the browser and again in <code>/submit</code>. Confirmed address lands in the archived intake PDF. A free-text delivery-instructions field was considered and declined for this phase.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 24</td>
+      <td class="cl-ver">v2.6</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Six new Bids #3 columns</strong> — <code>file_mm7get0y</code> Addenda (holds addendum 1, 2, 3 …), <code>numeric_mm7gj7zz</code> Addendum #, <code>date_mm7gbfs7</code> Last Addendum Date, <code>color_mm7ghh94</code> Addendum Status (Received - Unreviewed / Reviewed), <code>email_mm7gr1ce</code> Bid Delivery Email, <code>date_mm7gj5zp</code> Delivery Contact Confirmed.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 23</td>
+      <td class="cl-ver">v2.6</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>vtg-sp-folders design settled</strong> — Built as a Cloudflare Worker calling Microsoft Graph off a monday webhook, not Zapier/Make or a marketplace app. Folder name is the bid name with the colon removed (SharePoint rejects &quot;:&quot;). Standard subfolders come from the <code>Base Bid Docs</code> template (1-Cover Page … 9-Product Support Info) and are copied <em>with their files</em>, so each bid folder opens with VTG’s standard bid documents already in it. The Worker fills the SharePoint Link column, completes both Folder Creation subitems and uploads the Lead’s 470/RFP PDFs. Blocked on an Entra app registration + site grant from the M365 administrator; request email drafted.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 22</td>
+      <td class="cl-ver">v2.6</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Pricing scope corrections · SOV Builder</strong> — Three facts worth pinning because they shape the discount-tier work: the top-level bidder/driver discount model applies <strong>only to Ruckus parts</strong>, not to every manufacturer; VTG does <strong>not</strong> sell Ruckus vSZD (virtual SmartZone Data Plane); and the TP-Link/Omada price list is now in hand — TP-Link is a carried line, so that half of the pending-catalogs gap is unblocked. Vertiv is still outstanding.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 22</td>
+      <td class="cl-ver">v2.6</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Credential rotation flagged</strong> — Four credentials are hardcoded in <code>vtg_sov_import_v4.py</code>, across three copies of the file in the OneDrive-synced VTG Flows folder. Logged as a High gap: rotate, move to env vars or <code>wrangler secret</code>, delete the stale copies.</td>
+    </tr>
 
     <!-- ── Sep 21 2026 ── -->
     <tr class="cl-section-row"><td colspan="4">September 21, 2026</td></tr>
