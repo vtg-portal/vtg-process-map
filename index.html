@@ -242,7 +242,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="hdr">
   <div>
     <div class="hdr-title">VTG · Lead → Invoice Process Map</div>
-    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Sep 24 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
+    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Sep 25 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
   </div>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
     <div class="legend">
@@ -958,9 +958,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div class="sop-ph-hdr"><div class="sop-ph-num">1</div><div><div class="sop-ph-title">Lead Intake via MSP Portal</div><div class="sop-ph-sub">Bypasses El Nova and Bids #3 entirely · Automation</div></div></div>
       <div class="sop-steps">
         <div class="sop-step">
-          <div class="sop-step-hdr"><span class="sop-step-title">1.0 · System of Record — Salesforce</span><span class="sop-owner">Sales</span><span class="badge b-live">Policy — Sep 18 2026</span></div>
-          <div class="sop-body"><strong>Salesforce is VTG's system of record for commercial (non-E-Rate) pipeline.</strong> The rule the sales team works to: <em>"If it's not in Salesforce, it didn't happen."</em> Routing — no E-Rate / FCC funding → the deal lives in <strong>Salesforce</strong>; E-Rate work → <strong>monday.com</strong>; on a split-funded deal the non-E-Rate portion is tracked in Salesforce separately from the E-Rate side. Reps do not double-enter: <code>vtg-sf-account-sync</code> pushes Accounts and Contacts, and <code>vtg-monday-sf-sync</code> pushes Bids as Opportunities, both keyed on <code>Monday_Item_ID__c</code>. Written up in full in the VTG Salesforce SOP (<code>VTG_Salesforce_SOP.html</code>, v2.1 — Sep 9 2026).</div>
-          <div class="auto-row">⚡ vtg-sf-account-sync · vtg-monday-sf-sync · UID written back to monday</div>
+          <div class="sop-step-hdr"><span class="sop-step-title">1.0 · Where Commercial Pipeline Lives — Salesforce</span><span class="sop-owner">Sales</span><span class="badge b-live">Policy — Sep 18 2026</span><span class="badge b-gap">Revised Sep 24</span></div>
+          <div class="sop-body"><strong>For the sales team, Salesforce is the system of record for commercial (non-E-Rate) pipeline</strong> — <em>"If it's not in Salesforce, it didn't happen."</em> Routing: no E-Rate / FCC funding → <strong>Salesforce</strong>; E-Rate work → <strong>monday.com</strong>; on a split-funded deal the non-E-Rate portion is tracked in Salesforce separately. Written up in the VTG Salesforce SOP (<code>VTG_Salesforce_SOP.html</code>, v2.1 — Sep 9 2026).<br><br><strong>⚠ Revised Sep 24 2026 — Salesforce is a reporting layer, not a link in this chain.</strong> It exists to give the sales team a view of pipeline; it is <em>not</em> part of the order-to-invoice flow, and no step below should depend on it. <strong>Salesforce integration work is stopped</strong> until Salesforce settles its final product. The replacement direction: the monday client form creates the new customer <strong>directly in NetSuite</strong>, taking Salesforce out of the middle. The existing sync Workers keep running — they are how the UID gets written back — but nothing new is being built on them.</div>
+          <div class="auto-row">⚡ vtg-sf-account-sync · vtg-monday-sf-sync · UID written back to monday — running, not being extended</div>
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">1.1 · CSOP Form Submitted via MSP Portal</span><span class="sop-owner">Automation</span><span class="badge b-live">Live</span></div>
@@ -1015,7 +1015,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">Subitem task schedule never activates</div><div class="pri pri-h">High</div></div>
         <div class="gap-body"><code>formula8</code> computes every subitem's due date correctly, but <code>date3</code> "Task Due Date - Manual" — the column <strong>seven active automations</strong> actually trigger on — is empty on every subitem. monday formula columns cannot fire automations, so the due-today notification, the three per-person row highlights and the three auto-assign rules can never run. Fix without touching Dylan's automations: one more Autoboost recipe writing the computed date into <code>date3</code>, mirroring what 483152942 already does for Bid Due Date Mirror. Backfilling in bulk would trigger the three auto-assigns, so apply to new subitems first.</div>
-        <div class="gap-worker">Bids #3 subitems · date3 · Autoboost · 7 automations</div>
+        <div class="gap-body" style="margin-top:8px;"><strong>Sep 24 2026 — approved fix: build <code>vtg-bid-task-dates</code>.</strong> Rather than only filling <code>date3</code>, the offsets themselves get fixed. Today they count back from Bid Due Date in calendar days, so a plan step can land on a Saturday. The Worker converts the subitem-creation automation’s existing calendar-day offsets into <strong>equivalent business days</strong> — keeping the plan roughly the same length rather than reusing the numbers as-is — and skips <strong>federal holidays only</strong> (no special Christmas–New Year handling). It works on the subitems after creation, so Dylan’s automation is untouched. Rollout is <strong>going forward only</strong>; existing bids’ subitems are left alone. Mail carrier transit is already built into the offsets. If it proves out, the <code>date3</code> "Task Due Date - Manual" column comes out entirely.</div>
+        <div class="gap-worker">Bids #3 subitems · date3 · Autoboost · 7 automations · vtg-bid-task-dates (approved)</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">Salesforce CloseDate is always in the past</div><div class="pri pri-h">High</div></div>
@@ -1138,6 +1139,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">vtg-logo-probe · diagnostic · delete when done</div>
       </div>
       <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Unused bid subitems are deleted by hand on every bid</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">Every bid is created with the full subitem set, and the team then deletes the ones that do not apply — on every single bid, all season. The intake form already knows which ones apply: delivery method, bond required, blueprint selection and the rest are all captured at intake. <strong>Wanted next:</strong> create the subtasks <em>from</em> those intake selections instead of creating everything and pruning. Sits behind the date engine in the queue.</div>
+        <div class="gap-worker">vtg-bid-intake selections → Bids #3 subitem creation</div>
+      </div>
+      <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">DKIM not configured for vtgus.com</div><div class="pri pri-l">Low</div></div>
         <div class="gap-body">All Workers send via SMTP2GO / noreply@vtgus.com. DKIM not set up — deliverability risk on billing notifications, CSOP emails, bond emails as volume grows.</div>
         <div class="gap-worker">SMTP2GO · vtgus.com DNS</div>
@@ -1167,6 +1173,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-card-hdr"><div class="gap-title">Push the order from monday.com directly into NetSuite</div><div class="pri pri-h">High</div></div>
         <div class="gap-body"><strong>The structural fix for monday ↔ NS matching.</strong> Today the link between a monday project and its NetSuite order is reconstructed <em>after the fact</em> — vtg-ns-so-backfill matches UID to <code>custentity_acs_unique_entity_identifier</code> and falls back to fuzzy name; vtg-po-sync reads back from whatever it finds. That is a stopgap, and it is only as good as the name and UID data on both sides. Planned direction: <strong>create the order in NetSuite from monday at order time</strong>, so the NS record carries the monday item and UID identity from creation. Matching then becomes 100% accurate by construction, the backfill and reconciliation Workers drop back to being a safety net rather than the mechanism, and the customer ID mapping that currently blocks the invoice flow stops being a separate problem. Pairs with making the customer PO # required on the CS Order form as the verification key.</div>
         <div class="gap-worker">vtg-ns-mcp-sync · vtg-cs-form · retires the vtg-ns-so-backfill fuzzy path</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">monday client form → create the customer directly in NetSuite</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body"><strong>Sep 24 2026 — this replaces the Salesforce path for new customers.</strong> The monday client form will create the new customer record straight in NetSuite, taking Salesforce out of the middle entirely; Salesforce integration work is stopped until SF settles its final product. The form needs <strong>Cari’s required new-client fields</strong> — the same set Wendy is adding to the CSOP — so finance has everything it needs at intake rather than chasing it at invoice time. Pairs with the planned monday → NS order push: same principle, create the record in NS at the moment it exists rather than reconciling later.</div>
+        <div class="gap-worker">monday client form · NetSuite customer create · Cari’s required fields · CSOP parity (Wendy)</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">"Remaining to invoice" on Projects #4</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">VTG does a good amount of progress billing on Projects #4, and nothing on the board shows how much of a project is still uninvoiced. Wanted: capture invoiced amounts from NetSuite and subtract them from <strong>Total Project Amount</strong>. Source-of-truth split is deliberate — <strong>monday.com owns the contract value</strong> (it is where the sales proposal originates and where the team checks it), NetSuite reports invoiced actuals against it. Scope is <strong>invoiced only</strong>: no collections, no AR, no credit-memo netting. Note for the math: VTG invoices normally include tax and freight, though nearly all VTG jobs are tax exempt.</div>
+        <div class="gap-worker">Projects #4 · Total Project Amount · NS invoiced actuals</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Group-wide quote-to-cash consolidation</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">Bigger than this map, but it will reshape what sits under it. Bill Loiacano ran a <strong>Quote-to-Cash discovery across the group</strong> — Comm Core, VTG logistics, Quotient and JJ’s — and it is heading from discovery into decision and execution, with Kevin F. wanting Jon, Bill and Radde to fix the group’s Q2C processes. Open feasibility question on the table: <strong>drop Rev.io (Comm Core) in favour of NetSuite billing with monday for PM</strong> — how much work, and is it worth it. The VoIP business is staying and will be integrated rather than retired.</div>
+        <div class="gap-worker">Group Q2C · Rev.io → NetSuite feasibility · Comm Core / Quotient / JJ’s</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">SharePoint folder auto-creation on bid stage</div><div class="pri pri-l">Low</div></div>
@@ -1456,7 +1477,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>New Bids #3 cols</strong><span>SOW Document (file_mm6wm4hn) · Generate SOW button (button_mm70vvrb)</span></div>
         <div class="worker-meta-row"><strong>Confirmed</strong><span>First end-to-end delivery confirmed: North Branch Area Schools, 470# 260005778 — .docx uploaded to Bids #3 SOW Document column successfully</span></div>
         <div class="worker-meta-row"><strong>Gap</strong><span>Multiple button clicks create multiple ScopeStack documents — idempotency/dedup not yet built</span></div>
-        <div class="worker-meta-row"><strong>Future</strong><span>AI executive summaries · vtg-sow-builder pricing sheet integration · blueprint → datasheet auto-selection</span></div>
+        <div class="worker-meta-row"><strong>AI customer summary</strong><span><em>Sep 2026.</em> The team used to log into ScopeStack and write the project Customer Summary there with Claude/ChatGPT or ScopeStack’s built-in AI writer. That now runs from monday instead, inside this Worker — which already holds the ScopeStack API credentials. ScopeStack’s own generator was enabled first (<em>Generate Executive Summary: Create</em> on the Admin role) and produced poor output, leaking "missing the JSON" text into the summary, so the writing is done by <strong>Claude via the Anthropic API</strong> instead. VTG organization key stored as <code>ANTHROPIC_API_KEY</code> on this Worker.</span></div>
+        <div class="worker-meta-row"><strong>Summary trigger</strong><span>Runs as part of the existing <strong>Generate SOW</strong> button — the separate "Write Summary" button was built and then removed, so there is one button, not two</span></div>
+        <div class="worker-meta-row"><strong>Format constraint</strong><span>ScopeStack’s SOW template prints Markdown symbols literally, so summary text written back to ScopeStack must be <strong>plain text</strong> — no asterisks, no hashes</span></div>
+        <div class="worker-meta-row"><strong>Future</strong><span>vtg-sow-builder pricing sheet integration · blueprint → datasheet auto-selection</span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-scopestack-doc-sync\</span></div>
       </div>
     </div>
@@ -1537,6 +1561,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div class="worker-meta">
         <div class="worker-meta-row"><strong>Auth</strong><span>OAuth 2.0 M2M · EC P-256 · SuiteQL customer query</span></div>
         <div class="worker-meta-row"><strong>Blocked by</strong><span>NS sandbox refresh — all integration config will be wiped</span></div>
+      </div>
+    </div>
+
+    <div class="worker-card" style="border-color:var(--purple-dim);">
+      <div class="worker-card-hdr">
+        <div><div class="worker-name">vtg-bid-task-dates</div><div class="worker-url">vectorfi-admin.workers.dev</div></div>
+        <span class="badge b-plan worker-status">Approved — Sep 24 2026</span>
+      </div>
+      <div class="worker-desc">Business-day date engine for Bids #3 subitems. Today the subitem plan counts back from <strong>Bid Due Date</strong> in calendar days with no weekend or holiday logic, so steps land on Saturdays and the plan quietly compresses. This Worker recomputes those dates on new subitems: it converts the subitem-creation automation’s existing calendar-day offsets into <strong>equivalent business days</strong> — keeping the plan about the same length rather than reusing the numbers as-is — and skips <strong>federal holidays only</strong>. No special handling for Christmas–New Year’s week. It acts on subitems <em>after</em> creation, so Dylan’s automation does not have to change. Mail carrier transit is already baked into the offsets and is not added again.</div>
+      <div class="worker-meta">
+        <div class="worker-meta-row"><strong>Rollout</strong><span>Going forward only — existing bids’ subitems are not adjusted</span></div>
+        <div class="worker-meta-row"><strong>Delivery rules</strong><span>Email bids: compile can be the day before the bid is emailed · Mailed bids: mail out 5 days before due, Appendix C on the day of or the day after SOV/SOW</span></div>
+        <div class="worker-meta-row"><strong>Short-fuse bids</strong><span>Bids with less runway than the plan are left as-is for now — review once the season starts</span></div>
+        <div class="worker-meta-row"><strong>Follow-on</strong><span>If it proves out, the <code>date3</code> "Task Due Date - Manual" column is removed entirely</span></div>
+        <div class="worker-meta-row"><strong>Fixes</strong><span>The dead subitem reminder system — see the "Subitem task schedule never activates" gap</span></div>
       </div>
     </div>
 
@@ -2378,7 +2417,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.6</div>
+  <div class="cl-version-pill">Current: v2.7</div>
 </div>
 
 <table class="cl-table">
@@ -2393,6 +2432,46 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <tbody>
 
     <!-- ── Sep 22–24 2026 ── -->
+    <!-- ── Sep 25 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">September 25, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Sep 25</td>
+      <td class="cl-ver">v2.7</td>
+      <td><span class="cl-badge cl-new">New</span></td>
+      <td class="cl-desc"><strong>ScopeStack customer summary now written by Claude, from monday</strong> — The team used to log into ScopeStack and write each project’s Customer Summary there. It now runs inside <code>vtg-scopestack-doc-sync</code>, which already held the ScopeStack API credentials. ScopeStack’s own generator was enabled first (<em>Generate Executive Summary: Create</em> on the Admin role) and produced poor output — it leaked "missing the JSON" text into the summary — so the writing is done by <strong>Claude via the Anthropic API</strong>, with a VTG organization key stored as <code>ANTHROPIC_API_KEY</code> on the Worker. It runs as part of the existing <strong>Generate SOW</strong> button; a separate "Write Summary" button was built and then removed, so there is one button, not two. One constraint worth remembering: ScopeStack’s SOW template prints Markdown symbols literally, so summary text written back must be plain text.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 24</td>
+      <td class="cl-ver">v2.7</td>
+      <td><span class="cl-badge cl-new">New</span></td>
+      <td class="cl-desc"><strong>vtg-bid-task-dates approved — business-day subitem scheduling</strong> — The subitem plan counts back from Bid Due Date in calendar days with no weekend or holiday logic. New Worker converts the automation’s existing calendar-day offsets into <strong>equivalent business days</strong> (keeping the plan about the same length rather than reusing the numbers), skipping <strong>federal holidays only</strong> — no special Christmas–New Year handling. It works on subitems after creation so Dylan’s subitem-creation automation is untouched, and applies <strong>going forward only</strong>; existing bids are left alone. Delivery rules pinned: email bids can compile the day before sending; mailed bids go out 5 days before due, with Appendix C on the day of or the day after SOV/SOW. Mail transit is already in the offsets. If it proves out, the <code>date3</code> "Task Due Date - Manual" column comes out entirely — which also closes the dead-reminder gap.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 24</td>
+      <td class="cl-ver">v2.7</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Salesforce comes out of the flow · client form writes to NetSuite directly</strong> — Salesforce integration work is <strong>stopped</strong> until Salesforce settles its final product. It stays as the sales team’s pipeline reporting layer, not a link in the order-to-invoice chain, and nothing new gets built on it — the existing sync Workers keep running because that is how the UID is written back. In its place, the <strong>monday client form will create the new customer directly in NetSuite</strong>, carrying <strong>Cari’s required new-client fields</strong> (the same set Wendy is adding to the CSOP) so finance has what it needs at intake instead of chasing it at invoice time. Same principle as the planned monday → NS order push: create the record in NS when it exists rather than reconciling afterwards. SOP step 1.0 revised to match.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 24</td>
+      <td class="cl-ver">v2.7</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>"Remaining to invoice" wanted on Projects #4</strong> — VTG progress-bills heavily on that board and nothing shows how much of a project is still uninvoiced. Capture invoiced amounts from NetSuite, subtract from <strong>Total Project Amount</strong>. Source-of-truth split is deliberate: monday.com owns the contract value (the sales proposal originates there and the team checks it there), NetSuite reports invoiced actuals against it. Scope is invoiced only — no collections, no AR, no credit-memo netting. Logged under Planned.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 24</td>
+      <td class="cl-ver">v2.7</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Group-wide quote-to-cash consolidation in play</strong> — Bigger than this map but it will reshape what sits under it. Bill Loiacano ran a Quote-to-Cash discovery across the group (Comm Core, VTG logistics, Quotient, JJ’s), now moving from discovery into decision and execution, with Kevin F. wanting Jon, Bill and Radde on the group’s Q2C processes. Open feasibility question: drop <strong>Rev.io</strong> (Comm Core) in favour of NetSuite billing with monday for PM — can it be done and at what cost. The VoIP business stays and gets integrated rather than retired.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 24</td>
+      <td class="cl-ver">v2.7</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Bid subitems should be created from intake selections, not pruned by hand</strong> — Every bid is created with the full subitem set and the team deletes what does not apply, on every bid, all season. The intake form already captures what decides it — delivery method, bond required, blueprint selection. Logged as a Medium gap; queued behind the date engine.</td>
+    </tr>
+
     <tr class="cl-section-row"><td colspan="4">September 22–24, 2026</td></tr>
 
     <tr>
