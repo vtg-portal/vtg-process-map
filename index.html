@@ -242,7 +242,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="hdr">
   <div>
     <div class="hdr-title">VTG · Lead → Invoice Process Map</div>
-    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Sep 25 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
+    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Sep 28 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
   </div>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
     <div class="legend">
@@ -958,8 +958,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div class="sop-ph-hdr"><div class="sop-ph-num">1</div><div><div class="sop-ph-title">Lead Intake via MSP Portal</div><div class="sop-ph-sub">Bypasses El Nova and Bids #3 entirely · Automation</div></div></div>
       <div class="sop-steps">
         <div class="sop-step">
-          <div class="sop-step-hdr"><span class="sop-step-title">1.0 · Where Commercial Pipeline Lives — Salesforce</span><span class="sop-owner">Sales</span><span class="badge b-live">Policy — Sep 18 2026</span><span class="badge b-gap">Revised Sep 24</span></div>
-          <div class="sop-body"><strong>For the sales team, Salesforce is the system of record for commercial (non-E-Rate) pipeline</strong> — <em>"If it's not in Salesforce, it didn't happen."</em> Routing: no E-Rate / FCC funding → <strong>Salesforce</strong>; E-Rate work → <strong>monday.com</strong>; on a split-funded deal the non-E-Rate portion is tracked in Salesforce separately. Written up in the VTG Salesforce SOP (<code>VTG_Salesforce_SOP.html</code>, v2.1 — Sep 9 2026).<br><br><strong>⚠ Revised Sep 24 2026 — Salesforce is a reporting layer, not a link in this chain.</strong> It exists to give the sales team a view of pipeline; it is <em>not</em> part of the order-to-invoice flow, and no step below should depend on it. <strong>Salesforce integration work is stopped</strong> until Salesforce settles its final product. The replacement direction: the monday client form creates the new customer <strong>directly in NetSuite</strong>, taking Salesforce out of the middle. The existing sync Workers keep running — they are how the UID gets written back — but nothing new is being built on them.</div>
+          <div class="sop-step-hdr"><span class="sop-step-title">1.0 · Where Commercial Pipeline Lives — Salesforce</span><span class="sop-owner">Sales</span><span class="badge b-live">Policy — Sep 18 2026</span><span class="badge b-gap">Revised Sep 24</span><span class="badge b-plan">Order set Sep 28</span></div>
+          <div class="sop-body"><strong>For the sales team, Salesforce is the system of record for commercial (non-E-Rate) pipeline</strong> — <em>"If it's not in Salesforce, it didn't happen."</em> Routing: no E-Rate / FCC funding → <strong>Salesforce</strong>; E-Rate work → <strong>monday.com</strong>; on a split-funded deal the non-E-Rate portion is tracked in Salesforce separately. Written up in the VTG Salesforce SOP (<code>VTG_Salesforce_SOP.html</code>, v2.1 — Sep 9 2026).<br><br><strong>⚠ Revised Sep 24 2026 — Salesforce is a reporting layer, not a link in this chain.</strong> It exists to give the sales team a view of pipeline; it is <em>not</em> part of the order-to-invoice flow, and no step below should depend on it. <strong>Salesforce integration work is stopped</strong> until Salesforce settles its final product. The replacement direction: the monday client form creates the new customer <strong>directly in NetSuite</strong>, taking Salesforce out of the middle. The existing sync Workers keep running — they are how the UID gets written back — but nothing new is being built on them.<br><br><strong>Account creation order, agreed Sep 28 2026:</strong> the account is created in <strong>monday first</strong>, then the customer is created in <strong>NetSuite</strong>, then <strong>Salesforce</strong>, and the Salesforce UID comes back to both monday and NetSuite. The NetSuite customer is created <strong>at won/order, not at lead</strong> — no NS record for something that may never become an order. Salesforce still receives the data, but last and for reporting; that is also what satisfies Bill’s new-client checklist automation. This reconciles the two positions above: Salesforce is not in the critical path, but it is not cut off either. Worth knowing why it matters — <strong>sales reps do not want to create accounts in Salesforce</strong> and only do it when forced to, which is non-E-Rate jobs; an automated flow is what keeps SF populated at all.</div>
           <div class="auto-row">⚡ vtg-sf-account-sync · vtg-monday-sf-sync · UID written back to monday — running, not being extended</div>
         </div>
         <div class="sop-step">
@@ -1054,8 +1054,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">vtg-cs-form · Projects #4 · NetSuite order verification</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">Legacy monday records predate the UID standard</div><div class="pri pri-m">Medium</div></div>
-        <div class="gap-body"><strong>UID (the Salesforce Account ID) is the source of truth going forward</strong> — every new cross-system link keys on it, not on customer name. The monday ↔ Salesforce sync that produces it is reliable; the problem is history. Older Accounts, Bids and Projects records carry a blank or stale UID, which is what forces the fuzzy-name fallback in vtg-ns-so-backfill and friends. Cleanup of those legacy records is outstanding; the standard itself is settled — stick to the UID.</div>
+        <div class="gap-card-hdr"><div class="gap-title">The UID has not proved stable — standard under review</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body"><strong>⚠ Reversal, Sep 28 2026.</strong> The UID (Salesforce Account ID) was adopted as the cross-system source of truth on the understanding that the monday ↔ Salesforce sync was 100% reliable. In practice <strong>Salesforce duplicates contacts and the UID has not been stable</strong>, and Salesforce’s own requirements keep changing underneath it. So there are now two problems, not one: the old one — legacy Accounts, Bids and Projects records carrying a blank or stale UID, which is what forces the fuzzy-name fallback in vtg-ns-so-backfill and friends — and the new one, that a freshly-issued UID cannot simply be trusted either. This is the strongest argument yet for the monday → NetSuite order push and the direct NS customer create: an identity minted where the record is created does not depend on a third system staying still.</div>
         <div class="gap-worker">UID · Accounts text_mm6s8adk · Projects #4 text_mm76zvbz</div>
       </div>
       <div class="gap-card">
@@ -1190,6 +1190,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">Group Q2C · Rev.io → NetSuite feasibility · Comm Core / Quotient / JJ’s</div>
       </div>
       <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Account flow: monday → NetSuite → Salesforce</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body"><strong>Sequence agreed Sep 28 2026.</strong> Account created in <strong>monday</strong> → customer created in <strong>NetSuite</strong> → then <strong>Salesforce</strong> → SF UID returned to both monday and NS. The NS customer is created <strong>at won/order, not at lead</strong>. Build notes: the NetSuite API work runs under <strong>"VTG API Sync"</strong>, an integration identity with no GUI login but full API access — an existing Worker already holds its keys and secrets, so no new credential is needed. On the new-client form, a requested <strong>credit limit over the threshold flags but does not block</strong> the NetSuite create — finance reviews it rather than the order stalling at intake.</div>
+        <div class="gap-worker">monday client form · NetSuite (VTG API Sync) · Salesforce UID return</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Pull tax-exempt certificates from SharePoint into monday</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">Customer tax-exempt certificates live in the SharePoint <strong>All Company Documentation</strong> library under <code>Customers\&lt;customer&gt;\Accounting Documents</code>. The library is synced to Jon’s PC but <strong>not downloaded</strong> — it is very large — so anything reading it has to go through Graph rather than the local filesystem. Wanted: pull each customer’s certificate into monday so it sits with the account. Pairs with vtg-cs-form, which already captures a certificate at order time onto the Accounts board (<code>file_mm79y1x5</code>); this is the back-fill of the ones already on file.</div>
+        <div class="gap-worker">SharePoint All Company Documentation · Microsoft Graph · Accounts file_mm79y1x5</div>
+      </div>
+      <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">SharePoint folder auto-creation on bid stage</div><div class="pri pri-l">Low</div></div>
         <div class="gap-body"><strong>Designed Sep 23 2026, not yet built.</strong> Cloudflare Worker → Microsoft Graph off a monday webhook. Folder name = bid name minus the colon; standard subfolders (1-Cover Page … 9-Product Support Info) copied with their files from the <code>Base Bid Docs</code> template; Worker fills the SharePoint Link column, closes both Folder Creation subitems and uploads the Lead’s 470/RFP PDFs. <strong>Blocker:</strong> Entra app registration + SharePoint site grant from the M365 administrator — request email drafted, not yet actioned.</div>
         <div class="gap-worker">vtg-sp-folders · Microsoft Graph · Entra app registration</div>
@@ -1244,7 +1254,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Outputs</strong><span>Bids #3 item, Account/Contact linked, completed intake form PDF, SOV Builder link written, ScopeStack proposal created, bond subitem + email (if needed)</span></div>
         <div class="worker-meta-row"><strong>Bug fix</strong><span>Sep 19–20 2026 — GraphQL type error broke every Account/Contact lookup; contact selection rewritten and scored; dropdown reads from monday; intake PDF added</span></div>
         <div class="worker-meta-row"><strong>Logging</strong><span>Emits <code>[contact-match]</code> and <code>[intake-pdf]</code> per submit — visible in <code>wrangler tail</code></span></div>
-        <div class="worker-meta-row"><strong>Email</strong><span>bonds@vtgus.com + CHC-Surety@alliant.com (bond only)</span></div>
+        <div class="worker-meta-row"><strong>Contacts section</strong><span><em>Built Sep 24 2026 — replaced the single delivery field.</em> Three role relations to Contacts #2: <code>board_relation_mm7gf0s2</code> End User · <code>board_relation_mm7g1dbz</code> Consultant · <code>board_relation_mm7g72h8</code> eRate, plus <code>text_mm7gb8eg</code> Additional Recipients (joined with "; "). Named contacts are <strong>linked</strong> to Contacts #2 rather than duplicated as columns on the bid. Suggestions: consultant = the best-scoring contact that looks like one, end user = the best that does not, eRate = whoever filed the 470 either way. "+ Add someone else" requires name <em>and</em> email; write-back matches on email first to reuse an existing record, links it to the Account and types it Customer / Consultant, so the scorer gets better with every bid — and a failed CRM write never fails the bid. Additional recipients are deliberately <em>not</em> written back; they would dilute the contact data. Pre-change copy: <code>worker.pre-contacts.js</code>.</span></div>
+        <div class="worker-meta-row"><strong>Delivery recipients</strong><span>Bid delivery allows multiple recipients — checkboxes across the three roles plus "a different address". Rows disable as roles empty, nothing is pre-ticked (the confirmation gate stays deliberate), and addresses de-duplicate since the consultant is often also the eRate contact. monday’s email column holds one address, so <code>email_mm7gr1ce</code> Bid Delivery Email keeps the first recipient for a clickable value and <code>text_mm7gt2na</code> Bid Delivery Recipients holds the full "; " joined list.</span></div>
+        <div class="worker-meta-row"><strong>Bid bonds</strong><span><em>Live Sep 25 2026.</em> VTG’s surety is <strong>Alliant</strong>. When the bond toggle is on the form now requires a delivery choice — <strong>Electronic</strong> (Surety2000 / BidExpress / Other) or <strong>Physical</strong>, which is the default; physical ship-to defaults to the VTG office and stays editable, with an instructions field. That delivery instruction was the only real gap: Alliant confirmed system-generated requests are fine and that a lost-bid notice is enough to release a bond. Bond Type is fixed at <strong>Surety bond</strong> — VTG uses surety bonds only. Needed-by defaults to <strong>7 business days</strong> after submission, editable. On request the bid’s "Get bid bond - TOTAL = $" subitem is set to <em>Requested</em>. A bid set to <strong>Lost</strong> auto-cancels its bond, and a separate <strong>Not Needed</strong> bond status sends the same cancellation.</span></div>
+        <div class="worker-meta-row"><strong>Email</strong><span>Intake/bond: <strong>To</strong> CHC-Surety@alliant.com + bonds@vtgus.com · <strong>Cc</strong> Danny Rose (daniel.rose@alliant.com), Nicholas Manning (Nicholas.Manning@alliant.com) and the sales rep — all on one send</span></div>
         <div class="worker-meta-row"><strong>Addendum detection</strong><span><em>Shipped Sep 24 2026.</em> New <code>POST /lead-created</code> endpoint, fired by monday webhook <strong>642139356</strong> on Leads <code>create_item</code>. Matches the Leads item name (the bare 470 number) against Bids #3 <code>470__</code> — one 470 never covers two separately-bid RFPs, so a repeat 470 is an addendum, not a new opportunity. On a match it attaches the document, stamps the addendum columns and posts a courtesy update on the lead so nobody clicks Accept 470 on it. <strong>It never moves the bid’s stage.</strong> Acts only on exactly one match in a live stage; zero matches, closed-stage matches and multiple live matches all log and do nothing. Dedupe strips monday’s <code>&lt;assetId&gt;-</code> filename prefix, without which each lead’s copy of the same certified 470 PDF re-copies forever. Gated by <code>ADDENDUM_DRY_RUN</code> in wrangler.toml.</span></div>
         <div class="worker-meta-row"><strong>New Bids #3 columns</strong><span><code>file_mm7get0y</code> Addenda · <code>numeric_mm7gj7zz</code> Addendum # · <code>date_mm7gbfs7</code> Last Addendum Date · <code>color_mm7ghh94</code> Addendum Status (Received - Unreviewed / Reviewed) · <code>email_mm7gr1ce</code> Bid Delivery Email · <code>date_mm7gj5zp</code> Delivery Contact Confirmed — all created Sep 24 2026</span></div>
         <div class="worker-meta-row"><strong>Bid Delivery Contact</strong><span><em>Shipped Sep 24 2026.</em> The form now suggests the delivery contact from the account record and hard-blocks submit until the rep confirms it — required whatever the delivery method, because that contact also fields bid questions. Three states: suggestion with Yes/No radios, consultant suggestion with a warning, or no contact on file (radios gone, email required). <code>contactCandidates()</code> was split out of <code>pickContact()</code> so the form’s suggestion and the contact linked at submit use the same scorer; the candidate fetch is single-pass with no retries so a missing account record can never hang the form. Validated in the browser and again in <code>/submit</code> — format plus placeholder rejection, same pattern as vtg-cs-form’s PO number. The confirmed address lands in the archived intake PDF.</span></div>
@@ -1789,7 +1802,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <div class="glossary-card">
       <div class="glossary-term">UID (Salesforce Account ID)</div>
-      <div class="glossary-def">The Salesforce Account ID written back to the monday.com <strong>Accounts board</strong> UID column (<code>text_mm6s8adk</code>) by the <code>vtg-sf-account-sync</code> Worker after a successful Account upsert. Serves as the permanent cross-system identifier linking a monday.com Account record to its Salesforce counterpart. The external ID field <code>Monday_Item_ID__c</code> on the SF Account object is the join key used for idempotent upserts — UID is what comes back.</div>
+      <div class="glossary-def">The Salesforce Account ID written back to the monday.com <strong>Accounts board</strong> UID column (<code>text_mm6s8adk</code>) by the <code>vtg-sf-account-sync</code> Worker after a successful Account upsert. Intended as the permanent cross-system identifier linking a monday.com Account to its Salesforce counterpart; the external ID field <code>Monday_Item_ID__c</code> on the SF Account object is the join key used for idempotent upserts — UID is what comes back. <strong>Caveat (Sep 28 2026):</strong> treat a UID as a useful hint rather than a guarantee. Salesforce has been duplicating contacts and the UID has not held stable, so anything depending on it needs a fallback — see the UID gap.</div>
     </div>
 
     <div class="glossary-card">
@@ -2260,6 +2273,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <div class="dash-feeds">
         <div class="dash-feed">Bids #3 (18176633000) — linked via board_relation0</div>
         <div class="dash-feed">vtg-bid-intake — creates bond email + subitem on intake form submit</div>
+        <div class="dash-feed">Sep 25 2026 — request sets the bond subitem to Requested; Lost or Not Needed auto-cancels</div>
       </div>
     </div>
 
@@ -2417,7 +2431,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.7</div>
+  <div class="cl-version-pill">Current: v2.8</div>
 </div>
 
 <table class="cl-table">
@@ -2433,6 +2447,40 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <!-- ── Sep 22–24 2026 ── -->
     <!-- ── Sep 25 2026 ── -->
+    <!-- ── Sep 28 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">September 28, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Sep 28</td>
+      <td class="cl-ver">v2.8</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>⚠ The UID has not proved stable — reversal</strong> — The UID (Salesforce Account ID) was adopted as the cross-system source of truth on the understanding that the monday ↔ Salesforce sync was 100% reliable. It has not held: <strong>Salesforce duplicates contacts, the UID has not been stable, and Salesforce’s requirements keep changing</strong>. That leaves two problems where the map previously recorded one — legacy records with blank or stale UIDs, <em>and</em> newly-issued UIDs that cannot simply be trusted. The gap is raised to High and the glossary entry now carries the caveat. It also sharpens the case for the monday → NetSuite order push and the direct NS customer create: an identity minted where the record is created does not depend on a third system staying still.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 28</td>
+      <td class="cl-ver">v2.8</td>
+      <td><span class="cl-badge cl-new">New</span></td>
+      <td class="cl-desc"><strong>Account creation order settled: monday → NetSuite → Salesforce</strong> — Account created in monday first, then the customer in NetSuite, then Salesforce, with the SF UID returned to both monday and NS. The NetSuite customer is created <strong>at won/order, not at lead</strong>. This reconciles the Sep 24 position (Salesforce out of the flow) with Bill’s new-client checklist automation: SF still gets the data, last, for reporting. Context for why the automation matters at all — sales reps do not want to create accounts in Salesforce and only do so when forced, on non-E-Rate work. Build notes: NetSuite API work runs under <strong>"VTG API Sync"</strong>, an integration identity with no GUI login but full API access, whose keys an existing Worker already holds; and on the new-client form a requested credit limit over the threshold <strong>flags but does not block</strong> the NS create. SOP step 1.0 updated.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 25</td>
+      <td class="cl-ver">v2.8</td>
+      <td><span class="cl-badge cl-new">New</span></td>
+      <td class="cl-desc"><strong>Bid bond workflow rebuilt — live</strong> — VTG’s surety is <strong>Alliant</strong>, and they confirmed system-generated requests are fine and that a lost-bid notice is enough to release a bond; the only real gap was delivery instructions. So the intake form now requires a delivery choice when the bond toggle is on: <strong>Electronic</strong> (Surety2000 / BidExpress / Other) or <strong>Physical</strong>, the default, with ship-to defaulting to the VTG office, editable, plus an instructions field. Bond emails go <strong>To</strong> CHC-Surety@alliant.com + bonds@vtgus.com, <strong>Cc</strong> Danny Rose, Nicholas Manning and the sales rep, all on one send. Bond Type is fixed at Surety bond — VTG uses surety bonds only. Needed-by defaults to 7 business days after submission, editable. Requesting sets the bid’s "Get bid bond - TOTAL = $" subitem to <em>Requested</em>; a bid set to <strong>Lost</strong> auto-cancels its bond, and a new <strong>Not Needed</strong> status sends the same cancellation. Pushed live Sep 25, pending Jon’s own live test.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 25</td>
+      <td class="cl-ver">v2.8</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Intake contacts section replaces the single delivery field</strong> — Three role relations to Contacts #2 — <code>board_relation_mm7gf0s2</code> End User, <code>board_relation_mm7g1dbz</code> Consultant, <code>board_relation_mm7g72h8</code> eRate — plus <code>text_mm7gb8eg</code> Additional Recipients. Contacts are <em>linked</em> to Contacts #2, not duplicated as bid columns. Suggestions: consultant = best-scoring contact that looks like one, end user = best that does not, eRate = whoever filed the 470. "+ Add someone else" needs name and email, matches on email first to reuse a record, links it to the Account and types it Customer / Consultant so the scorer improves each bid — and a failed CRM write never fails the bid. Additional recipients are deliberately not written back. Bid delivery now takes <strong>multiple recipients</strong> as checkboxes across the three roles plus "a different address"; nothing is pre-ticked so the confirmation gate stays deliberate, and addresses de-duplicate since the consultant is often also the eRate contact. monday’s email column holds one address, so <code>email_mm7gr1ce</code> keeps the first recipient and <code>text_mm7gt2na</code> Bid Delivery Recipients holds the full list. A Billing contact field and the proposed Optional 1–5 fields were both dropped as excessive.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 28</td>
+      <td class="cl-ver">v2.8</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Tax-exempt certificates to be pulled into monday · Design Desk bypassed</strong> — Customer tax-exempt certificates live in the SharePoint <em>All Company Documentation</em> library under <code>Customers\&lt;customer&gt;\Accounting Documents</code>; the library is synced but not downloaded (too large), so it has to be read through Graph. Logged as a Medium planned item — it back-fills what vtg-cs-form already captures at order time. Separately, the <strong>Design Desk dependency stays open but is being bypassed</strong> by routing orders monday → NetSuite directly.</td>
+    </tr>
+
     <tr class="cl-section-row"><td colspan="4">September 25, 2026</td></tr>
 
     <tr>
