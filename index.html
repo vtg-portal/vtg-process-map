@@ -322,7 +322,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="hdr">
   <div>
     <div class="hdr-title">VTG · Lead → Invoice Process Map</div>
-    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Sep 29 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
+    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Oct 1 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
   </div>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
     <div class="legend">
@@ -1237,23 +1237,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">Bids #3 subitems · date3 · Autoboost · 7 automations · vtg-bid-task-dates (approved)</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">Salesforce CloseDate is always in the past</div><div class="pri pri-h">High</div></div>
-        <div class="gap-body">vtg-monday-sf-sync populates the Opportunity's <code>CloseDate</code> from <code>deal_creation_date</code>, the day the bid was created — so every E-Rate Opportunity is created with an expected close date that has already passed. Bids #3 has an unused <code>date_mm2c6t1k</code> "Expected Award Date" column which is exactly this field. <code>Amount</code> is likewise taken straight from Bid Value, so a placeholder bid value becomes a real forecast number. Quietly wrong on every Opportunity the sync has touched, not just the test bid.</div>
-        <div class="gap-worker">vtg-monday-sf-sync · CloseDate · date_mm2c6t1k</div>
+        <div class="gap-card-hdr"><div class="gap-title">Salesforce CloseDate was always in the past — resolved</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
+        <div class="gap-body">✅ <strong>Fixed 21 Sep 2026, both paths verified in production.</strong> <code>CloseDate</code> came from <code>deal_creation_date</code>, so every Opportunity was created already closed in the past. New column <strong><code>date_mm7dfkx</code> Actual Close Date</strong> on Bids #3; the Worker stamps it with today’s date when the bid reaches Post-Sale, and that value then wins. Precedence: <strong>Actual Close Date → Bid Due + 65 days → Creation + 65 (logged as a warning) → the old 2027-06-30 fallback.</strong> One-way monday → Salesforce, never read back.<br><br><em>The obvious fix would have broken it.</em> Switching to the existing <code>date_mm2c6t1k</code> Expected Award Date column was the first suggestion — measurement killed it: <strong>0 of 500 bids have that column set</strong>, so the sync would have sent a null to a required Salesforce field. 498 of 500 have Bid Due Date, which is why the fallback chain is built on it. <code>Amount</code> still comes straight from Bid Value and is unchanged — a placeholder bid value still becomes a real forecast number.</div>
+        <div class="gap-worker">vtg-monday-sf-sync · date_mm7dfkx Actual Close Date · patch_close_date.py · version 1f7be6d6</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">vtg-monday-sf-sync endpoint is unauthenticated</div><div class="pri pri-h">High</div></div>
-        <div class="gap-body">Every request logs <code>HMAC mismatch — sig received: &lt;empty&gt;</code> and is processed regardless, so the public Workers URL will write to a Salesforce Opportunity for anyone who knows it. Either monday's plain webhook action never signs the body, or the secret is unreachable — check the latter first, since vtg-sf-account-sync has a binding named <code>WEBHOOK_SECRETvtg-sf-sync-2026-xK9mQpL3</code> that looks like a secret pasted into the name field.</div>
-        <div class="gap-worker">vtg-monday-sf-sync · vtg-sf-account-sync · WEBHOOK_SECRET</div>
+        <div class="gap-body">Every request logs <code>HMAC mismatch — sig received: &lt;empty&gt;</code> and is processed regardless, so the public Workers URL will write to a Salesforce Opportunity for anyone who knows it. <strong>Cause established from the source (Sep 30 2026):</strong> the Worker reads <code>request.headers.get("x-monday-signature")</code>, and monday <em>does not send that header</em> for a "send a webhook" automation. <code>verifySignature</code> returns false on an empty signature, so <strong>the check can never pass and the secret is irrelevant</strong> — it was written against a header that never arrives. Fixing it means choosing a scheme monday actually sends, or a shared secret in the URL. The <code>WEBHOOK_SECRETvtg-sf-sync-2026-xK9mQpL3</code> binding on vtg-sf-account-sync is a separate question.</div>
+        <div class="gap-worker">vtg-monday-sf-sync · x-monday-signature · verifySignature</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">Salesforce stage map is incomplete</div><div class="pri pri-m">Medium</div></div>
-        <div class="gap-body">Bid Building sends <code>StageName: "Stage 3: Bid Building"</code>, but Folder Creation, Deal Reg and Bid Compilation send no stage at all — they log <code>active: false</code> and the field is omitted. So the Opportunity keeps reporting the last mapped stage while monday has moved on. If sales reads stage off Salesforce, they are looking at a bid one or more steps behind reality. Separately, <code>skip: true</code> only suppresses StageName; the Opportunity is still written on every column change, which produced 14 writes in one morning.</div>
-        <div class="gap-worker">vtg-monday-sf-sync · stage map · skip logic</div>
+        <div class="gap-body">Bid Building sends <code>StageName: "Stage 3: Bid Building"</code>, but Folder Creation, Deal Reg and Bid Compilation send no stage at all — they log <code>active: false</code> and the field is omitted. So the Opportunity keeps reporting the last mapped stage while monday has moved on. If sales reads stage off Salesforce, they are looking at a bid one or more steps behind reality. Separately, <code>skip: true</code> only suppresses StageName; the Opportunity is still written on every column change.<br><br><strong>The write volume has a cause, found Sep 30 2026.</strong> The "any column changes" webhook fires on <code>subitems</code> too, so <em>every subitem creation is another Salesforce write</em>: one Post-Sale transition produces 8, and creating a bid with its 22 subitems produces roughly 22. That — not users editing columns — is what the 414-run count was. The fix is a one-line early return on <code>event.columnId === "subitems"</code>. (An earlier single-column test came back 1:1 and the conclusion drawn from it, that there was no amplification, was wrong.)</div>
+        <div class="gap-worker">vtg-monday-sf-sync · stage map · skip logic · event.columnId === "subitems"</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">Generate SOW reports nothing while it runs</div><div class="pri pri-m">Medium</div></div>
-        <div class="gap-body">Generate Proposal sets <em>Working on it</em>, produces the PDF and sets <em>Done</em> in nine seconds. Generate SOW has no status column, takes around three and a half minutes, and is indistinguishable from a failure while running — it was mistaken for one during the 21 Sep walkthrough. Needs a SOW Status column and the same pattern. Its filename also doubles the district name. Neither generator closes its own <em>Create SOW</em> / <em>Create SOV</em> subitem, so both have to be ticked by hand.</div>
+        <div class="gap-body"><strong>Both generators work — this is a reporting gap, not a broken feature.</strong> Generate Proposal sets <em>Working on it</em>, produces the PDF and sets <em>Done</em> in nine seconds. Generate SOW has no status column and takes around three and a half minutes, which is indistinguishable from a failure while it runs — it was called broken twice during the walkthrough and was working both times. The SOV export was likewise called broken; it had simply never been run on the bids being checked. Needs a SOW Status column and the same pattern Generate Proposal already uses. Its filename also doubles the district name. Neither generator closes its own <em>Create SOW</em> / <em>Create SOV</em> subitem, so both have to be ticked by hand.</div>
         <div class="gap-worker">Generate SOW · file_mm6wm4hn · Create SOW subitem</div>
       </div>
       <div class="gap-card">
@@ -1362,6 +1362,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">vtg-bid-intake selections → Bids #3 subitem creation</div>
       </div>
       <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">The PO validator accepts its own placeholder</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">The Customer PO Number hard block rejects known junk — N/A, TBD, all-x, all-zero. A PO needs no particular format; anything genuinely filled in is acceptable. But the form’s own hint text, <code>PO-XXXX</code>, normalises to <code>poxxxx</code>, which is not in the reject list — so a rep who types the placeholder they are being shown sails through the check that exists to stop exactly that. One word in the reject list closes it.</div>
+        <div class="gap-worker">vtg-cs-form · PO number validator · reject list</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">An addendum made reps decline the lead</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body"><strong>Found in the field, Oct 2026 — Kent ISD.</strong> When an addendum arrived, the automation sent the lead back to New Leads, which meant a rep had to fill out a <em>whole new intake form</em> to re-accept a bid they had already accepted and were already working. Faced with that, reps declined those leads instead. The addendum screen was built to stop a second bid being created; this path was creating a second <em>intake</em> instead, and the workaround people found was to opt out.</div>
+        <div class="gap-worker">Dylan’s two "Accepted Leads → New Leads" addendum automations · vtg-bid-intake</div>
+      </div>
+      <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">DKIM not configured for vtgus.com</div><div class="pri pri-l">Low</div></div>
         <div class="gap-body">All Workers send via SMTP2GO / noreply@vtgus.com. DKIM not set up — deliverability risk on billing notifications, CSOP emails, bond emails as volume grows.</div>
         <div class="gap-worker">SMTP2GO · vtgus.com DNS</div>
@@ -1416,6 +1426,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-card-hdr"><div class="gap-title">Pull tax-exempt certificates from SharePoint into monday</div><div class="pri pri-m">Medium</div></div>
         <div class="gap-body">Customer tax-exempt certificates live in the SharePoint <strong>All Company Documentation</strong> library under <code>Customers\&lt;customer&gt;\Accounting Documents</code>. The library is synced to Jon’s PC but <strong>not downloaded</strong> — it is very large — so anything reading it has to go through Graph rather than the local filesystem. Wanted: pull each customer’s certificate into monday so it sits with the account. Pairs with vtg-cs-form, which already captures a certificate at order time onto the Accounts board (<code>file_mm79y1x5</code>); this is the back-fill of the ones already on file.</div>
         <div class="gap-worker">SharePoint All Company Documentation · Microsoft Graph · Accounts file_mm79y1x5</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Addenda attach to the live bid, not a fresh lead</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body"><strong>Direction set Oct 2026, in response to the Kent ISD decline.</strong> The Worker handles addendum files added to <em>existing</em> leads that already have a live bid, and <strong>Dylan’s two "Accepted Leads → New Leads" addendum automations get turned off</strong>. The bid stays where it is and the addendum lands on it — which was the original intent of the addendum screen; the lead-reset path was undoing it. Worth noting this is one of the few changes that touches Dylan’s automations rather than routing around them, so it needs his sign-off.</div>
+        <div class="gap-worker">vtg-bid-intake · Dylan’s addendum automations (to be disabled)</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Addenda copied into the bid’s SharePoint folder</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body"><strong>Scoped Oct 2026.</strong> An addendum gets copied into the bid’s SharePoint folder the same way the RFP already is, placed in the <strong>bid folder root next to the RFP and the 470</strong> rather than in a separate Addenda subfolder — the people reading these folders expect the bid documents together, not filed by type. A Bids #3 Addenda webhook drives it.<br><br><strong>Security note worth carrying:</strong> that route is <code>/addenda</code> on vtg-sp-folders and it is <strong>key-less</strong>, because the existing <code>WEBHOOK_KEY</code> could not be recovered. Every other route on the Worker keeps its key. This is a deliberate, scoped exception — not an oversight — but it is a second unauthenticated endpoint on the map, alongside vtg-monday-sf-sync.</div>
+        <div class="gap-worker">vtg-sp-folders · /addenda (key-less) · Bids #3 Addenda webhook</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">SharePoint folder auto-creation on bid stage</div><div class="pri pri-l">Low</div></div>
@@ -2649,7 +2669,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.9</div>
+  <div class="cl-version-pill">Current: v2.10</div>
 </div>
 
 <table class="cl-table">
@@ -2667,6 +2687,46 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <!-- ── Sep 25 2026 ── -->
     <!-- ── Sep 28 2026 ── -->
     <!-- ── Sep 29 2026 ── -->
+    <!-- ── Oct 1 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">October 1, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 1</td>
+      <td class="cl-ver">v2.10</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>An addendum was making reps decline the lead</strong> — Found in the field at <strong>Kent ISD</strong>. When an addendum arrived, the automation sent the lead back to New Leads, so a rep had to complete a whole new intake form to re-accept a bid they were already working — and faced with that, reps declined those leads instead. The addendum screen exists to stop a second <em>bid</em>; this path was creating a second <em>intake</em>. Direction set: the Worker handles addendum files added to existing leads that already have a live bid, and Dylan’s two "Accepted Leads → New Leads" addendum automations are turned off. One of the few changes that touches Dylan’s automations rather than routing around them.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 1</td>
+      <td class="cl-ver">v2.10</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Addenda to be copied into the bid’s SharePoint folder</strong> — Same treatment the RFP already gets, placed in the bid folder root next to the RFP and the 470 rather than a separate Addenda subfolder. Driven by a Bids #3 Addenda webhook. The route is <code>/addenda</code> on vtg-sp-folders and is <strong>key-less</strong> because the existing <code>WEBHOOK_KEY</code> could not be recovered; every other route keeps its key. Logged plainly because it is a second unauthenticated endpoint on this map.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 30</td>
+      <td class="cl-ver">v2.10</td>
+      <td><span class="cl-badge cl-fix">Resolved</span></td>
+      <td class="cl-desc"><strong>Salesforce CloseDate fixed — and the obvious fix would have broken it</strong> — Shipped 21 Sep, both paths verified in production. New <code>date_mm7dfkx</code> Actual Close Date column on Bids #3, stamped when the bid reaches Post-Sale; precedence Actual Close Date → Bid Due + 65 days → Creation + 65 (warned) → old fallback. One-way monday → Salesforce. The first suggestion was to use the existing Expected Award Date column — measurement killed it: <strong>0 of 500 bids have it set</strong>, so the sync would have sent a null to a required Salesforce field, while 498 of 500 have Bid Due Date. <code>Amount</code> is unchanged and still takes a placeholder bid value as a real forecast number.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 30</td>
+      <td class="cl-ver">v2.10</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>Why the Salesforce endpoint can never authenticate</strong> — Established from the source rather than inferred. The Worker reads <code>x-monday-signature</code>, which monday <em>does not send</em> for a "send a webhook" automation, and <code>verifySignature</code> returns false on an empty signature — so the check can never pass and the secret is irrelevant. It was written against a header that never arrives. Fixing it means a scheme monday actually sends, or a shared secret in the URL. Separately, the write volume now has a cause: the "any column changes" webhook fires on <code>subitems</code>, so every subitem creation is another Salesforce write — 8 for a Post-Sale transition, ~22 for a bid creation. That is what the 414-run count was, not user edits. One-line early return fixes it.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 30</td>
+      <td class="cl-ver">v2.10</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Two corrections: the SOW and SOV generators were never broken</strong> — Both were called broken during the walkthrough and both were working. Generate SOW simply takes ~3.5 minutes with no status column, which is indistinguishable from a failure; the SOV export had never been run on the bids being checked. The gap stands, but as a <em>reporting</em> gap. Likewise the two CS Order subitems are not an automation duplicate — vtg-cs-form creates the linked one and dedupes via KV, Dylan’s automation creates the plain checklist row. Nothing to raise there.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Sep 30</td>
+      <td class="cl-ver">v2.10</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>The PO validator accepts its own placeholder</strong> — The hard block rejects N/A, TBD, all-x and all-zero, and a PO needs no particular format beyond being filled in. But the form’s own hint, <code>PO-XXXX</code>, normalises to <code>poxxxx</code>, which is not in the reject list — so typing the placeholder the form shows you passes the check meant to stop exactly that. One word closes it. Also: the Ionia walkthrough is finished and its records are deleted — bid 13089254247, test bids 13087066256 and 13089189680, and deal reg 13093685203 are all gone.</td>
+    </tr>
+
     <tr class="cl-section-row"><td colspan="4">September 29, 2026</td></tr>
 
     <tr>
