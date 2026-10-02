@@ -967,7 +967,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">0.3 · vtg-sf-account-sync Upserts Account + Contact to Salesforce</span><span class="sop-owner">Automation</span><span class="badge b-live">Live — Sep 12 2026</span></div>
-          <div class="sop-body">When an Account or Contact is created or updated on their respective monday.com boards, <strong>vtg-sf-account-sync</strong> fires via webhook. It upserts both the <strong>Account</strong> and <strong>Contact</strong> objects into Salesforce using <code>Monday_Item_ID__c</code> as the external ID — creating new SF records or updating existing ones idempotently. After the SF upsert, the Worker writes the <strong>Salesforce Account ID</strong> back to the <code>UID</code> column (<code>text_mm6s8adk</code>) on the monday.com Accounts board, completing the cross-system link. A <strong>backfill script</strong> (backfill.mjs) ran against all 791 existing accounts to populate Salesforce and stamp the UID column. Complements vtg-monday-sf-sync which syncs Bids — this Worker handles the CRM Account/Contact layer.</div>
+          <div class="sop-body"><strong>⚠ Runs when called — today that is only <code>backfill.mjs</code>, run by hand. No monday automation triggers it (checked Oct 1 2026).</strong> When it does run, <strong>vtg-sf-account-sync</strong> upserts both the <strong>Account</strong> and <strong>Contact</strong> objects into Salesforce using <code>Monday_Item_ID__c</code> as the external ID — creating new SF records or updating existing ones idempotently. After the SF upsert, the Worker writes the <strong>Salesforce Account ID</strong> back to the <code>UID</code> column (<code>text_mm6s8adk</code>) on the monday.com Accounts board, completing the cross-system link. A <strong>backfill script</strong> (backfill.mjs) ran against all 791 existing accounts to populate Salesforce and stamp the UID column. Complements vtg-monday-sf-sync which syncs Bids — this Worker handles the CRM Account/Contact layer.</div>
           <div class="auto-row">⚡ vtg-sf-account-sync · SF Client Credentials OAuth · Monday_Item_ID__c external ID · KV: SF_ACCOUNT_TOKEN_KV</div>
         </div>
       </div>
@@ -1242,9 +1242,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">vtg-monday-sf-sync · date_mm7dfkx Actual Close Date · patch_close_date.py · version 1f7be6d6</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">vtg-monday-sf-sync endpoint is unauthenticated</div><div class="pri pri-h">High</div></div>
-        <div class="gap-body">Every request logs <code>HMAC mismatch — sig received: &lt;empty&gt;</code> and is processed regardless, so the public Workers URL will write to a Salesforce Opportunity for anyone who knows it. <strong>Cause established from the source (Sep 30 2026):</strong> the Worker reads <code>request.headers.get("x-monday-signature")</code>, and monday <em>does not send that header</em> for a "send a webhook" automation. <code>verifySignature</code> returns false on an empty signature, so <strong>the check can never pass and the secret is irrelevant</strong> — it was written against a header that never arrives. Fixing it means choosing a scheme monday actually sends, or a shared secret in the URL. The <code>WEBHOOK_SECRETvtg-sf-sync-2026-xK9mQpL3</code> binding on vtg-sf-account-sync is a separate question.</div>
-        <div class="gap-worker">vtg-monday-sf-sync · x-monday-signature · verifySignature</div>
+        <div class="gap-card-hdr"><div class="gap-title">vtg-monday-sf-sync endpoint was unauthenticated — resolved</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
+        <div class="gap-body">✅ <strong>Fixed Oct 1 2026 · version <code>dc33a840</code>.</strong> monday’s "send a webhook" automation sends no signature at all, so signature checking was the wrong mechanism. The Worker now requires a <strong>shared key in the webhook URL</strong> (<code>?key=</code>), checked before anything else — requests without it get <strong>401</strong>. It also rejects non-numeric item IDs and any item that is not on Bids #3. Both Bids #3 automations were switched to the keyed connection.<br><br><em>The original check had two independent reasons it could never pass:</em> the header never arrives, <strong>and</strong> the code read <code>WEBHOOK_SECRET</code> while the deployed secret was named <code>MONDAY_WEBHOOK_SECRET</code>. Either alone was fatal. Verified with a 401 on an unkeyed request and a live sync of Clinton Macomb Public Library.</div>
+        <div class="gap-worker">vtg-monday-sf-sync · ?key= · version dc33a840</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">vtg-sf-account-sync endpoints were unauthenticated — resolved</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
+        <div class="gap-body">✅ <strong>Fixed Oct 1 2026 · version <code>e6d28b50</code>.</strong> <code>/sync/:itemId</code> and <code>/backfill</code> had no authentication at all, and <code>/webhook</code> checked an <code>Authorization</code> header that monday never sends — the same class of mistake as vtg-monday-sf-sync, found while fixing it. <strong>Every route except <code>/health</code> now requires <code>?key=</code>.</strong> <code>/webhook</code> accepts numeric IDs only, and a sync by ID runs only for Accounts #1 items. <code>backfill.mjs</code> reads the key from <code>ACCOUNT_SYNC_KEY</code>. The misnamed secret binding and the old <code>WEBHOOK_SECRET</code> were both deleted. Verified with a 401 on an unkeyed request.</div>
+        <div class="gap-worker">vtg-sf-account-sync · ?key= on every route but /health · version e6d28b50</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">New and edited Accounts do not reach Salesforce on their own</div><div class="pri pri-l">Low</div></div>
+        <div class="gap-body">The Account → Salesforce path runs <strong>only when something calls it</strong>, and today the only caller is <code>backfill.mjs</code>, run by hand. No monday automation was found that triggers the Worker: the Accounts #1 board’s only two webhooks were created Jul 28 and both feed the logo Worker, and vtg-sf-account-sync recorded <strong>zero invocations in the last seven days</strong> (checked Oct 1 2026). So an account created or edited today sits in monday until someone remembers to run the backfill. Low priority only because Salesforce integration work is paused — it is not a small gap if that changes.</div>
+        <div class="gap-worker">vtg-sf-account-sync · backfill.mjs · Accounts #1 webhooks</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">Salesforce stage map is incomplete</div><div class="pri pri-m">Medium</div></div>
@@ -1541,9 +1551,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div><div class="worker-name">vtg-monday-sf-sync</div><div class="worker-url">vectorfi-admin.workers.dev</div></div>
         <span class="badge b-live worker-status">Live — Aug 13 2026</span>
       </div>
-      <div class="worker-desc">Syncs every Bids #3 stage change to Salesforce as an Opportunity upsert. Uses <strong>Monday_Item_ID__c</strong> as the external ID for idempotent creates/updates. Runs on any change to deal_stage, deal_value, or deal_creation_date. SF token cached in KV. Stage map: Folder Creation→1, Deal Reg→2, Bid Building→3, Bid Compilation→4, Bid Submittal→5, Awaiting Results→6.</div>
+      <div class="worker-desc">🔒 <strong>Key required</strong> — the webhook URL carries <code>?key=</code>, checked before anything else; unkeyed requests get 401. Non-numeric item IDs and items that are not on Bids #3 are rejected. Version dc33a840, Oct 1 2026. Syncs Bids #3 items to Salesforce as an Opportunity upsert, using <strong>Monday_Item_ID__c</strong> as the external ID for idempotent creates/updates. SF token cached in KV.<br><br><strong>Fired by two Bids #3 automations</strong> — "when an item is created, send a webhook" and "when any column changes, send a webhook". It is <em>not</em> limited to deal_stage, deal_value or deal_creation_date; any column change on the item reaches it, which is why subitem activity amplifies the write count.<br><br><strong>Stage map, read from the live code (version dc33a840):</strong> only <strong>Bid Building</strong> → "Stage 3: Bid Building", <strong>Awaiting Results</strong> → "Stage 6: Awaiting Results", plus <strong>Post-Sale</strong>, <strong>Post-Monday</strong> and <strong>Lost</strong>. Folder Creation, Deal Reg, Bid Compilation, Bid Submittal, Bidding and Wins Archive <strong>send no stage at all</strong> — see the stage-map gap.</div>
       <div class="worker-meta">
-        <div class="worker-meta-row"><strong>Trigger</strong><span>Bids #3 stage / value / date change → webhook</span></div>
+        <div class="worker-meta-row"><strong>Trigger</strong><span>Two Bids #3 automations — item created, and any column changes → keyed webhook</span></div>
         <div class="worker-meta-row"><strong>Auth</strong><span>SF Client Credentials OAuth · integration@vtgus.com.prod · VTG Integration Permissions permission set</span></div>
         <div class="worker-meta-row"><strong>KV</strong><span class="worker-kv">SF_TOKEN_KV (afcf72c9f5ed44ff97adced0f714ad93) · key: sf_token</span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\worker.js + wrangler.toml</span></div>
@@ -1697,11 +1707,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
       <div class="worker-desc">Syncs monday.com Accounts (#1) and Contacts (#2) to Salesforce as Account and Contact objects. Uses <strong>Monday_Item_ID__c</strong> as the external ID for idempotent upserts on both objects. After upserting, writes the Salesforce Account ID back to the <strong>UID column</strong> (<code>text_mm6s8adk</code>) on the Accounts board. A backfill script (<code>backfill.mjs</code>) ran against all 791 existing accounts to populate Salesforce and stamp the UID column. Complements <code>vtg-monday-sf-sync</code> which syncs Bids — this Worker handles the CRM Account/Contact layer.</div>
       <div class="worker-meta">
-        <div class="worker-meta-row"><strong>Trigger</strong><span>monday.com webhook on Account/Contact creation or change</span></div>
+        <div class="worker-meta-row"><strong>Trigger</strong><span>⚠ Called by hand via <code>backfill.mjs</code> → <code>POST /sync/:itemId</code> (key required). <strong>No monday automation triggers it</strong> (checked Oct 1 2026).</span></div>
         <div class="worker-meta-row"><strong>Auth</strong><span>SF Client Credentials OAuth · integration@vtgus.com.prod · VTG Integration Permissions permission set</span></div>
         <div class="worker-meta-row"><strong>KV</strong><span class="worker-kv">SF_ACCOUNT_TOKEN_KV — token cache for SF OAuth</span></div>
         <div class="worker-meta-row"><strong>SF fields</strong><span>Monday_Item_ID__c (External ID, Text 20, Unique) on both Account and Contact objects</span></div>
         <div class="worker-meta-row"><strong>Write-back</strong><span>SF Account ID → Accounts board UID column (text_mm6s8adk)</span></div>
+        <div class="worker-meta-row"><strong>Auth</strong><span>🔒 <strong>Key required</strong> — every route except <code>/health</code> needs <code>?key=</code>; unkeyed requests get 401. <code>/webhook</code> takes numeric IDs only; sync-by-ID is restricted to Accounts #1. <code>backfill.mjs</code> reads <code>ACCOUNT_SYNC_KEY</code>. Version e6d28b50, Oct 1 2026.</span></div>
         <div class="worker-meta-row"><strong>Backfill</strong><span>backfill.mjs ran against all 791 accounts — requires MONDAY_TOKEN env var set before running</span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-sf-account-sync\ · worker.js + wrangler.toml + backfill.mjs</span></div>
       </div>
@@ -2198,7 +2209,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <td class="auto-id">SF sync webhook</td>
         <td class="auto-trigger">When Account created or updated</td>
         <td class="auto-action">Send webhook → vtg-sf-account-sync</td>
-        <td class="auto-note">LIVE Sep 8 2026 — upserts Account + Contact to Salesforce via Monday_Item_ID__c external ID; writes SF Account ID back to UID column (text_mm6s8adk)</td>
+        <td class="auto-note"><strong>⚠ NOT WIRED — checked Oct 1 2026.</strong> This automation could not be found. The Accounts #1 board’s only two webhooks were created Jul 28 and both feed the logo Worker, and vtg-sf-account-sync had zero invocations in the last seven days. Kept on the map because it was recorded as LIVE Sep 8 2026 and the Worker does do this work — upserting Account + Contact via <code>Monday_Item_ID__c</code> and writing the SF Account ID back to <code>text_mm6s8adk</code> — but only when something calls it, which today is backfill.mjs by hand.</td>
       </tr>
     </tbody>
   </table>
@@ -2669,7 +2680,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.10</div>
+  <div class="cl-version-pill">Current: v2.11</div>
 </div>
 
 <table class="cl-table">
@@ -2688,7 +2699,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <!-- ── Sep 28 2026 ── -->
     <!-- ── Sep 29 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
+    <!-- ── Oct 1 2026 ── -->
     <tr class="cl-section-row"><td colspan="4">October 1, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 1</td>
+      <td class="cl-ver">v2.11</td>
+      <td><span class="cl-badge cl-fix">Resolved</span></td>
+      <td class="cl-desc"><strong>Both Salesforce Workers are now key-protected</strong> — <code>vtg-monday-sf-sync</code> (version <code>dc33a840</code>) and <code>vtg-sf-account-sync</code> (version <code>e6d28b50</code>). monday’s "send a webhook" automation sends no signature, so signature checking was never going to work; both Workers now require a <strong>shared key in the URL</strong> (<code>?key=</code>), checked before anything else, with <strong>401</strong> on anything unkeyed. They also narrowed what they accept: non-numeric item IDs are rejected, vtg-monday-sf-sync takes Bids #3 items only, vtg-sf-account-sync’s sync-by-ID takes Accounts #1 items only, and every route but <code>/health</code> is keyed. Both Bids #3 automations were switched to the keyed connection, and <code>backfill.mjs</code> now reads <code>ACCOUNT_SYNC_KEY</code>. Verified with a 401 on an unkeyed request and a live sync of Clinton Macomb Public Library.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 1</td>
+      <td class="cl-ver">v2.11</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>The old check failed twice over · secrets deleted</strong> — Worth recording because it explains why nothing caught it: the signature check on vtg-monday-sf-sync had <em>two independent</em> reasons it could never pass. The header never arrives, <strong>and</strong> the code read <code>WEBHOOK_SECRET</code> while the deployed secret was named <code>MONDAY_WEBHOOK_SECRET</code>. Fixing either one alone would have left it broken and looking fixed. On vtg-sf-account-sync the same pattern appeared again — <code>/webhook</code> checking an <code>Authorization</code> header monday never sends, while <code>/sync/:itemId</code> and <code>/backfill</code> had no check at all. The misnamed secret binding and the old <code>WEBHOOK_SECRET</code> have been deleted, and the binding name no longer appears on this map. It remains in this repo’s git history; the secret itself no longer exists.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 1</td>
+      <td class="cl-ver">v2.11</td>
+      <td><span class="cl-badge cl-gap">Gap</span></td>
+      <td class="cl-desc"><strong>The Account → Salesforce webhook cannot be found</strong> — The automations table has carried "SF sync webhook → vtg-sf-account-sync · LIVE Sep 8 2026" since it was built. Checked Oct 1: the Accounts #1 board has exactly two webhooks, both created Jul 28, and both feed the logo Worker. vtg-sf-account-sync recorded <strong>zero invocations in the preceding seven days</strong>. The row is kept and marked <strong>NOT WIRED</strong> rather than deleted — the Worker does the work it claims, but only when called, and today the only caller is <code>backfill.mjs</code> run by hand. SOP step 0.3 and the Account Sync detail panel were reworded to match; a new Low gap records the consequence, that a new or edited account sits in monday until someone runs the backfill. Low only because Salesforce integration work is paused.</td>
+    </tr>
 
     <tr>
       <td class="cl-date">Oct 1</td>
@@ -2896,7 +2927,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <td class="cl-date">Sep 21</td>
       <td class="cl-ver">v2.5</td>
       <td><span class="cl-badge cl-gap">Gap</span></td>
-      <td class="cl-desc"><strong>vtg-monday-sf-sync accepts unsigned requests</strong> — Every invocation logs <code>HMAC mismatch — sig received: &lt;empty&gt;</code> and then processes the request anyway, so the public endpoint will write to a Salesforce Opportunity for anyone who knows the URL. The signature arriving empty has two plausible causes: monday's plain "send a webhook" action does not HMAC-sign its body, so the check may be for something that never arrives; or the secret is unreachable. The second is worth checking first — <code>vtg-sf-account-sync</code> carries a binding named <code>WEBHOOK_SECRETvtg-sf-sync-2026-xK9mQpL3</code>, which looks like a secret value pasted into the name field, leaving <code>WEBHOOK_SECRET</code> undefined and the comparison unable to succeed.</td>
+      <td class="cl-desc"><strong>vtg-monday-sf-sync accepts unsigned requests</strong> — Every invocation logs <code>HMAC mismatch — sig received: &lt;empty&gt;</code> and then processes the request anyway, so the public endpoint will write to a Salesforce Opportunity for anyone who knows the URL. The signature arriving empty has two plausible causes: monday's plain "send a webhook" action does not HMAC-sign its body, so the check may be for something that never arrives; or the secret is unreachable. The second is worth checking first — <code>vtg-sf-account-sync</code> carries a misnamed secret binding (deleted Oct 1 2026) that looks like a secret value pasted into the name field, leaving <code>WEBHOOK_SECRET</code> undefined and the comparison unable to succeed.</td>
     </tr>
     <tr>
       <td class="cl-date">Sep 21</td>
@@ -3390,7 +3421,7 @@ const D = {
     workers:['El Nova integration (Austin Novakowski\'s original webhook automations)'],
     notes:['vtg-bid-intake has a 5s retry loop specifically because El Nova may not have written Account/Contact yet when the bid item is being created','Commercial (MSP portal) track does NOT create Accounts or Contacts — E-Rate only','Records are auto-populated — sales reps do not manually create them']},
   'sf-account-sync':{title:'Salesforce Account + Contact Sync',phase:'E-Rate · Phase 0 · CRM Setup',status:'live',
-    triggers:['monday.com webhook on Account created or updated (Accounts board 18176632844)','monday.com webhook on Contact created or updated (Contacts board 18176633260)'],
+    triggers:['⚠ Runs when called — today only backfill.mjs, run by hand','No monday automation triggers it (checked Oct 1 2026) — Accounts #1 has two webhooks, both feeding the logo Worker','Zero Worker invocations in the seven days to Oct 1 2026'],
     inputs:['Account/Contact monday.com item data','Monday_Item_ID__c as external ID for upsert'],
     outputs:['Salesforce Account object created/updated','Salesforce Contact object created/updated','SF Account ID written back to UID column (text_mm6s8adk) on Accounts board'],
     workers:['vtg-sf-account-sync (LIVE Sep 8 2026)'],
@@ -3472,9 +3503,9 @@ const D = {
     workers:['vtg-sov-builder'],notes:['vendorPOs array pre-grouped by vendor — ready for NS PO creation','Bond auto-enables from board_relation0 column','ADD-ALTS tab + Summary tab included']},
   sfSync:{title:'Salesforce Opportunity Sync',phase:'E-Rate · Phase 2 · Bid Building',status:'live',
     triggers:['Any Bids #3 stage, value, or date change'],
-    inputs:['deal_stage, deal_value, deal_creation_date columns','Monday_Item_ID__c as upsert key'],
+    inputs:['Any column on the Bids #3 item — not just deal_stage, deal_value, deal_creation_date','Monday_Item_ID__c as upsert key'],
     outputs:['SF Opportunity created/updated'],
-    workers:['vtg-monday-sf-sync'],notes:['SF token cached in KV afcf72c9f5ed44ff97adced0f714ad93','First SF record: Shaker Heights City Sch Dist (Aug 13 2026)','Stage map: Deal Reg→2, Folder→1, Bid Build→3, Compile→4, Submittal→5, Results→6']},
+    workers:['vtg-monday-sf-sync'],notes:['SF token cached in KV afcf72c9f5ed44ff97adced0f714ad93','First SF record: Shaker Heights City Sch Dist (Aug 13 2026)','Fired by two Bids #3 automations: item created, and any column changes','Stage map (live code, dc33a840): Bid Building and Awaiting Results only, plus Post-Sale, Post-Monday and Lost — Folder Creation, Deal Reg, Bid Compilation, Bid Submittal, Bidding and Wins Archive send no stage']},
   bidbuild:{title:'Bid Build + Compile',phase:'E-Rate · Phase 2 · Bid Building',status:'manual',
     triggers:['Bids #3 stage = Bid Building'],
     inputs:['Disty pricing','Cabling scope','SOV from vtg-sov-builder','Partner pricing'],
