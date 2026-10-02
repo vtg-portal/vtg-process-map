@@ -927,8 +927,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <p>The Workers tab documents a six-entry stage map — Folder Creation → Awaiting Results — while the Sep 21 walkthrough found that Folder Creation, Deal Reg and Bid Compilation send no stage at all. Both are on this site. The diagram shows the stage sync as live without claiming which stages arrive. Worth an hour with <code>wrangler tail</code> before this goes in front of anyone outside the team.</p>
     </div>
     <div class="df-note">
-      <h4>The UID is not a guarantee</h4>
-      <p>Salesforce issues the UID and it is stamped on the monday account, which is what vtg-ns-so-backfill matches on first. Salesforce has been duplicating contacts and the UID has not held stable, so the name-match fallback still carries real traffic. See the UID gap.</p>
+      <h4>The UID is reference only now</h4>
+      <p>Salesforce issues the UID and it is stamped on the monday account, but as of Sep 28 2026 it is <strong>no longer the match key</strong> — the <strong>NetSuite Customer Internal ID</strong> is. The UID had not held stable, Salesforce had been duplicating accounts, and it never matched NetSuite’s own <code>custentity_acs_unique_entity_identifier</code> anyway. New NS customers created from the CS form carry <code>externalId mon-&lt;monday item id&gt;</code> instead. One dependency is left: vtg-ns-so-backfill’s auto-sync still links project to account by UID. See the UID gap.</p>
     </div>
     <div class="df-note">
       <h4>Where the hand-keyed steps go</h4>
@@ -1282,9 +1282,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">vtg-cs-form · Projects #4 · NetSuite order verification</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">The UID has not proved stable — standard under review</div><div class="pri pri-h">High</div></div>
-        <div class="gap-body"><strong>⚠ Reversal, Sep 28 2026.</strong> The UID (Salesforce Account ID) was adopted as the cross-system source of truth on the understanding that the monday ↔ Salesforce sync was 100% reliable. In practice <strong>Salesforce duplicates contacts and the UID has not been stable</strong>, and Salesforce’s own requirements keep changing underneath it. So there are now two problems, not one: the old one — legacy Accounts, Bids and Projects records carrying a blank or stale UID, which is what forces the fuzzy-name fallback in vtg-ns-so-backfill and friends — and the new one, that a freshly-issued UID cannot simply be trusted either. This is the strongest argument yet for the monday → NetSuite order push and the direct NS customer create: an identity minted where the record is created does not depend on a third system staying still.</div>
-        <div class="gap-worker">UID · Accounts text_mm6s8adk · Projects #4 text_mm76zvbz</div>
+        <div class="gap-card-hdr"><div class="gap-title">The UID has not proved stable — reference only, no longer a match key</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body"><strong>Sep 28 2026.</strong> The UID (Salesforce <code>UID__c</code> auto-number) was adopted as the cross-system key. Salesforce duplicates contacts — <strong>69 SF duplicate accounts sent to Merlin for review</strong> — the UID has not been stable, and SF requirements keep changing. Two problems: legacy Accounts, Bids and Projects rows carry a blank or stale UID (<strong>17 Projects #4 rows "Cannot verify"</strong> as of Sep 28; fuzzy-name fallback is off), and a newly issued UID can’t be trusted either. The UID also <strong>does not match NetSuite’s <code>custentity_acs_unique_entity_identifier</code></strong> — different numbering.<br><br><strong>Current state:</strong> the <strong>NS Customer Internal ID is the matching key</strong>. New NS customers created from the CS form use <code>externalId mon-&lt;monday item id&gt;</code>, live since Sep 28. <strong>Remaining dependency:</strong> vtg-ns-so-backfill’s auto-sync still links project → account via UID.</div>
+        <div class="gap-worker">UID · Accounts text_mm6s8adk · Projects #4 text_mm76zvbz · NS ID Accounts text_mm7m8z67</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">NetSuite data cleanup has no owner</div><div class="pri pri-m">Medium</div></div>
@@ -1409,7 +1409,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="gap-grid">
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">Push the order from monday.com directly into NetSuite</div><div class="pri pri-h">High</div></div>
-        <div class="gap-body"><strong>The structural fix for monday ↔ NS matching.</strong> Today the link between a monday project and its NetSuite order is reconstructed <em>after the fact</em> — vtg-ns-so-backfill matches UID to <code>custentity_acs_unique_entity_identifier</code> and falls back to fuzzy name; vtg-po-sync reads back from whatever it finds. That is a stopgap, and it is only as good as the name and UID data on both sides. Planned direction: <strong>create the order in NetSuite from monday at order time</strong>, so the NS record carries the monday item and UID identity from creation. Matching then becomes 100% accurate by construction, the backfill and reconciliation Workers drop back to being a safety net rather than the mechanism, and the customer ID mapping that currently blocks the invoice flow stops being a separate problem. Pairs with making the customer PO # required on the CS Order form as the verification key.</div>
+        <div class="gap-body"><strong>The structural fix for monday ↔ NS matching.</strong> Today the link between a monday project and its NetSuite order is reconstructed <em>after the fact</em> — vtg-ns-so-backfill matches on identifiers after the order exists, and vtg-po-sync reads back from whatever it finds. That is a stopgap. <em>Updated Sep 28 2026:</em> the fuzzy-name fallback is <strong>off</strong>, the UID is no longer the match key, and the <strong>NS Customer Internal ID</strong> took its place — so the stopgap is now narrower and stricter, but it is still reconstruction after the fact. Planned direction: <strong>create the order in NetSuite from monday at order time</strong>, so the NS record carries the monday item and UID identity from creation. Matching then becomes 100% accurate by construction, the backfill and reconciliation Workers drop back to being a safety net rather than the mechanism, and the customer ID mapping that currently blocks the invoice flow stops being a separate problem. Pairs with making the customer PO # required on the CS Order form as the verification key.</div>
         <div class="gap-worker">vtg-ns-mcp-sync · vtg-cs-form · retires the vtg-ns-so-backfill fuzzy path</div>
       </div>
       <div class="gap-card">
@@ -2051,7 +2051,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <div class="glossary-card">
       <div class="glossary-term">UID (Salesforce Account ID)</div>
-      <div class="glossary-def">The Salesforce Account ID written back to the monday.com <strong>Accounts board</strong> UID column (<code>text_mm6s8adk</code>) by the <code>vtg-sf-account-sync</code> Worker after a successful Account upsert. Intended as the permanent cross-system identifier linking a monday.com Account to its Salesforce counterpart; the external ID field <code>Monday_Item_ID__c</code> on the SF Account object is the join key used for idempotent upserts — UID is what comes back. <strong>Caveat (Sep 28 2026):</strong> treat a UID as a useful hint rather than a guarantee. Salesforce has been duplicating contacts and the UID has not held stable, so anything depending on it needs a fallback — see the UID gap.</div>
+      <div class="glossary-def">The Salesforce Account ID written back to the monday.com <strong>Accounts board</strong> UID column (<code>text_mm6s8adk</code>) by the <code>vtg-sf-account-sync</code> Worker after a successful Account upsert. Intended as the permanent cross-system identifier linking a monday.com Account to its Salesforce counterpart; the external ID field <code>Monday_Item_ID__c</code> on the SF Account object is the join key used for idempotent upserts — UID is what comes back. <strong>Superseded as a key, Sep 28 2026:</strong> the UID is <strong>reference only</strong> now. Salesforce had been duplicating accounts (69 sent to Merlin for review), the value did not hold stable, and it never matched NetSuite’s <code>custentity_acs_unique_entity_identifier</code>. The <strong>NS Customer Internal ID</strong> (<code>text_mm7m8z67</code> on Accounts) is the matching key; new NS customers from the CS form carry <code>externalId mon-&lt;monday item id&gt;</code>. See the UID gap.</div>
     </div>
 
     <div class="glossary-card">
@@ -2680,7 +2680,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.11</div>
+  <div class="cl-version-pill">Current: v2.12</div>
 </div>
 
 <table class="cl-table">
@@ -2701,6 +2701,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <!-- ── Oct 1 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
     <tr class="cl-section-row"><td colspan="4">October 1, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 1</td>
+      <td class="cl-ver">v2.12</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc"><strong>The UID is reference only — NetSuite Customer Internal ID is the match key</strong> — The UID (Salesforce <code>UID__c</code> auto-number) was adopted as the cross-system key and has been demoted. Salesforce duplicates accounts — <strong>69 duplicates sent to Merlin for review</strong> — the value has not been stable, SF requirements keep moving, and it never matched NetSuite’s <code>custentity_acs_unique_entity_identifier</code>, which uses different numbering. Legacy rows carry blank or stale UIDs: <strong>17 Projects #4 rows read "Cannot verify"</strong> as of Sep 28, and the fuzzy-name fallback is now <strong>off</strong> rather than papering over them. In its place the <strong>NS Customer Internal ID</strong> (<code>text_mm7m8z67</code> on Accounts) is the matching key, and new NS customers created from the CS form carry <code>externalId mon-&lt;monday item id&gt;</code> — live since Sep 28. One dependency remains: vtg-ns-so-backfill’s auto-sync still links project → account by UID. The Data Flow note, the glossary entry and the order-push card were all updated to match.</td>
+    </tr>
 
     <tr>
       <td class="cl-date">Oct 1</td>
