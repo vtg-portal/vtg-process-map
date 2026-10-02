@@ -235,6 +235,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .gap-worker{margin-top:7px;font-size:10px;font-family:var(--font-mono);color:var(--purple);}
 .sec-title{font-size:13px;font-weight:600;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid var(--border);}
 .sec-block{margin-bottom:26px;}
+.gap-filter{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 18px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);position:sticky;top:0;z-index:5;}
+.gf-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-dim);margin-right:2px;}
+.gf-chip{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:11.5px;padding:5px 11px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--text-muted);cursor:pointer;transition:background .15s,border-color .15s,opacity .15s;}
+.gf-chip:hover{border-color:var(--accent);}
+.gf-chip.on{background:var(--accent-dim);border-color:var(--accent);color:var(--text);}
+.gf-chip:not(.on){opacity:.55;}
+.gf-chip:not(.on) .gf-t{text-decoration:line-through;}
+.gf-chip:focus-visible,.gf-reset:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.gf-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0;}
+.gf-n{font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--text-dim);}
+.gf-sep{width:1px;height:18px;background:var(--border);margin:0 4px;}
+.gf-reset{margin-left:auto;font:inherit;font-size:11px;background:none;border:none;color:var(--accent);cursor:pointer;padding:4px 6px;}
+.gf-count{font-size:10.5px;color:var(--text-dim);font-family:var(--font-mono);}
+.gap-card.gf-hide{display:none;}
+.gf-empty{font-size:12px;color:var(--text-dim);font-style:italic;padding:4px 2px 0;}
+@media(max-width:640px){.gf-reset{margin-left:0;}.gf-sep{display:none;}}
+
 
 /* ── DATA FLOW ─────────────────────────────────────────── */
 
@@ -1311,6 +1328,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
      GAPS
 ════════════════════════════════════════════ -->
 <div class="view" id="view-gaps">
+  <div class="gap-filter" id="gap-filter" role="group" aria-label="Filter gaps">
+    <span class="gf-label">Show</span>
+    <button type="button" class="gf-chip on" data-key="high" aria-pressed="true"><i class="gf-dot" style="background:var(--red)"></i><span class="gf-t">High</span> <b class="gf-n"></b></button>
+    <button type="button" class="gf-chip on" data-key="medium" aria-pressed="true"><i class="gf-dot" style="background:var(--yellow)"></i><span class="gf-t">Medium</span> <b class="gf-n"></b></button>
+    <button type="button" class="gf-chip on" data-key="low" aria-pressed="true"><i class="gf-dot" style="background:var(--cyan)"></i><span class="gf-t">Low</span> <b class="gf-n"></b></button>
+    <button type="button" class="gf-chip on" data-key="paused" aria-pressed="true"><i class="gf-dot" style="background:var(--text-muted)"></i><span class="gf-t">Paused</span> <b class="gf-n"></b></button>
+    <button type="button" class="gf-chip on" data-key="resolved" aria-pressed="true"><i class="gf-dot" style="background:var(--green)"></i><span class="gf-t">Resolved / Done</span> <b class="gf-n"></b></button>
+    <span class="gf-sep"></span>
+    <button type="button" class="gf-chip on" data-key="active" aria-pressed="true"><span class="gf-t">Active gaps</span> <b class="gf-n"></b></button>
+    <button type="button" class="gf-chip on" data-key="planned" aria-pressed="true"><span class="gf-t">Planned</span> <b class="gf-n"></b></button>
+    <button type="button" class="gf-reset" id="gf-reset">Show all</button>
+    <span class="gf-count" id="gf-count"></span>
+  </div>
   <div class="sec-block">
     <div class="sec-title">🔴 Active Gaps — Need Resolution</div>
     <div class="gap-grid">
@@ -2901,7 +2931,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.13</div>
+  <div class="cl-version-pill">Current: v2.14</div>
 </div>
 
 <table class="cl-table">
@@ -2922,6 +2952,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <!-- ── Oct 1 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
     <tr class="cl-section-row"><td colspan="4">October 1, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 1</td>
+      <td class="cl-ver">v2.14</td>
+      <td><span class="cl-badge cl-infra">UI</span></td>
+      <td class="cl-desc"><strong>Gap Analysis filters</strong> — chips at the top of Gap Analysis turn cards on and off by priority (High / Medium / Low), Paused, and Resolved / Done (which includes Live and Retired), and by section (Active gaps / Planned). Each chip shows its count, "Show all" resets, and the choice is remembered in your browser.</td>
+    </tr>
 
     <tr>
       <td class="cl-date">Oct 1</td>
@@ -3954,6 +3991,65 @@ function closePanel(){
   document.querySelectorAll('.step,.decision').forEach(s=>s.classList.remove('sel'));
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
+
+// ── Gap Analysis filters ── chips show/hide cards by priority / status and by section.
+// Categories come from each card's .pri label, so cards added later are filtered too.
+(function(){
+  const KEY = 'vtg-gap-filter';
+  const view = document.getElementById('view-gaps');
+  const bar = document.getElementById('gap-filter');
+  if (!view || !bar) return;
+  const ALL = ['high','medium','low','paused','resolved','active','planned'];
+  let state = {};
+  ALL.forEach(k => state[k] = true);
+  try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s) ALL.forEach(k => { if (typeof s[k] === 'boolean') state[k] = s[k]; }); } catch(e){}
+
+  function catOf(card){
+    const t = ((card.querySelector('.pri') || {}).textContent || '').trim().toLowerCase();
+    if (t === 'high' || t === 'medium' || t === 'low' || t === 'paused') return t;
+    return 'resolved';   // Resolved, Done, Live, Retired
+  }
+  const blocks = Array.from(view.querySelectorAll('.sec-block'));
+  const cards = [];
+  blocks.forEach(b => {
+    const title = (b.querySelector('.sec-title') || {}).textContent || '';
+    const sec = /planned/i.test(title) ? 'planned' : 'active';
+    b.dataset.sec = sec;
+    let empty = b.querySelector('.gf-empty');
+    if (!empty) { empty = document.createElement('div'); empty.className = 'gf-empty'; empty.textContent = 'Nothing in this section matches the filters.'; empty.hidden = true; b.appendChild(empty); }
+    b.querySelectorAll('.gap-card').forEach(c => { c.dataset.cat = catOf(c); c.dataset.sec = sec; cards.push(c); });
+  });
+
+  function apply(){
+    let shown = 0;
+    cards.forEach(c => {
+      const on = state[c.dataset.cat] && state[c.dataset.sec];
+      c.classList.toggle('gf-hide', !on);
+      if (on) shown++;
+    });
+    blocks.forEach(b => {
+      const secOn = state[b.dataset.sec];
+      b.hidden = !secOn;
+      const any = Array.from(b.querySelectorAll('.gap-card')).some(c => !c.classList.contains('gf-hide'));
+      b.querySelector('.gf-empty').hidden = !secOn || any;
+    });
+    bar.querySelectorAll('.gf-chip').forEach(ch => {
+      const k = ch.dataset.key, on = !!state[k];
+      ch.classList.toggle('on', on);
+      ch.setAttribute('aria-pressed', on ? 'true' : 'false');
+      const n = cards.filter(c => c.dataset.cat === k || c.dataset.sec === k).length;
+      ch.querySelector('.gf-n').textContent = n;
+    });
+    document.getElementById('gf-count').textContent = 'Showing ' + shown + ' of ' + cards.length;
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e){}
+  }
+  bar.addEventListener('click', e => {
+    const ch = e.target.closest('.gf-chip');
+    if (ch) { state[ch.dataset.key] = !state[ch.dataset.key]; apply(); return; }
+    if (e.target.closest('#gf-reset')) { ALL.forEach(k => state[k] = true); apply(); }
+  });
+  apply();
+})();
 </script>
 </body>
 </html>
