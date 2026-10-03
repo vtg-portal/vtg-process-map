@@ -341,7 +341,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="hdr">
   <div>
     <div class="hdr-title">VTG · Lead → Invoice Process Map</div>
-    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Oct 2 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
+    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Oct 3 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
   </div>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
     <div class="legend">
@@ -369,6 +369,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <div class="tab" onclick="showView('automations',this)">Automations</div>
   <div class="tab" onclick="showView('dashboards',this)">Dashboards</div>
   <div class="tab" onclick="showView('changelog',this)">Changelog</div>
+  <div class="tab" id="tab-requests" onclick="showView('requests',this)">Requests <span class="rq-tabn" id="rq-tabn" hidden></span></div>
 </div>
 
 <div class="main">
@@ -1185,7 +1186,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">4.3 · Stage → Ready for Invoicing</span><span class="sop-owner">Automation</span><span class="badge b-live">Live</span></div>
-          <div class="sop-body">Materials log submission advances stage to <strong>Ready for Invoicing</strong>, stamps date_mm54qwps, posts thread update, and triggers vtg-billing-ready → email to eratebilling@vtgus.com. Automations: 7920569056, 7920172789, 7917999463, 7920230690.</div>
+          <div class="sop-body">Materials log submission advances stage to <strong>Ready for Invoicing</strong>, stamps date_mm54qwps, posts thread update, and triggers vtg-billing-ready → email to eratebilling@vtgus.com. Automations: 7920569056, 7920172789, 7917999463 (7920230690 off since Sep 9 2026).</div>
           <div class="auto-row">⚡ vtg-billing-ready · vtg-materials-log · SMTP2GO</div>
         </div>
       </div>
@@ -1211,7 +1212,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">5.3 · Project Closed</span><span class="sop-owner">Jon / Finance</span><span class="badge b-man">Manual</span></div>
-          <div class="sop-body">Once invoiced and paid, Projects #4 → Closed. Stage-change automation populates Actual Revenue Month (date_mm4tatyy) feeding the Forecast vs. Actual widget on the Pipeline dashboard (board 18419943586).</div>
+          <div class="sop-body">Once invoiced and paid, Projects #4 → Closed. 7924141707 stamps Closed Date (date_mm7scanx) and 7924141714 fills Actual Revenue Month (date_mm4tatyy) only if it is still blank; both feed the Accounting KPIs and revenue dashboards. 7920172818, which overwrites Actual Revenue Month at Closed, is still active until paused.</div>
         </div>
       </div>
     </div>
@@ -1446,6 +1447,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-card-hdr"><div class="gap-title">E-Rate Deals and E-Rate Projects boards are unused</div><div class="pri pri-l">Low</div></div>
         <div class="gap-body">The E-Rate Deals and E-Rate Projects boards were set up in March for pipeline reporting and are no longer used. No one has edited E-Rate Deals by hand since early April, and E-Rate Projects holds a single test item. Won bids already become projects through Bids #3 → Post-Monday → Projects #4, and the E-Rate KPIs come from those boards, so nothing is lost. One live side effect: Bids #3 automation 559103546 still adds an E-Rate Deals item for every bid that reaches Post-Monday. Every item is a won deal but shows Status = Pipeline. Next step: with Dylan, turn off 559103546, turn off 7917669964 and 7917670450, then archive both boards and mark this resolved.</div>
         <div class="gap-worker">E-Rate Deals board · E-Rate Projects board · Bids #3 automation 559103546 · automations 7917669964, 7917670450</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Actual Revenue Month still overwritten at Closed</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">7920172818 sets Actual Revenue Month (<code>date_mm4tatyy</code>) to the close date even when 7920172789 already set it at Ready for Invoicing, so a project sent to accounting late in a month and closed early the next lands in the later month. On Oct 2 2026 the 16 affected projects were reset to their Ready for Invoicing date (both revenue-month columns), and 7924141714 now fills the column at Closed only when it is blank. 7920172818 is still active — the API refused to pause it — so it must be paused in the Projects #4 automation center. Revenue Month (<code>date_mm39fh8x</code>, vtg-revenue-month) is not affected.</div>
+        <div class="gap-worker">Projects #4 automations 7920172818, 7920172789, 7924141714</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Pipeline dashboard: two widgets misreport</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">On 📊 E-Rate Pipeline &amp; Project Delivery (37086241), checked Oct 2 2026: <strong>Total Active Bids</strong> shows 0, while Bids #3 has 17 pre-award bids (Folder Creation 1, Bid Building 13, Bid Compilation 1, Awaiting Results 2). <strong>Active Post-Sale Pipeline</strong> ($12.15M) sums every bid not in Lost or Wins Archive stage, so it includes $1.80M of pre-award bids, the ZZ TEST bond-test bid ($9,999) and Shelby Public Schools ($151K, in the Wins Archive group with stage Bid Submittal); Post-Sale + Post-Monday alone is $10.20M. Widget settings can't be read or changed through the API — fix in the monday UI.</div>
+        <div class="gap-worker">Dashboard 37086241 · Bids #3 deal_stage / deal_value</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">E-Rate Historical Awards import never ran</div><div class="pri pri-l">Low</div></div>
+        <div class="gap-body">The 📁 E-Rate Historical Awards board (18424893495) has its FY2017–FY2025 groups and 15 columns, but only 3 FY2025 rows. Its activity log shows no other items were ever created, so the USAC QuickBase import has not run. Win-rate and "have we won here before" lookups have no data until it does.</div>
+        <div class="gap-worker">Board 18424893495 · USAC QuickBase exports</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">"Create Contract in CW Sell" subitem — paused</div><div class="pri" style="background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);">Paused</div></div>
@@ -1801,6 +1817,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Trigger</strong><span>NS SO# column change webhook + cron every 4h</span></div>
         <div class="worker-meta-row"><strong>KV</strong><span class="worker-kv">PO_SYNC_KV (2c487e21b1324f5b8dbfc754db7b2622)</span></div>
         <div class="worker-meta-row"><strong>Outputs</strong><span>Projects #4: Vendor PO # (text_mm76antg) + PO Status (color_mm766mdj)</span></div>
+        <div class="worker-meta-row"><strong>Pending deploy</strong><span>Written Oct 2 2026, not yet deployed: also writes PO Issued Date (date_mm7s4n0m) — the earliest NetSuite date across the project's vendor POs — for Accounting KPIs, plus a one-off backfill that covers Closed projects. Old version kept as worker.pre-podate.js</span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-po-sync\</span></div>
       </div>
     </div>
@@ -1825,7 +1842,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div><div class="worker-name">vtg-billing-ready</div><div class="worker-url">vectorfi-admin.workers.dev</div></div>
         <span class="badge b-live worker-status">Live</span>
       </div>
-      <div class="worker-desc">Sends a billing notification email to finance when a Projects #4 item reaches the Ready for Invoicing stage. Triggered by monday.com stage-change automations (IDs: 7920569056, 7920172789, 7917999463, 7920230690). Stamps the Ready for Invoicing Date column (date_mm54qwps). Used by both E-Rate and Commercial tracks.</div>
+      <div class="worker-desc">Sends a billing notification email to finance when a Projects #4 item reaches the Ready for Invoicing stage. Triggered by monday.com stage-change automations (IDs: 7920569056, 7920172789, 7917999463; 7920230690 off since Sep 9 2026). Stamps the Ready for Invoicing Date column (date_mm54qwps). Used by both E-Rate and Commercial tracks.</div>
       <div class="worker-meta">
         <div class="worker-meta-row"><strong>Trigger</strong><span>Projects #4 stage → Ready for Invoicing (4 monday automations)</span></div>
         <div class="worker-meta-row"><strong>Email</strong><span>eratebilling@vtgus.com via SMTP2GO / noreply@vtgus.com</span></div>
@@ -2019,6 +2036,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-ruckus-tools\ · src/ + test/e2e.mjs · README has setup and retirement steps</span></div>
       </div>
     </div>
+    <div class="worker-card">
+      <div class="worker-card-hdr">
+        <div><div class="worker-name">vtg-process-requests</div><div class="worker-url">vtg-process-requests.vectorfi-admin.workers.dev</div></div>
+        <span class="badge b-live worker-status">Live — Oct 3 2026</span>
+      </div>
+      <div class="worker-desc">Backend for this map’s <strong>Requests</strong> tab. Anyone with the map can send a request or question (their name + the ask, optional area) and see every request with its status and Jon’s reply — no monday account needed. Requests land on the monday board <strong>Process Map Requests</strong> (18433839739, E-Rate Operating System), where Jon sets Status, writes the Reply, can note the changelog version, or ticks <em>Hide from map</em>.</div>
+      <div class="worker-meta">
+        <div class="worker-meta-row"><strong>Board</strong><span>Process Map Requests · Status (New / Reviewing / Planned / Done / Won’t fix) · Requester · Ask · Area · Reply · Changelog · Hide from map · Request ID · new item notifies Jon (workflow 7924145960)</span></div>
+        <div class="worker-meta-row"><strong>monday calls</strong><span>Only that board: read it, look up a Request ID, create an item. The list is cached 60 s.</span></div>
+        <div class="worker-meta-row"><strong>Duplicates</strong><span>The page sends a one-time Request ID with each request; a double click or retry returns the item already created instead of making a second one.</span></div>
+        <div class="worker-meta-row"><strong>Open for now</strong><span>No sign-in yet (Cloudflare Access is on Jon’s list). Submissions are limited by origin, rate limits, length limits and a spam trap.</span></div>
+        <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-process-requests\ · src/index.js + test/</span></div>
+      </div>
+    </div>
 
   </div>
 </div>
@@ -2192,7 +2223,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <div class="glossary-card">
       <div class="glossary-term">Funding Year <span class="glossary-abbr">FY</span></div>
-      <div class="glossary-def">E-Rate funding is allocated in annual cycles running <strong>July 1 – June 30</strong>. A project funded in FY2025 covers July 2025–June 2026. VTG tracks funding year on both the E-Rate Deals board and the E-Rate Historical Awards board (FY2017–FY2025 imported).</div>
+      <div class="glossary-def">E-Rate funding is allocated in annual cycles running <strong>July 1 – June 30</strong>. A project funded in FY2025 covers July 2025–June 2026. VTG tracks funding year on the E-Rate Deals board and the E-Rate Historical Awards board (FY2017–FY2025 groups set up; the import has not run).</div>
     </div>
 
     <div class="glossary-card">
@@ -2279,7 +2310,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <div class="glossary-card">
       <div class="glossary-term">Ready for Invoicing Date <span class="glossary-abbr">RFID</span></div>
-      <div class="glossary-def">The date column (date_mm54qwps) on Projects #4 automatically stamped when a project reaches Ready for Invoicing stage. Used to populate the Forecast vs. Actual Revenue dashboard and feed the billing notification email to finance.</div>
+      <div class="glossary-def">The date column (date_mm54qwps) on Projects #4 automatically stamped when a project reaches Ready for Invoicing stage — the day the project is sent to accounting for invoicing. Starts the Days to Invoice and Days to Close clocks on Accounting KPIs.</div>
+    </div>
+
+    <div class="glossary-card">
+      <div class="glossary-term">Order Sent Date / PO Issued Date / Closed Date</div>
+      <div class="glossary-def">Projects #4 date columns added Oct 2 2026 for Accounting KPIs. <strong>Order Sent Date</strong> (<code>date_mm7sd79k</code>) — the day the project was created, which is when the CS Order form sends the order to processing. <strong>PO Issued Date</strong> (<code>date_mm7s4n0m</code>) — the earliest NetSuite date across the project's vendor POs, from vtg-po-sync. <strong>Closed Date</strong> (<code>date_mm7scanx</code>) — the day Project Stage became Closed.</div>
+    </div>
+
+    <div class="glossary-card">
+      <div class="glossary-term">Days to PO / Days to Invoice / Days to Close</div>
+      <div class="glossary-def">Projects #4 formula columns counting <strong>business days</strong> (Mon–Fri; same day = 0; Friday → Monday = 1). Days to PO: Order Sent → PO Issued (<code>formula_mm7s252p</code>). Days to Invoice: Ready for Invoicing → NetSuite Last Invoice Date (<code>formula_mm7s1r59</code>). Days to Close: Ready for Invoicing → Closed Date (<code>formula_mm7sjt7h</code>). Blank when a date is missing or the end is before the start.</div>
     </div>
 
   </div>
@@ -2632,7 +2673,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <div class="auto-board-header">
     <div class="auto-board-name">👷 Projects — #4</div>
     <div class="auto-board-id">ID: 18176626554</div>
-    <div class="auto-board-count">21 legacy + 11 workflows · incl. AI + app integrations</div>
+    <div class="auto-board-count">21 legacy + 14 workflows · incl. AI + app integrations</div>
   </div>
   <table class="auto-table">
     <thead><tr><th>ID</th><th>Trigger</th><th>Action</th><th>Notes</th></tr></thead>
@@ -2646,7 +2687,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <tr><td class="auto-id">482368830</td><td class="auto-trigger">Stage → Closeout (index 9)</td><td class="auto-action">Move to Closeout group</td><td></td></tr>
       <tr><td class="auto-id">482368834</td><td class="auto-trigger">Stage → Ready for Invoicing (index 3)</td><td class="auto-action">Move to Ready for Invoicing group</td><td></td></tr>
       <tr><td class="auto-id">482368833</td><td class="auto-trigger">Stage → Closed (index 4)</td><td class="auto-action">Move to Closed group</td><td></td></tr>
-      <tr class="auto-inactive"><td class="auto-id">482368828<span class="auto-badge-err">Error</span></td><td class="auto-trigger">Stage → Waiting for Product</td><td class="auto-action">Move to Waiting for Product group</td><td class="auto-note">Error: "missing_group" — target group no longer exists. Group was likely deleted or renamed.</td></tr>
+      <tr class="auto-inactive"><td class="auto-id">482368828<span class="auto-badge-err">Error</span></td><td class="auto-trigger">Stage → Waiting for Product</td><td class="auto-action">Move to Waiting for Product group</td><td class="auto-note">Error: "missing_group" — target group no longer exists. The Waiting for Product stage label is deactivated, so this never fires.</td></tr>
       <tr><td class="auto-id">591750313 (Projects webhook)</td><td class="auto-trigger">Stage → Ready for Invoicing</td><td class="auto-action">Send webhook to vtg-billing-ready</td><td class="auto-note">Fires billing notification email to eratebilling@vtgus.com via vtg-billing-ready Worker</td></tr>
       <tr><td class="auto-id">628087115 (Projects PO webhook)</td><td class="auto-trigger">NS Sales Order # column (text_mm6hv20b) changes</td><td class="auto-action">Send webhook to vtg-po-sync</td><td class="auto-note">Live Aug 25 2026 — fires vtg-po-sync when SO# is manually entered or backfilled</td></tr>
       <tr><td class="auto-id">639640003 / 639640004</td><td class="auto-trigger">Timeline (timerange_mm1q29se) / Project Stage changes</td><td class="auto-action">Send webhook to vtg-revenue-month</td><td class="auto-note">Keeps Revenue Month equal to the Timeline end; stamps and locks it at Ready for Invoicing / Closed</td></tr>
@@ -2661,8 +2702,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <tr><td class="auto-id">7918629648 (workflow)</td><td class="auto-trigger">Stage → Equipment Only (index 11)</td><td class="auto-action">Move to Equipment Only group</td><td></td></tr>
       <tr><td class="auto-id">7918731761 (workflow)</td><td class="auto-trigger">Blueprint column changes + Blueprint = Equipment Only (label 8)</td><td class="auto-action">Move to Equipment Only group</td><td class="auto-note">Routes equipment-only projects to the correct group when Blueprint is selected</td></tr>
       <tr><td class="auto-id">7920172789 (workflow)</td><td class="auto-trigger">Stage → Ready for Invoicing</td><td class="auto-action">Set Actual Revenue Month (date_mm4tatyy) = today</td><td class="auto-note">Stamps the revenue date for Forecast vs. Actual dashboard</td></tr>
-      <tr><td class="auto-id">7920172818 (workflow)</td><td class="auto-trigger">Stage → Closed</td><td class="auto-action">Set Actual Revenue Month (date_mm4tatyy) = today</td><td class="auto-note">Also stamps revenue date on Closed — covers projects that skip Ready for Invoicing</td></tr>
-      <tr><td class="auto-id">7920230690 (workflow)</td><td class="auto-trigger">Stage → Closed</td><td class="auto-action">Notify Branden Sumerix + Dylan Lindhout</td><td class="auto-note">"Performance Bond Complete — notify the bonding company that this project is complete."</td></tr>
+      <tr><td class="auto-id">7920172818 (workflow)</td><td class="auto-trigger">Stage → Closed</td><td class="auto-action">Set Actual Revenue Month (date_mm4tatyy) = today</td><td class="auto-note">Still active. Overwrites the date 7920172789 set at Ready for Invoicing, moving revenue into the close month. Replaced by 7924141714; pausing it is pending (the API refused) — see gap</td></tr>
+      <tr><td class="auto-id">7924141714 (workflow)</td><td class="auto-trigger">Stage → Closed, only if Actual Revenue Month is empty</td><td class="auto-action">Set Actual Revenue Month (date_mm4tatyy) = today</td><td class="auto-note">Live Oct 2 2026 — covers projects that skip Ready for Invoicing without overwriting an existing date</td></tr>
+      <tr><td class="auto-id">7924141707 (workflow)</td><td class="auto-trigger">Stage → Closed</td><td class="auto-action">Set Closed Date (date_mm7scanx) = today</td><td class="auto-note">Live Oct 2 2026 — end of the Days to Close clock on Accounting KPIs; 127 Closed projects backfilled from their Closed stamp</td></tr>
+      <tr><td class="auto-id">7924141807 (workflow)</td><td class="auto-trigger">New item created</td><td class="auto-action">Set Order Sent Date (date_mm7sd79k) = today</td><td class="auto-note">Live Oct 2 2026 — start of the Days to PO clock on Accounting KPIs; 215 projects backfilled from item creation date</td></tr>
+      <tr class="auto-inactive"><td class="auto-id">7920230690 (workflow) <span class="auto-badge-ia">Inactive</span></td><td class="auto-trigger">Stage → Ready for Invoicing</td><td class="auto-action">Notify Branden Sumerix + Dylan Lindhout</td><td class="auto-note">"Performance Bond Complete" notice. Off since Sep 9 2026.</td></tr>
       <tr><td class="auto-id">7920569056 (workflow)</td><td class="auto-trigger">Stage → Ready for Invoicing</td><td class="auto-action">Set Ready for Invoicing Date (date_mm54qwps) = today</td><td class="auto-note">Timestamps the Ready for Invoicing date for billing SLA tracking</td></tr>
       <tr><td class="auto-id">7922447604 (workflow)</td><td class="auto-trigger">Stage → Installing</td><td class="auto-action">Set Materials Log link column (link_mm6mhdcx) = vtg-materials-log URL for this item</td><td class="auto-note">Live Aug 27 2026 — auto-populates the PM's one-click link to the materials log tool</td>
       </tr>
@@ -2694,6 +2738,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <tr><td class="auto-id">7920230458 (workflow)</td><td class="auto-trigger">Item moved to Lost Bid Bond Archive</td><td class="auto-action">Notify Branden + Dylan: “Cancel Bid Bond - {item}”</td><td class="auto-note">The manual cancellation alert; the message says to cancel only if not already cancelled</td></tr>
       <tr><td class="auto-id">642848824</td><td class="auto-trigger">Item moved to Lost Bid Bond Archive</td><td class="auto-action">Send webhook to vtg-bid-intake /bond-lost</td><td class="auto-note">Live Sep 25 2026 — emails Alliant the cancellation for bonds the Worker requested, once (stamps the cancelled date and posts an update). Hand-requested bonds are left to the manual alert.</td></tr>
       <tr><td class="auto-id">642876743</td><td class="auto-trigger">Bond Status changes</td><td class="auto-action">Send webhook to vtg-bid-intake /bond-status</td><td class="auto-note">Live Sep 25 2026 — acts only on Not Needed: the Worker moves the item to Lost Bid Bond Archive (no board automation does), which fires /bond-lost. Webhook targets matched by event and route.</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ── PROCESS MAP REQUESTS ── -->
+<div class="auto-board-section">
+  <div class="auto-board-header">
+    <div class="auto-board-name">📝 Process Map Requests</div>
+    <div class="auto-board-id">ID: 18433839739</div>
+    <div class="auto-board-count">1 workflow</div>
+  </div>
+  <table class="auto-table">
+    <thead><tr><th>ID</th><th>Trigger</th><th>Action</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td class="auto-id">7924145960 (workflow)</td><td class="auto-trigger">New item created</td><td class="auto-action">Notify Jon: “New process map request”</td><td class="auto-note">Items are created by vtg-process-requests from the map’s Requests tab</td></tr>
     </tbody>
   </table>
 </div>
@@ -2731,18 +2790,51 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="dash-card">
       <div class="dash-card-hdr">
         <div>
-          <div class="dash-name">E-Rate Pipeline Dashboard</div>
-          <div class="dash-workspace">CRM Workspace · Board 18419943586</div>
+          <div class="dash-name">Accounting KPIs</div>
+          <div class="dash-workspace">CRM Workspace · Dashboard 39808989 · Projects Folder</div>
+        </div>
+        <span class="dash-audience aud-fin">Finance / Jon</span>
+      </div>
+      <div class="dash-desc">Built Oct 2 2026 on <strong>Projects #4</strong>, so it covers every project and updates as projects move. Tracks how long two accounting handoffs take, in <strong>business days</strong> (Mon–Fri; same day = 0): <strong>order sent → vendor PO issued</strong>, and <strong>Ready for Invoicing → invoice</strong> (shown two ways: to the NetSuite invoice date and to Closed). Each project row carries its own day counts — Days to PO, Days to Invoice, Days to Close — and the dashboard shows the average and median of each, monthly trend lines, a per-project timings list and projects by stage.</div>
+      <div class="dash-feeds">
+        <div class="dash-feed">Projects #4 — Order Sent Date (date_mm7sd79k), set on item creation by automation 7924141807; 215 projects backfilled from creation date</div>
+        <div class="dash-feed">Projects #4 — PO Issued Date (date_mm7s4n0m), earliest NetSuite PO date, written by vtg-po-sync</div>
+        <div class="dash-feed">Projects #4 — Ready for Invoicing Date (date_mm54qwps, automation 7920569056) · Last Invoice Date (date_mm7d365w, vtg-ns-so-backfill billing sync) · Closed Date (date_mm7scanx, automation 7924141707)</div>
+        <div class="dash-feed">Formulas: Days to PO (formula_mm7s252p) · Days to Invoice (formula_mm7s1r59) · Days to Close (formula_mm7sjt7h)</div>
+      </div>
+      <div class="dash-note">⚠ Days to PO stays empty until the vtg-po-sync PO Issued Date change is deployed (written Oct 2 2026). Last Invoice Date is the most recent NetSuite invoice, so on progress-billed jobs it can move after Closed.</div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-hdr">
+        <div>
+          <div class="dash-name">📊 E-Rate Pipeline &amp; Project Delivery</div>
+          <div class="dash-workspace">CRM Workspace · Dashboard 37086241</div>
         </div>
         <span class="dash-audience aud-exec">Executive</span>
       </div>
-      <div class="dash-desc">The primary E-Rate revenue visibility tool. Shows the full pipeline from active bids through to billed projects — forecast vs. actual revenue by month, stage distribution across Bids #3, and project counts by status. Used by Jon and Greg to understand where revenue stands and what's pending in the pipeline at any given time.</div>
+      <div class="dash-desc">Pipeline and delivery dashboard on Bids #3 and Projects #4. Top widgets: <strong>Active Post-Sale Pipeline</strong>, <strong>Total Active Project Value</strong>, <strong>Total Active Bids</strong> and <strong>Bids by Stage</strong>. Checked Oct 2 2026: Total Active Project Value ($4.45M) matches the sum of non-Closed Projects #4 exactly; Total Active Bids shows 0 and Active Post-Sale Pipeline counts more than post-sale bids (see gap).</div>
       <div class="dash-feeds">
-        <div class="dash-feed">Bids #3 (18176633000) — bid values, stage counts, deal owner breakdown</div>
-        <div class="dash-feed">Projects #4 (18176626554) — Actual Revenue Month (date_mm4tatyy), Ready for Invoicing Date (date_mm54qwps)</div>
-        <div class="dash-feed">E-Rate Revenue Forecast board (18419943586) — monthly forecast targets vs. actuals</div>
+        <div class="dash-feed">Bids #3 (18176633000) — Bid Value (deal_value), Bid Stage (deal_stage)</div>
+        <div class="dash-feed">Projects #4 (18176626554) — Total Project Amount (numeric_mkqzrk8y), Project Stage</div>
       </div>
-      <div class="dash-note">⚠ Actual Revenue Month is auto-stamped by automations 7920172789 (Ready for Invoicing) and 7920172818 (Closed) — accuracy depends on those stages being set correctly</div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-hdr">
+        <div>
+          <div class="dash-name">Other monday dashboards</div>
+          <div class="dash-workspace">CRM 12853770 · E-Rate OS 14860884</div>
+        </div>
+        <span class="dash-audience aud-exec">Various</span>
+      </div>
+      <div class="dash-desc">Listed from monday Oct 2 2026; widget contents not reviewed. <strong>CRM:</strong> 🧙 Merlin – E-Rate Revenue (37290789), 🦅 THE Dashboard (33629663), Carmen Tech &amp; Ops (37400773), 🌎 "My" Bids (33629661), and two private ones — E-Rate Pipeline &amp; Projects (36597174) and eRate Pipeline &amp; Budget (36598780). <strong>E-Rate OS:</strong> Sales Dashboard (36369270) and E-Rate Executive Dashboard (36392597).</div>
+      <div class="dash-feeds">
+        <div class="dash-feed">📈 E-Rate Revenue Forecast board (18419943586) — 12 monthly forecast rows, Jan–Dec 2026; no 2027 rows yet</div>
+        <div class="dash-feed">Projects #4 — Actual Revenue Month (date_mm4tatyy): set at Ready for Invoicing (7920172789); at Closed only if blank (7924141714)</div>
+        <div class="dash-feed">Projects #4 — Revenue Month (date_mm39fh8x): vtg-revenue-month, locked at Ready for Invoicing</div>
+      </div>
+      <div class="dash-note">⚠ Actual Revenue Month has no values before July 2026 (the stamp automations started Jun 30); Revenue Month covers March onward. 7920172818 still overwrites Actual Revenue Month at Closed until it is paused — see gap.</div>
     </div>
 
     <div class="dash-card">
@@ -2753,9 +2845,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <span class="dash-audience aud-sales">Sales / Bid Team</span>
       </div>
-      <div class="dash-desc">Not a separate dashboard — each team member has a dedicated <strong>Table View</strong> on Bids #3 filtered and column-ordered for their role: Alan's View, Jake's View, Dylan's View, Mark's View, plus a "My Kanban" and "My Timeline" view filtered to items assigned to the logged-in user. Each view hides irrelevant columns and surfaces what that person needs for their day-to-day bid work.</div>
+      <div class="dash-desc">Not a separate dashboard — each team member has a dedicated <strong>Table View</strong> on Bids #3: Alan's View, Jake's View, Dylan's View, Mark's View. The four views have <strong>no filters</strong>; they differ by column order and hidden columns (Dylan's is sorted by Bid Due Date, newest first; Mark's by name). The board also has "My" Kanban, "My" Timeline and "My" Calendar views and two "Bids – #3 report" views.</div>
       <div class="dash-feeds">
-        <div class="dash-feed">Bids #3 (18176633000) — all columns, role-filtered</div>
+        <div class="dash-feed">Bids #3 (18176633000) — all items; columns ordered per person</div>
         <div class="dash-feed">Subitem board (18176633598) — task status, due dates per person</div>
       </div>
     </div>
@@ -2782,9 +2874,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <span class="dash-audience aud-exec">Executive / Sales</span>
       </div>
-      <div class="dash-desc">Houses 1,107+ FRN records imported from nine years of USAC QuickBase exports (FY2017–FY2025), grouped by funding year. Used for win-rate analysis, territory planning, and pre-bid research — "have we won in this district before, and at what value?" Also serves as a historical reference for which 470s VTG has bid on and won over time.</div>
+      <div class="dash-desc">Set up for FRN award history from USAC QuickBase exports, with a group per funding year (FY2017–FY2025) and 15 columns. Checked Oct 2 2026: the board holds <strong>3 rows</strong>, all FY2025 (Alpena, Augusta Twp, Benzonia), and its activity log shows only those 3 were ever created — the full import never ran (see gap).</div>
       <div class="dash-feeds">
-        <div class="dash-feed">USAC QuickBase export CSVs — imported via API import script</div>
+        <div class="dash-feed">USAC QuickBase export CSVs — import not yet run (3 sample rows)</div>
         <div class="dash-feed">15 columns: District, FRN, Funding Year, Category, Award Amount, etc.</div>
       </div>
     </div>
@@ -2797,12 +2889,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <span class="dash-audience aud-pm">PM / Jon</span>
       </div>
-      <div class="dash-desc">Projects #4 is organized into stage-based groups that function as a kanban board: New → Waiting for Product → All Products Received → Kick Off → Pre-Install Staging → Installing → Equipment Only → Construction Hold → Ready for Invoicing → Closed. Each group move is automated by stage changes. Jon uses this as his primary delivery management view — seeing what's installing, what's ready to bill, and what's waiting on product at a glance.</div>
+      <div class="dash-desc">Projects #4 is organized into stage-based groups that function as a kanban board: Non-Monday Submissions · New Projects · Construction Hold or Phased install · Installing · On Hold · Equipment Only · Closeout · Ready for Invoicing · Closed. Group moves are automated by stage changes. The Waiting for Product, Kickoff and All products Received stage labels are deactivated. Jon uses this as his primary delivery management view — seeing what's installing, what's ready to bill, and what's waiting on product at a glance.</div>
       <div class="dash-feeds">
-        <div class="dash-feed">Projects #4 (18176626554) — all delivery stages, linked to Bids #3 via connect_boards6</div>
+        <div class="dash-feed">Projects #4 (18176626554) — all delivery stages; linked from Bids #3 (connect_boards6 is on Bids #3)</div>
         <div class="dash-feed">Blueprint column drives item template overlays (Wireless/Fiber/BMIC)</div>
       </div>
-      <div class="dash-note">⚠ "Waiting for Product" group automation (482368828) is in error state — group may have been renamed or deleted</div>
+      <div class="dash-note">482368828 ("Waiting for Product" group move) shows a missing-group error, but its stage label is deactivated, so it never fires.</div>
     </div>
 
     <div class="dash-card">
@@ -2828,7 +2920,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <span class="dash-audience aud-ops">Dylan / Branden / Bonding</span>
       </div>
-      <div class="dash-desc">Tracks bid bond requirements for bids that require performance or bid bonds. A bond subitem is created on Bids #3 and a linked item is created on this board when the intake form indicates "bond required." vtg-bid-intake emails Alliant (the surety) automatically. Bond status is tracked here and mirrored via the "🅱️ Bid Bonds" relation on Bids #3. When a project closes, automation 7920230690 notifies Branden and Dylan to release the bond.</div>
+      <div class="dash-desc">Tracks bid bond requirements for bids that require performance or bid bonds. A bond subitem is created on Bids #3 and a linked item is created on this board when the intake form indicates "bond required." vtg-bid-intake emails Alliant (the surety) automatically. Bond status is tracked here and mirrored via the "🅱️ Bid Bonds" relation on Bids #3. Automation 7920230690 (performance-bond-complete notice to Branden and Dylan, on Projects #4 Ready for Invoicing) has been off since Sep 9 2026.</div>
       <div class="dash-feeds">
         <div class="dash-feed">Bids #3 (18176633000) — linked via board_relation0</div>
         <div class="dash-feed">vtg-bid-intake — creates bond email + subitem on intake form submit</div>
@@ -2861,17 +2953,31 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="dash-card">
       <div class="dash-card-hdr">
         <div>
+          <div class="dash-name">Process Map Requests</div>
+          <div class="dash-workspace">E-Rate OS Workspace · Board 18433839739</div>
+        </div>
+        <span class="dash-audience aud-ops">Jon</span>
+      </div>
+      <div class="dash-desc">Requests and questions sent from this map’s Requests tab. Jon triages here: Status and Reply show on the map; <em>Hide from map</em> removes an item from the public list. A new item notifies Jon.</div>
+      <div class="dash-feeds">
+        <div class="dash-feed">vtg-process-requests — creates items from the Requests tab</div>
+      </div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-hdr">
+        <div>
           <div class="dash-name">E-Rate Deals Board</div>
           <div class="dash-workspace">E-Rate OS Workspace · Board 18406412794</div>
         </div>
         <span class="dash-audience aud-fin">Finance / Jon</span>
       </div>
-      <div class="dash-desc">The financial deal-tracking layer for post-award E-Rate projects. Items are auto-created here when a Bids #3 item enters Post-Monday stage. Tracks: District, FRN, Contract Value, Funding Year, Category, Sales Owner, and Status (Pipeline → Submitted → Awarded → Booked). Status progression triggers E-Rate Projects creation (Pipeline→Awarded) and stamps Booking Date (→Booked). Currently has no defined owner for status updates — a documented gap.</div>
+      <div class="dash-desc">The financial deal-tracking layer for post-award E-Rate projects. Items are auto-created here when a Bids #3 item enters Post-Monday stage. Tracks: District, FRN, Contract Value, Funding Year, Category, Sales Owner, and Status (Pipeline → Submitted → Awarded → Booked). Status progression triggers E-Rate Projects creation (Pipeline→Awarded) and stamps Booking Date (→Booked). Checked Oct 2 2026: 108 of 109 items sit at Pipeline, and 559103546 still adds one for every Post-Monday bid.</div>
       <div class="dash-feeds">
         <div class="dash-feed">Bids #3 (18176633000) — created by automation 559103546 on Post-Monday</div>
         <div class="dash-feed">E-Rate Projects (18406413755) — linked via Linked Deal relation</div>
       </div>
-      <div class="dash-note">⚠ Gap: no defined owner or automation for status progression Pipeline → Submitted → Awarded → Booked</div>
+      <div class="dash-note">⚠ Board is unused — see the "E-Rate Deals and E-Rate Projects boards are unused" gap.</div>
     </div>
 
     <div class="dash-card">
@@ -2882,7 +2988,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <span class="dash-audience aud-fin">Finance / Jon / PM</span>
       </div>
-      <div class="dash-desc">The financial and scheduling view of post-award E-Rate project execution. Mirrors data from Bids #3 (Account, Contact, Bid Value, 470#, SharePoint, Projects #4 link) and E-Rate Deals (District, Booking Date, Contract Value, Funding Year). Jon manages Execution Status, Billing Status, Planned Start Window, Risk Flag, PM/Project Owner, and timeline dates here. This board is the source of truth for <em>when</em> projects start and complete — complementing Projects #4 which tracks <em>what</em> is happening on the ground.</div>
+      <div class="dash-desc">The financial and scheduling view of post-award E-Rate project execution. Mirrors data from Bids #3 (Account, Contact, Bid Value, 470#, SharePoint, Projects #4 link) and E-Rate Deals (District, Booking Date, Contract Value, Funding Year). Columns exist for Execution Status, Billing Status, Planned Start Window, Risk Flag, PM/Project Owner and timeline dates. Checked Oct 2 2026: 1 item, last updated Apr 7 2026 — the board is unused (see gap).</div>
       <div class="dash-feeds">
         <div class="dash-feed">E-Rate Deals (18406412794) — created by automation 7917669964 when Status → Awarded</div>
         <div class="dash-feed">Bids #3 (18176633000) — mirrored via board_relation_mm1yt0xa</div>
@@ -2905,7 +3011,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <span class="dash-audience aud-ops">Ops / Warehouse</span>
       </div>
-      <div class="dash-desc">Company-wide NetSuite inventory dashboard. Fetches live from vtg-ns-mcp-sync /api/inventory/all and displays all NS locations: <strong>41 Cabling Warehouse</strong>, <strong>42 Secondary Warehouse</strong>, <strong>4 Grand Rapids Office</strong>. Color-coded by location. Protected by a shared access code (Azure AD SSO planned). Features: search, location filter pills, sortable columns, light/dark mode, CSV export. The page says it refreshes every 15 min; data comes from INVENTORY_CACHE or a live NetSuite fetch on a miss, and whether the vtg-ns-mcp-sync cron keeps it refreshed is unconfirmed.</div>
+      <div class="dash-desc">Company-wide NetSuite inventory dashboard. Fetches live from vtg-ns-mcp-sync /api/inventory/all and displays every NetSuite location in the feed — on Oct 2 2026 that was 822 rows across 7 location IDs (4, 6, 23, 32, 39, 41, 42), including <strong>41 Cabling Warehouse</strong>, <strong>42 Secondary Warehouse</strong> and <strong>4 Grand Rapids Office</strong>. Color-coded by location. Protected by a shared access code (Azure AD SSO planned). Features: search, location filter pills, sortable columns, light/dark mode, CSV export. The page says it refreshes every 15 min; data comes from INVENTORY_CACHE or a live NetSuite fetch on a miss, and whether the vtg-ns-mcp-sync cron keeps it refreshed is unconfirmed.</div>
       <div class="dash-feeds">
         <div class="dash-feed">vtg-ns-mcp-sync /api/inventory/all · INVENTORY_CACHE KV (0233a14225194cbd81a49601f448963b)</div>
         <div class="dash-feed">GitHub: vtg-portal/vtg-inventory · Cloudflare Pages auto-deploy on push</div>
@@ -2955,6 +3061,106 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <!-- ════════════════════════════════════════════
      CHANGELOG
 ════════════════════════════════════════════ -->
+
+<!-- ════════════════════════════════════════════
+     REQUESTS  (live: vtg-process-requests Worker → monday board 18433839739)
+════════════════════════════════════════════ -->
+<div class="view" id="view-requests">
+<style>
+.rq-tabn{display:inline-block;min-width:16px;padding:0 5px;margin-left:4px;border-radius:9px;background:var(--accent);color:#fff;font-size:9.5px;font-weight:700;line-height:16px;text-align:center;}
+.rq-tabn[hidden]{display:none;}
+.rq-wrap{display:grid;grid-template-columns:minmax(280px,380px) 1fr;gap:22px;align-items:start;}
+@media(max-width:900px){.rq-wrap{grid-template-columns:1fr;}.rq-form{position:static;}}
+.rq-head{margin-bottom:18px;}
+.rq-head h2{font-size:16px;font-weight:700;color:var(--text);}
+.rq-head p{font-size:12px;color:var(--text-muted);margin-top:3px;max-width:680px;line-height:1.5;}
+.rq-form{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:16px;position:sticky;top:12px;}
+.rq-form h3{font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;}
+.rq-field{margin-bottom:12px;}
+.rq-field label{display:block;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--text-muted);margin-bottom:5px;}
+.rq-field label span{font-weight:500;text-transform:none;letter-spacing:0;color:var(--text-dim);}
+.rq-in{width:100%;box-sizing:border-box;font:inherit;font-size:12.5px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;}
+.rq-in:focus{outline:2px solid var(--accent);outline-offset:1px;}
+textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
+.rq-count{font-size:10px;color:var(--text-dim);text-align:right;margin-top:3px;font-family:var(--font-mono);}
+.rq-hp{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;}
+.rq-btn{width:100%;font:inherit;font-size:12.5px;font-weight:600;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:9px 12px;cursor:pointer;}
+.rq-btn[disabled]{opacity:.55;cursor:default;}
+.rq-btn:focus-visible,.rq-retry:focus-visible,.rq-link:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+.rq-msg{font-size:11.5px;margin-top:9px;line-height:1.45;}
+.rq-msg.ok{color:var(--green);} .rq-msg.err{color:var(--red);}
+.rq-note{font-size:10.5px;color:var(--text-dim);margin-top:9px;line-height:1.5;}
+.rq-ts{margin:4px 0 12px;}
+.rq-bar{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.rq-list{display:flex;flex-direction:column;gap:10px;}
+.rq-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:13px 15px;}
+.rq-card.rq-new-flash{border-color:var(--accent);}
+.rq-card-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px;}
+.rq-who{font-size:12.5px;font-weight:600;color:var(--text);overflow-wrap:anywhere;}
+.rq-when{font-size:10.5px;font-family:var(--font-mono);color:var(--text-dim);}
+.rq-area{font-size:10px;font-family:var(--font-mono);color:var(--cyan);background:var(--cyan-dim);padding:1px 7px;border-radius:10px;}
+.rq-st{margin-left:auto;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+.st-new{background:var(--accent-dim);color:var(--accent);}
+.st-rev{background:var(--yellow-dim);color:var(--yellow);}
+.st-plan{background:var(--purple-dim);color:var(--purple);}
+.st-done{background:var(--green-dim);color:var(--green);}
+.st-wont{background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);}
+[data-theme="light"] .st-rev{color:#854d0e;} [data-theme="light"] .st-done{color:#166534;}
+.rq-ask{font-size:12.5px;color:var(--text);line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;}
+.rq-reply{margin-top:9px;padding:8px 10px;border-left:3px solid var(--accent);background:var(--shade);border-radius:0 var(--r) var(--r) 0;font-size:12px;color:var(--text-muted);line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;}
+.rq-reply b{color:var(--text);font-weight:600;}
+.rq-link{font:inherit;font-size:11px;color:var(--accent);margin-top:7px;display:inline-block;background:none;border:none;padding:0;cursor:pointer;text-decoration:underline;}
+.rq-empty,.rq-state{font-size:12px;color:var(--text-dim);font-style:italic;padding:6px 2px;}
+.rq-retry{font:inherit;font-size:11px;margin-left:8px;color:var(--accent);background:none;border:1px solid var(--accent);border-radius:var(--r);padding:2px 8px;cursor:pointer;font-style:normal;}
+.rq-cardlink{display:inline-block;margin-top:10px;font:inherit;font-size:11px;color:var(--accent);background:none;border:none;padding:0;cursor:pointer;}
+.rq-cardlink:hover{text-decoration:underline;}
+</style>
+  <div class="rq-head">
+    <h2>Requests</h2>
+    <p>Ask for a change or ask a question about anything on this map. No monday account needed — Jon reviews every request, and the status and reply show up here.</p>
+  </div>
+  <div class="rq-wrap">
+    <form class="rq-form" id="rq-form" novalidate>
+      <h3>New request</h3>
+      <div class="rq-field"><label for="rq-name">Your name</label><input class="rq-in" id="rq-name" maxlength="80" autocomplete="name" required></div>
+      <div class="rq-field"><label for="rq-area">Area <span>(optional)</span></label>
+        <select class="rq-in" id="rq-area">
+          <option value="">—</option>
+          <option>Lead intake / El Nova Leads</option>
+          <option>Bid intake form</option>
+          <option>Bids #3</option>
+          <option>SOV Builder</option>
+          <option>SOW / ScopeStack</option>
+          <option>Bid bonds</option>
+          <option>CS Order form</option>
+          <option>Projects #4</option>
+          <option>Materials Log</option>
+          <option>Billing / invoicing</option>
+          <option>NetSuite</option>
+          <option>SharePoint folders</option>
+          <option>Dashboards</option>
+          <option>Ruckus tools</option>
+          <option>The process map itself</option>
+          <option>Other / not sure</option>
+        </select></div>
+      <div class="rq-field"><label for="rq-ask">What's the ask?</label><textarea class="rq-in" id="rq-ask" maxlength="2000" required placeholder="What should change, or what's your question?"></textarea><div class="rq-count" id="rq-count">0 / 2000</div></div>
+      <div class="rq-hp" aria-hidden="true"><label for="rq-website">Website</label><input id="rq-website" name="website" tabindex="-1" autocomplete="off"></div>
+      <div class="rq-ts" id="rq-ts" hidden></div>
+      <button class="rq-btn" id="rq-send" type="submit">Send request</button>
+      <div class="rq-msg" id="rq-msg" role="status" aria-live="polite"></div>
+      <div class="rq-note">Requests and replies are visible to everyone who can open this map.</div>
+    </form>
+    <div>
+      <div class="rq-bar" role="group" aria-label="Filter requests">
+        <button type="button" class="gf-chip on" data-rq="open" aria-pressed="true"><span class="gf-t">Open</span> <b class="gf-n"></b></button>
+        <button type="button" class="gf-chip on" data-rq="done" aria-pressed="true"><span class="gf-t">Done</span> <b class="gf-n"></b></button>
+        <button type="button" class="gf-chip on" data-rq="wont" aria-pressed="true"><span class="gf-t">Won’t fix</span> <b class="gf-n"></b></button>
+        <span class="gf-count" style="margin-left:auto">Newest first</span>
+      </div>
+      <div class="rq-list" id="rq-list"><div class="rq-state">Loading requests…</div></div>
+    </div>
+  </div>
+</div>
 <div class="view" id="view-changelog">
 <style>
 .cl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
@@ -2988,7 +3194,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.16</div>
+  <div class="cl-version-pill">Current: v2.18</div>
 </div>
 
 <table class="cl-table">
@@ -3008,7 +3214,52 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <!-- ── Sep 29 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">October 3, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 3</td>
+      <td class="cl-ver">v2.18</td>
+      <td><span class="cl-badge cl-new">New</span></td>
+      <td class="cl-desc"><strong>Requests tab</strong> — anyone with the map can send a request or question (name + the ask, optional area) and see every request with its status and Jon’s reply, no monday account needed. Each Worker card has a “Request a change” link that opens the tab with that Worker filled in. New Worker <strong>vtg-process-requests</strong> stores requests on the monday board <strong>Process Map Requests</strong> (18433839739), which notifies Jon. Open for now; sign-in comes later.</td>
+    </tr>
     <tr class="cl-section-row"><td colspan="4">October 2, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 2</td>
+      <td class="cl-ver">v2.17</td>
+      <td><span class="cl-badge cl-new">New</span></td>
+      <td class="cl-desc"><strong>Accounting KPIs dashboard</strong> (monday 39808989, on Projects #4): business days for order sent → vendor PO issued, Ready for Invoicing → NetSuite invoice, and Ready for Invoicing → Closed. Average, median, monthly trend and per-project timings. New Projects #4 columns Order Sent Date, PO Issued Date and the Days to PO / Days to Invoice / Days to Close formulas; automation 7924141807 stamps Order Sent Date on new projects (215 backfilled).</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 2</td>
+      <td class="cl-ver">v2.17</td>
+      <td><span class="cl-badge cl-new">New</span></td>
+      <td class="cl-desc"><strong>Closed Date</strong> column on Projects #4, stamped at Closed by 7924141707; 127 Closed projects backfilled from their Closed stamp.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 2</td>
+      <td class="cl-ver">v2.17</td>
+      <td><span class="cl-badge cl-fix">Fix</span></td>
+      <td class="cl-desc"><strong>Actual Revenue Month</strong>: 16 projects that had been moved into their close month were reset to their Ready for Invoicing date (both revenue-month columns), and 7924141714 now fills it at Closed only when blank. 7920172818, which overwrites it, is still active until paused.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 2</td>
+      <td class="cl-ver">v2.17</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>vtg-po-sync</strong>: PO Issued Date change written, not yet deployed.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 2</td>
+      <td class="cl-ver">v2.17</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Dashboards tab corrected</strong> from the Oct 2 review: real monday dashboard list, Historical Awards row count, Projects #4 groups, per-person views, Bid Bonds notice, E-Rate Deals / Projects usage, inventory locations. Automations, SOP and glossary entries updated to match.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 2</td>
+      <td class="cl-ver">v2.17</td>
+      <td><span class="cl-badge cl-gap">Gap</span></td>
+      <td class="cl-desc">Added gaps: Actual Revenue Month still overwritten at Closed (Medium), Pipeline dashboard widgets misreport (Medium), Historical Awards import never ran (Low).</td>
+    </tr>
 
     <tr>
       <td class="cl-date">Oct 2</td>
@@ -4180,6 +4431,167 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
     if (e.target.closest('#gf-reset')) { ALL.forEach(k => state[k] = true); apply(); }
   });
   apply();
+})();
+
+// ── Requests tab ── live list + form. Backend: vtg-process-requests (monday board 18433839739).
+// Everything typed by people is rendered with textContent, never as HTML.
+(function(){
+  const PROD_API = 'https://vtg-process-requests.vectorfi-admin.workers.dev';
+  const local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  const qApi = new URLSearchParams(location.search).get('reqapi');
+  const API = (local && qApi) ? qApi : PROD_API;          // override only for local testing
+  const NAME_KEY = 'vtg-req-name', FILTER_KEY = 'vtg-req-filter';
+  const OPEN = ['New', 'Reviewing', 'Planned'];
+  const ST = { 'New': 'st-new', 'Reviewing': 'st-rev', 'Planned': 'st-plan', 'Done': 'st-done', "Won't fix": 'st-wont' };
+  const $ = id => document.getElementById(id);
+  const view = $('view-requests'), list = $('rq-list'), form = $('rq-form');
+  if (!view || !list || !form) return;
+  const nameIn = $('rq-name'), areaIn = $('rq-area'), askIn = $('rq-ask'), hpIn = $('rq-website');
+  const sendBtn = $('rq-send'), msg = $('rq-msg'), count = $('rq-count'), badge = $('rq-tabn'), tsBox = $('rq-ts');
+
+  let items = [], loadedAt = 0, loading = null, sending = false, tsToken = '', tsWidget = null;
+  let filt = { open: true, done: true, wont: true };
+  try { const s = JSON.parse(localStorage.getItem(FILTER_KEY) || 'null'); if (s) for (const k in filt) if (typeof s[k] === 'boolean') filt[k] = s[k]; } catch (e) {}
+  try { nameIn.value = localStorage.getItem(NAME_KEY) || ''; } catch (e) {}
+  const newId = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+    : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10) + '-' + Math.random().toString(36).slice(2, 10);
+  let rid = newId();
+
+  function catOf(r) { return OPEN.includes(r.status) ? 'open' : (r.status === 'Done' ? 'done' : 'wont'); }
+  function fmtDate(iso) {
+    const d = new Date(iso); if (isNaN(d)) return '';
+    const opts = { month: 'short', day: 'numeric' };
+    if (d.getFullYear() !== new Date().getFullYear()) opts.year = 'numeric';
+    return d.toLocaleDateString('en-US', opts);
+  }
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  function card(r) {
+    const c = el('div', 'rq-card'); c.dataset.id = r.id;
+    const top = el('div', 'rq-card-top');
+    top.append(el('span', 'rq-who', r.requester || 'Someone'));
+    if (r.created) top.append(el('span', 'rq-when', fmtDate(r.created)));
+    if (r.area) top.append(el('span', 'rq-area', r.area));
+    top.append(el('span', 'rq-st ' + (ST[r.status] || 'st-new'), r.status || 'New'));
+    c.append(top, el('div', 'rq-ask', r.ask));
+    if (r.reply) { const rep = el('div', 'rq-reply'); rep.append(el('b', null, 'Jon: '), document.createTextNode(r.reply)); c.append(rep); }
+    if (r.changelog) {
+      const a = el('button', 'rq-link', 'See it in the changelog → ' + r.changelog); a.type = 'button';
+      a.addEventListener('click', () => { const t = document.querySelector(".tab[onclick*=\"'changelog'\"]"); if (t) { showView('changelog', t); window.scrollTo(0, 0); } });
+      c.append(a);
+    }
+    return c;
+  }
+
+  function render() {
+    const counts = { open: 0, done: 0, wont: 0 };
+    items.forEach(r => counts[catOf(r)]++);
+    view.querySelectorAll('.gf-chip[data-rq]').forEach(ch => {
+      const k = ch.dataset.rq; ch.classList.toggle('on', !!filt[k]); ch.setAttribute('aria-pressed', filt[k] ? 'true' : 'false');
+      ch.querySelector('.gf-n').textContent = counts[k];
+    });
+    badge.textContent = counts.open; badge.hidden = !counts.open;
+    list.replaceChildren();
+    const shown = items.filter(r => filt[catOf(r)]);
+    if (!items.length) list.append(el('div', 'rq-empty', 'No requests yet — be the first.'));
+    else if (!shown.length) list.append(el('div', 'rq-empty', 'Nothing matches the filters.'));
+    else shown.forEach(r => list.append(card(r)));
+  }
+
+  function showError() {
+    list.replaceChildren();
+    const s = el('div', 'rq-state', 'Couldn’t load requests right now.');
+    const b = el('button', 'rq-retry', 'Retry'); b.type = 'button'; b.addEventListener('click', () => load(true));
+    s.append(b); list.append(s);
+  }
+
+  function load(force) {
+    if (loading) return loading;
+    if (!force && loadedAt && Date.now() - loadedAt < 60000) return Promise.resolve();
+    if (!items.length) list.replaceChildren(el('div', 'rq-state', 'Loading requests…'));
+    loading = fetch(API + '/api/requests', { headers: { 'Accept': 'application/json' } })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status)))
+      .then(d => { items = Array.isArray(d.requests) ? d.requests : []; loadedAt = Date.now(); render(); })
+      .catch(() => { if (!items.length) showError(); })
+      .finally(() => { loading = null; });
+    return loading;
+  }
+
+  // Turnstile only when the Worker has a site key configured
+  fetch(API + '/api/config').then(r => r.ok ? r.json() : null).then(cfg => {
+    if (!cfg || !cfg.turnstileSiteKey) return;
+    tsBox.hidden = false;
+    window.__rqTsReady = () => { tsWidget = window.turnstile.render('#rq-ts', { sitekey: cfg.turnstileSiteKey, callback: t => { tsToken = t; }, 'expired-callback': () => { tsToken = ''; } }); };
+    const s = document.createElement('script');
+    s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=__rqTsReady'; s.async = true; document.head.append(s);
+  }).catch(() => {});
+
+  function say(text, kind) { msg.textContent = text; msg.className = 'rq-msg' + (kind ? ' ' + kind : ''); }
+  askIn.addEventListener('input', () => { count.textContent = askIn.value.length + ' / 2000'; });
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (sending) return;
+    const requester = nameIn.value.trim(), ask = askIn.value.trim(), area = areaIn.value;
+    if (requester.length < 2) { say('Please enter your name.', 'err'); nameIn.focus(); return; }
+    if (ask.length < 5) { say('Please describe the ask.', 'err'); askIn.focus(); return; }
+    if (!tsBox.hidden && !tsToken) { say('Please complete the check above the button.', 'err'); return; }
+    sending = true; sendBtn.disabled = true; sendBtn.textContent = 'Sending…'; say('');
+    try {
+      const r = await fetch(API + '/api/requests', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requester, ask, area, requestId: rid, website: hpIn.value, turnstileToken: tsToken }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.ok) throw new Error(d.error || 'Couldn’t send that. Please try again.');
+      try { localStorage.setItem(NAME_KEY, requester); } catch (e2) {}
+      if (d.request && !items.some(x => x.id === d.request.id)) items.unshift(d.request);
+      filt.open = true; render();
+      const first = list.querySelector('.rq-card[data-id="' + (d.id || '') + '"]');
+      if (first) first.classList.add('rq-new-flash');
+      askIn.value = ''; areaIn.value = ''; count.textContent = '0 / 2000';
+      rid = newId();
+      say('Thanks — your request is in. Jon’s reply will show here.', 'ok');
+    } catch (err) {
+      say(err.message || 'Couldn’t send that. Please try again.', 'err');   // same rid kept, so a retry can't duplicate
+    } finally {
+      sending = false; sendBtn.disabled = false; sendBtn.textContent = 'Send request';
+      if (tsWidget != null && window.turnstile) { window.turnstile.reset(tsWidget); tsToken = ''; }
+    }
+  });
+
+  view.querySelector('.rq-bar').addEventListener('click', e => {
+    const ch = e.target.closest('.gf-chip[data-rq]'); if (!ch) return;
+    filt[ch.dataset.rq] = !filt[ch.dataset.rq];
+    try { localStorage.setItem(FILTER_KEY, JSON.stringify(filt)); } catch (e2) {}
+    render();
+  });
+
+  const tab = $('tab-requests');
+  function openTab(area) {
+    showView('requests', tab); window.scrollTo(0, 0);
+    if (area) {
+      if (![...areaIn.options].some(o => o.value === area)) { const o = document.createElement('option'); o.textContent = area; areaIn.insertBefore(o, areaIn.options[areaIn.options.length - 1]); }
+      areaIn.value = area; askIn.focus();
+    }
+    load(false);
+  }
+  tab.addEventListener('click', () => load(false));
+
+  // "Request a change" on every Worker card → opens the tab with that Worker as the area
+  document.querySelectorAll('#view-workers .worker-card').forEach(c => {
+    const n = c.querySelector('.worker-name'); if (!n) return;
+    const b = el('button', 'rq-cardlink', 'Request a change / ask a question →'); b.type = 'button';
+    b.addEventListener('click', () => openTab(n.textContent.trim().slice(0, 60)));
+    c.append(b);
+  });
+
+  // Deep link: #requests or #requests?area=SOV%20Builder
+  if (/^#requests\b/.test(location.hash)) {
+    const q = new URLSearchParams(location.hash.split('?')[1] || '');
+    openTab((q.get('area') || '').slice(0, 60));
+  }
+  load(false);   // fills the tab badge on page load
 })();
 </script>
 </body>
