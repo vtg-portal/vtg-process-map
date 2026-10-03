@@ -248,6 +248,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 .gf-sep{width:1px;height:18px;background:var(--border);margin:0 4px;}
 .gf-reset{margin-left:auto;font:inherit;font-size:11px;background:none;border:none;color:var(--accent);cursor:pointer;padding:4px 6px;}
 .gf-count{font-size:10.5px;color:var(--text-dim);font-family:var(--font-mono);}
+.gap-legend{font-size:11.5px;line-height:1.6;color:var(--text-muted);margin:-8px 0 18px;padding:0 4px;}
+.gap-legend b{color:var(--text);font-weight:600;}
 .gap-card.gf-hide{display:none;}
 .gf-empty{font-size:12px;color:var(--text-dim);font-style:italic;padding:4px 2px 0;}
 @media(max-width:640px){.gf-reset{margin-left:0;}.gf-sep{display:none;}}
@@ -1341,6 +1343,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <button type="button" class="gf-reset" id="gf-reset">Show all</button>
     <span class="gf-count" id="gf-count"></span>
   </div>
+  <div class="gap-legend"><b>Priority means impact and urgency, not effort.</b> <b>High</b> — blocks the lead-to-invoice flow, undermines a source of truth, or is a security exposure. <b>Medium</b> — causes errors, duplicates or manual work, but there is a workaround. <b>Low</b> — cleanup, or limited impact for now. <b>Paused</b> — on hold by decision. <b>Resolved / Done</b> — closed.</div>
   <div class="sec-block">
     <div class="sec-title">🔴 Active Gaps — Need Resolution</div>
     <div class="gap-grid">
@@ -1440,9 +1443,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">dealreg.py · Playwright</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">E-Rate Deals status has no defined owner or automation</div><div class="pri pri-h">High</div></div>
-        <div class="gap-body">The E-Rate Deals board (18406412794) status (Pipeline → Submitted → Awarded → Booked) drives creation of the E-Rate Projects item and stamps the Booking Date. No one is consistently updating it and there's no automation to advance it. If Awarded is never set, the E-Rate Projects item is never created.</div>
-        <div class="gap-worker">E-Rate Deals board · automation 7917669964 (blocked by this)</div>
+        <div class="gap-card-hdr"><div class="gap-title">E-Rate Deals and E-Rate Projects boards are unused</div><div class="pri pri-l">Low</div></div>
+        <div class="gap-body">The E-Rate Deals and E-Rate Projects boards were set up in March for pipeline reporting and are no longer used. No one has edited E-Rate Deals by hand since early April, and E-Rate Projects holds a single test item. Won bids already become projects through Bids #3 → Post-Monday → Projects #4, and the E-Rate KPIs come from those boards, so nothing is lost. One live side effect: Bids #3 automation 559103546 still adds an E-Rate Deals item for every bid that reaches Post-Monday. Every item is a won deal but shows Status = Pipeline. Next step: with Dylan, turn off 559103546, turn off 7917669964 and 7917670450, then archive both boards and mark this resolved.</div>
+        <div class="gap-worker">E-Rate Deals board · E-Rate Projects board · Bids #3 automation 559103546 · automations 7917669964, 7917670450</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">"Create Contract in CW Sell" subitem — paused</div><div class="pri" style="background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);">Paused</div></div>
@@ -1475,9 +1478,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">vtg-scopestack-doc-sync · /generate endpoint · KV lock needed</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">Hardcoded credentials in vtg_sov_import_v4.py — rotate</div><div class="pri pri-h">High</div></div>
-        <div class="gap-body">Four credentials sit in plaintext in <code>vtg_sov_import_v4.py</code>, and there are <strong>three copies of that file</strong> in a OneDrive-synced folder — so they are replicated to every machine the folder syncs to and to OneDrive’s version history. Rotate all four, move them to environment variables or <code>wrangler secret</code>, and delete the stale copies rather than editing them.</div>
-        <div class="gap-worker">vtg_sov_import_v4.py · ×3 copies · VTG Flows (OneDrive-synced)</div>
+        <div class="gap-card-hdr"><div class="gap-title">Hardcoded credentials in vtg_sov_import_v4.py — monday token rotation pending</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body">Oct 2 2026: all three copies of <code>vtg_sov_import_v4.py</code> now read their keys from environment variables, and no copies of those keys remain in VTG Flows (full scan). The Anthropic key was replaced and the Cloudflare token rolled (old value confirmed dead). Still open: the monday personal API token can’t be rotated yet because other systems use it. It was in plain text in OneDrive, so it stays exposed through version history until it is rotated.</div>
+        <div class="gap-worker">vtg_sov_import_v4.py · environment variables · monday personal API token (rotation pending)</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">Addendum detection is live — resolved</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
@@ -1490,9 +1493,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">vtg-bid-intake · file upload · API-Version header</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">vtg-logo-probe still deployed</div><div class="pri pri-l">Low</div></div>
-        <div class="gap-body">Temporary read-only diagnostic built Sep 20 to work out why the logo extractor was only finding six logos. It mutates nothing, but it is a live endpoint with no purpose. Delete when the backfill work is done: <code>npx wrangler delete --name vtg-logo-probe</code>.</div>
-        <div class="gap-worker">vtg-logo-probe · diagnostic · delete when done</div>
+        <div class="gap-card-hdr"><div class="gap-title">vtg-logo-probe still deployed — resolved</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
+        <div class="gap-body">✅ Deleted Oct 2 2026 with <code>wrangler delete</code>. It was a temporary read-only diagnostic for the logo extractor and had no traffic. Source kept in VTG Flows if it’s ever needed again.</div>
+        <div class="gap-worker">vtg-logo-probe · deleted Oct 2 2026</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">vtg-logo-backfill still runs the old scraper</div><div class="pri pri-l">Low</div></div>
@@ -1510,8 +1513,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">vtg-bid-intake selections → Bids #3 subitem creation</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">The PO validator accepts its own placeholder</div><div class="pri pri-m">Medium</div></div>
-        <div class="gap-body">The Customer PO Number hard block rejects known junk — N/A, TBD, all-x, all-zero. A PO needs no particular format; anything genuinely filled in is acceptable. But the form’s own hint text, <code>PO-XXXX</code>, normalises to <code>poxxxx</code>, which is not in the reject list — so a rep who types the placeholder they are being shown sails through the check that exists to stop exactly that. One word in the reject list closes it.</div>
+        <div class="gap-card-hdr"><div class="gap-title">The PO validator accepts its own placeholder — won’t fix</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
+        <div class="gap-body">Won’t fix — by design. A PO can be anything; the form only requires something be entered and rejects obvious non-answers (N/A, TBD, all x’s).</div>
         <div class="gap-worker">vtg-cs-form · PO number validator · reject list</div>
       </div>
       <div class="gap-card">
@@ -2985,7 +2988,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.15</div>
+  <div class="cl-version-pill">Current: v2.16</div>
 </div>
 
 <table class="cl-table">
@@ -3007,6 +3010,36 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <!-- ── Oct 1 2026 ── -->
     <tr class="cl-section-row"><td colspan="4">October 2, 2026</td></tr>
 
+    <tr>
+      <td class="cl-date">Oct 2</td>
+      <td class="cl-ver">v2.16</td>
+      <td><span class="cl-badge cl-infra">Infrastructure</span></td>
+      <td class="cl-desc">Credential cleanup: vtg_sov_import reads keys from environment variables, Anthropic key replaced, Cloudflare token rolled; monday token rotation pending.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 2</td>
+      <td class="cl-ver">v2.16</td>
+      <td><span class="cl-badge cl-resolved">Gap Resolved</span></td>
+      <td class="cl-desc">Closed the PO placeholder gap as won’t fix: any PO value is acceptable by design.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 2</td>
+      <td class="cl-ver">v2.16</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc">Re-rated the E-Rate Deals status gap from High to Low and rewrote it: the E-Rate Deals and E-Rate Projects boards are unused, and won bids already reach Projects #4 through Bids #3.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 2</td>
+      <td class="cl-ver">v2.16</td>
+      <td><span class="cl-badge cl-resolved">Gap Resolved</span></td>
+      <td class="cl-desc"><strong>Deleted vtg-logo-probe</strong> (temporary diagnostic); gap marked resolved.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 2</td>
+      <td class="cl-ver">v2.16</td>
+      <td><span class="cl-badge cl-infra">UI</span></td>
+      <td class="cl-desc"><strong>Gap Analysis priority legend</strong> — a line under the filter chips defines the levels: priority means impact and urgency, not effort (High / Medium / Low / Paused / Resolved).</td>
+    </tr>
     <tr>
       <td class="cl-date">Oct 2</td>
       <td class="cl-ver">v2.15</td>
@@ -3188,7 +3221,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <td class="cl-date">Sep 30</td>
       <td class="cl-ver">v2.10</td>
       <td><span class="cl-badge cl-update">Update</span></td>
-      <td class="cl-desc"><strong>The PO validator accepts its own placeholder</strong> — The hard block rejects N/A, TBD, all-x and all-zero, and a PO needs no particular format beyond being filled in. But the form’s own hint, <code>PO-XXXX</code>, normalises to <code>poxxxx</code>, which is not in the reject list — so typing the placeholder the form shows you passes the check meant to stop exactly that. One word closes it. Also: the Ionia walkthrough is finished and its records are deleted — bid 13089254247, test bids 13087066256 and 13089189680, and deal reg 13093685203 are all gone.</td>
+      <td class="cl-desc"><strong>The PO validator accepts its own placeholder</strong> — <em>[updated v2.16: closed as won’t fix — any PO value is acceptable by design, so no reject-list change]</em> The hard block rejects N/A, TBD, all-x and all-zero, and a PO needs no particular format beyond being filled in. But the form’s own hint, <code>PO-XXXX</code>, normalises to <code>poxxxx</code>, which is not in the reject list — so typing the placeholder the form shows you passes the check meant to stop exactly that. One word closes it. Also: the Ionia walkthrough is finished and its records are deleted — bid 13089254247, test bids 13087066256 and 13089189680, and deal reg 13093685203 are all gone.</td>
     </tr>
 
     <tr class="cl-section-row"><td colspan="4">September 29, 2026</td></tr>
