@@ -341,7 +341,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="hdr">
   <div>
     <div class="hdr-title">VTG · Lead → Invoice Process Map</div>
-    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Oct 3 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
+    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Oct 7 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
   </div>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
     <div class="legend">
@@ -1076,7 +1076,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">1.2 · Rep Clicks accept_470 → vtg-bid-intake Form Opens</span><span class="sop-owner">Sales Rep (Alan / Jake / Kevin)</span><span class="badge b-man">Manual</span></div>
-          <div class="sop-body">Rep clicks <strong>accept_470</strong>. Automation 7920733007 sets Status → <strong>Pending Intake</strong>, which fires webhook 632506055 to vtg-bid-intake; the Worker writes the <strong>📋 Intake Form</strong> link onto the lead and the rep opens the form from it in a new tab. Rejected leads simply close the lead — no webhook fires, no Bids item created.</div>
+          <div class="sop-body">Rep clicks <strong>accept_470</strong>. Automation 7920733007 sets Status → <strong>Pending Intake</strong>, which fires webhook 632506055 to vtg-bid-intake; the Worker writes the <strong>📋 Intake Form</strong> link onto the lead and the rep opens the form from it in a new tab. Rejected leads simply close the lead — no webhook fires, no Bids item created. <strong>Since Oct 4 2026</strong> Reject 470 also sets Status → <strong>Rejected</strong> (workflow 7924220684), and a rejected lead that an addendum sends back to New Leads gets a blank Status again (7924220688).</div>
           <div class="auto-row">⚡ Automation 7920733007 → Status → Pending Intake → webhook 632506055 → vtg-bid-intake · webhook 608965294 (Status → Accepted) is deactivated</div>
         </div>
         <div class="sop-step">
@@ -1400,8 +1400,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">Old SmartZone Workers still deployed alongside vtg-ruckus-tools</div><div class="pri pri-m">Medium</div></div>
-        <div class="gap-body">vtg-ruckus-tools went live Oct 2 2026 and replaces six SmartZone tools, but vsz-retry-export, vsz-ap-renamer, vtg-sz-add-ap, vtg-ap-preprovision (and its form) and vtg-vsz-inventory are still deployed. Both vtg-vsz-inventory and vtg-ruckus-tools send the monthly inventory email on the 25th, so it goes out twice unless the old cron is removed before Oct 25.</div>
+        <div class="gap-body">vtg-ruckus-tools went live Oct 2 2026 and replaces six SmartZone tools, but vsz-retry-export, vsz-ap-renamer, vtg-sz-add-ap, vtg-ap-preprovision (and its form) and vtg-vsz-inventory are still deployed. Both vtg-vsz-inventory and vtg-ruckus-tools send the monthly inventory email on the 25th, so it goes out twice unless the old cron is removed before Oct 25. Their portal tiles were replaced by the one Ruckus tools tile on Oct 6, but the Workers themselves are still running.</div>
         <div class="gap-worker">vtg-ruckus-tools · vtg-vsz-inventory · vsz-retry-export · vsz-ap-renamer · vtg-sz-add-ap · vtg-ap-preprovision</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">Generate SOW fails — El Nova stopped creating ScopeStack projects</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body"><strong>Found Oct 6 2026.</strong> Generate SOW needs the bid’s ScopeStack project, which El Nova creates when a lead is accepted. That stopped between Sep 24 and Sep 25: El Nova still acknowledges the Accept 470 webhook (every delivery succeeded), but no project appears. Since Sep 29 the Generate SOW automation has logged 19 failures (“No ScopeStack project found for this 470#”), and on Oct 6, 16 FY27 bids had no project. None of VTG’s Workers create ScopeStack projects today. A fallback in vtg-scopestack-doc-sync that creates the project from the bid’s blueprints is written but not deployed; the El Nova side is with Austin. If both run, El Nova must check the 470# first or the same bid gets two projects.</div>
+        <div class="gap-worker">El Nova · ScopeStack · vtg-scopestack-doc-sync · Leads webhooks 615218876 / 615223909 · Bids #3 Generate SOW</div>
+      </div>
+      <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">ScopeStack SOW template: frozen footer date and empty per-location scope</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body"><strong>Found Oct 6 2026</strong> in the SOP walkthrough. Every SOW’s footer shows the date the template was last saved (9/11/2026) instead of the print date, and the “Scope of Work per location” section prints only placeholder text (“Output all Language Field Information”). Both are in the live “Vector eRate SOW” template in ScopeStack, so every SOW has them; the fix is in the template, not a Worker.</div>
+        <div class="gap-worker">ScopeStack · Vector eRate SOW template (7085)</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">Customer PO # required on the CS Order form — resolved</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
@@ -1611,7 +1621,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">Cloudflare Access + Azure AD for portal</div><div class="pri pri-l">Low</div></div>
-        <div class="gap-body">vtg-portal admin route is password-gated. Cloudflare Access + Azure AD Entra ID SSO scoped but on hold pending IT. Also needs monday.com plan upgrade for Azure AD SSO on CRM side.</div>
+        <div class="gap-body"><strong>Cloudflare Access is live on the portal since Oct 6 2026</strong> (Vector Tech Staff Only), and the admin login was hardened. Still planned: Entra ID (Azure AD) sign-in in place of the email code — on hold pending IT — and the monday.com plan upgrade for Azure AD SSO on the CRM side.</div>
         <div class="gap-worker">vtg-portal · Cloudflare Access · Azure AD</div>
       </div>
     </div>
@@ -1736,6 +1746,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>AI customer summary</strong><span><em>Sep 2026.</em> The team used to log into ScopeStack and write the project Customer Summary there with Claude/ChatGPT or ScopeStack’s built-in AI writer. That now runs from monday instead, inside this Worker — which already holds the ScopeStack API credentials. ScopeStack’s own generator was enabled first (<em>Generate Executive Summary: Create</em> on the Admin role) and produced poor output, leaking "missing the JSON" text into the summary, so the writing is done by <strong>Claude via the Anthropic API</strong> instead. VTG organization key stored as <code>ANTHROPIC_API_KEY</code> on this Worker.</span></div>
         <div class="worker-meta-row"><strong>Summary trigger</strong><span>Runs as part of the existing <strong>Generate SOW</strong> button — the separate "Write Summary" button was built and then removed, so there is one button, not two</span></div>
         <div class="worker-meta-row"><strong>Format constraint</strong><span>ScopeStack’s SOW template prints Markdown symbols literally, so summary text written back to ScopeStack must be <strong>plain text</strong> — no asterisks, no hashes</span></div>
+        <div class="worker-meta-row"><strong>Lookup report</strong><span><em>Oct 6 2026.</em> Key-protected, read-only report of which bids have a ScopeStack project. It confirmed the Worker’s project search by 470# is correct — Generate SOW fails because the project doesn’t exist (see the gap). A fallback that creates the project from the bid’s blueprints is written but <strong>not deployed</strong>.</span></div>
         <div class="worker-meta-row"><strong>Future</strong><span>vtg-sow-builder pricing sheet integration · blueprint → datasheet auto-selection</span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-scopestack-doc-sync\</span></div>
         <div class="worker-meta-row"><strong>SOW Status</strong><span><code>color_mm7f9qc2</code> — Working on it on click, then Done, or Stuck with a reason posted as an update (since Sep 24 2026). The doubled district name in the filename is stripped (<code>dedupeFilename</code>).</span></div>
@@ -1747,7 +1758,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div><div class="worker-name">vtg-proposal-builder</div><div class="worker-url">vtg-proposal-builder.vectorfi-admin.workers.dev</div></div>
         <span class="badge b-live worker-status">Live — Sep 14 2026</span>
       </div>
-      <div class="worker-desc">Triggered by "Generate Proposal" button on Bids #3. Fetches the ScopeStack SOW PDF via assets API, fetches the client logo from Accounts #1, and injects the logo + bid due date onto the SOW cover page using pdf-lib. If a SOV PDF exists in column file_mm749nna, fetches it and merges SOW+SOV via iLoveAPI. Uploads final PDF to Proposal PDF column (<code>file_mm739vxe</code>). Updates a Proposal Status column (orange → green/red) so reps can see progress without re-clicking.<br><br>
+      <div class="worker-desc">Triggered by "Generate Proposal" button on Bids #3. Fetches the ScopeStack SOW PDF via assets API, fetches the client logo from Accounts #1, and injects the logo + bid due date onto the SOW cover page using pdf-lib. If a SOV PDF exists in column file_mm749nna, fetches it and merges SOW+SOV via iLoveAPI (it picks the newest <strong>.pdf</strong> in that column — fixed Oct 6 2026). Uploads final PDF to Proposal PDF column (<code>file_mm739vxe</code>). Updates a Proposal Status column (orange → green/red) so reps can see progress without re-clicking.<br><br>
       <strong>Trigger:</strong> button_mm732fyx → automation 636065801 → POST /generate<br>
       <strong>Logo box:</strong> 192×144pt, centered between district name and "Statement of Work" on cover<br>
       <strong>Status column:</strong> color_mm74qsfe ("Working on it" / "Done" / "Stuck")<br>
@@ -1759,6 +1770,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="meta-row"><span class="meta-k">Deps</span><span class="meta-v">pdf-lib 1.17.1 (bundled, 847KB)</span></div>
         <div class="meta-row"><span class="meta-k">Output</span><span class="meta-v">Bids #3 → file_mm739vxe (Proposal PDF)</span></div>
         <div class="meta-row"><span class="meta-k">Version</span><span class="meta-v">4.0.0 — ef64840c</span></div>
+        <div class="meta-row"><span class="meta-k">Oct 6 2026 fix</span><span class="meta-v">Proposals had been going out <strong>without the SOV</strong>: since the SOV Builder started adding an Excel file to the SOV PDF column (Sep 30), the Worker took the last file — the .xlsx — the merge failed and it fell back to SOW only. It now takes the newest PDF. Verified on Olmsted Falls (12 pages = 9 SOW + 3 SOV). Still open: Proposal Status shows Done, not Stuck, if the SOV merge fails.</span></div>
       </div>
     </div>
     <div class="worker-card">
@@ -1971,12 +1983,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="worker-card">
       <div class="worker-card-hdr">
         <div><div class="worker-name">vtg-portal</div><div class="worker-url">vtg-portal.vectorfi-admin.workers.dev</div></div>
-        <span class="badge b-live worker-status">Live</span>
+        <span class="badge b-live worker-status">Live — v2 Oct 6 2026</span>
       </div>
-      <div class="worker-desc">Internal staff portal with sections for Tools (sales/finance/field/admin), Docs (replacing OneNote), and Admin. Admin route is password-gated temporarily until Cloudflare Access + Azure AD is configured. GitHub repo vtg-portal/vtg-portal (private) — <code>config/tools.json</code> is source of truth for tool entries. Docs backed by GitHub markdown files.</div>
+      <div class="worker-desc">Internal staff portal: <strong>Tools</strong> tiles (sales / finance / field / admin) and a <strong>Docs</strong> repository replacing OneNote. GitHub repo vtg-portal/vtg-portal (private) — <code>config/tools.json</code> is the source of truth for the tiles, read live on every page load. <strong>v2 (Oct 6 2026):</strong> the portal is behind Cloudflare Access (Vector Tech Staff Only), and Docs became an editable repository — any signed-in staff member can add, edit and organize pages (sections → pages → subpages, drag to reorder) in a rich-text editor. Pages are saved as Markdown in the GitHub repo, one commit per change under the editor’s email; deleted pages can be restored. Light / dark mode and a phone layout. Admin (adding tools) is limited to Jon.</div>
       <div class="worker-meta">
-        <div class="worker-meta-row"><strong>Planned</strong><span>tools.vtgus.com CNAME + Cloudflare Access + Azure AD SSO</span></div>
-        <div class="worker-meta-row"><strong>Files</strong><span>GitHub: vtg-portal/vtg-portal</span></div>
+        <div class="worker-meta-row"><strong>Tools tiles</strong><span>31 (Oct 6 2026): the five old SmartZone tool tiles were replaced by one <strong>Ruckus tools</strong> tile; Materials Log, Process map, Requests, MSP CSOP, SharePoint folders and the other live Workers were added; descriptions match this map. Home shows CS Order form, SOV Builder, Ruckus tools and Materials Log first.</span></div>
+        <div class="worker-meta-row"><strong>Duplicates</strong><span>New page IDs are made in the browser, a save on an out-of-date page asks which version to keep, and images are stored once by content hash</span></div>
+        <div class="worker-meta-row"><strong>Planned</strong><span>tools.vtgus.com custom domain · Entra ID (Azure AD) sign-in · editing / removing tiles from the admin page (still done in GitHub)</span></div>
+        <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-portal\ (source since Oct 6, deployed with wrangler) · GitHub vtg-portal/vtg-portal (tools.json + docs)</span></div>
       </div>
     </div>
     <div class="worker-card">
@@ -2017,7 +2031,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Auth</strong><span>SmartZone SSH credentials + separate enable password + REST API credentials entered at runtime</span></div>
         <div class="worker-meta-row"><strong>Pagination fix</strong><span>Fetches all APs with no zone filter using start/limit as URL query params, then filters client-side by zoneId</span></div>
         <div class="worker-meta-row"><strong>Write-back</strong><span>AP description field updated via controller CLI (config → ap &lt;MAC&gt; → description → exit); REST API PATCH returns 403</span></div>
-        <div class="worker-meta-row"><strong>Portal</strong><span>vtg-portal tool #23 — listed as local script with GitHub repo link</span></div>
+        <div class="worker-meta-row"><strong>Portal</strong><span>vtg-portal tile (status: local) links to this map since Oct 6 2026 — the old GitHub link was a 404</span></div>
       </div>
     </div>
     <div class="worker-card">
@@ -2041,10 +2055,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div><div class="worker-name">vtg-process-requests</div><div class="worker-url">vtg-process-requests.vectorfi-admin.workers.dev</div></div>
         <span class="badge b-live worker-status">Live — Oct 3 2026</span>
       </div>
-      <div class="worker-desc">Backend for this map’s <strong>Requests</strong> tab. Anyone with the map can send a request or question (their name + the ask, optional area) and see every request with its status and Jon’s reply — no monday account needed. Requests land on the monday board <strong>Process Map Requests</strong> (18433839739, E-Rate Operating System), where Jon sets Status, writes the Reply, can note the changelog version, or ticks <em>Hide from map</em>.</div>
+      <div class="worker-desc">Backend for this map’s <strong>Requests</strong> tab. Anyone with the map can see every request with its status and Jon’s reply. <strong>Since Oct 7 2026</strong> the sender picks their name from the monday <strong>E-Rate</strong> team (no typed names), and they get monday notifications when the request is received, when its Status changes and when Jon replies. Requests land on the monday board <strong>Process Map Requests</strong> (18433839739, E-Rate Operating System), where Jon sets Status, writes the Reply, can note the changelog version, or ticks <em>Hide from map</em>.</div>
       <div class="worker-meta">
-        <div class="worker-meta-row"><strong>Board</strong><span>Process Map Requests · Status (New / Reviewing / Planned / Done / Won’t fix) · Requester · Ask · Area · Reply · Changelog · Hide from map · Request ID · new item notifies Jon (workflow 7924145960)</span></div>
-        <div class="worker-meta-row"><strong>monday calls</strong><span>Only that board: read it, look up a Request ID, create an item. The list is cached 60 s.</span></div>
+        <div class="worker-meta-row"><strong>Board</strong><span>Process Map Requests · Status (New / Reviewing / Planned / Done / Won’t fix) · Requested by (people) · Requester · Ask · Area · Reply · Changelog · Hide from map · Request ID · new item notifies Jon (7924145960) · Requested by is notified on receipt (7924398808), Status change (7924398754) and Reply (7924398782)</span></div>
+        <div class="worker-meta-row"><strong>monday calls</strong><span>Only that board — read it, look up a Request ID, create an item — plus the E-Rate team’s names (team 1363397, cached 1 h; email-only logins left out). The list is cached 60 s. The name comes from monday, never from the browser.</span></div>
         <div class="worker-meta-row"><strong>Duplicates</strong><span>The page sends a one-time Request ID with each request; a double click or retry returns the item already created instead of making a second one.</span></div>
         <div class="worker-meta-row"><strong>Open for now</strong><span>No sign-in yet (Cloudflare Access is on Jon’s list). Submissions are limited by origin, rate limits, length limits and a spam trap.</span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-process-requests\ · src/index.js + test/</span></div>
@@ -2534,7 +2548,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <div class="auto-board-header">
     <div class="auto-board-name">⚡ El Nova Leads Board</div>
     <div class="auto-board-id">ID: 18181651809</div>
-    <div class="auto-board-count">16 legacy + 1 workflow automations · 3 inactive</div>
+    <div class="auto-board-count">16 legacy + 3 workflow automations · 3 inactive</div>
   </div>
   <table class="auto-table">
     <thead><tr><th>ID</th><th>Trigger</th><th>Action</th><th>Notes</th></tr></thead>
@@ -2587,6 +2601,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <td class="auto-action">Move item to Rejected group</td>
         <td class="auto-note">Routes rejected leads off the active list — rejected leads do NOT go to Accepted Monitor</td>
       </tr>
+      <tr>
+        <td class="auto-id">7924220684 (workflow)</td>
+        <td class="auto-trigger">When "Reject 470" button clicked</td>
+        <td class="auto-action">Set Status → Rejected</td>
+        <td class="auto-note">Live Oct 4 2026 — before this, rejected leads had a blank Status. Same shape as the Accept workflow 7920733007. The 60 existing rejected leads were set by hand; first live reject confirmed Oct 5.</td>
+      </tr>
+      <tr>
+        <td class="auto-id">7924220688 (workflow)</td>
+        <td class="auto-trigger">Item moves to New Leads + Status is Rejected</td>
+        <td class="auto-action">Clear Status</td>
+        <td class="auto-note">Live Oct 4 2026 — covers a rejected lead that an addendum sends back to New Leads (493355183 / 493355373), so it looks like every other new lead</td>
+      </tr>
       <tr class="auto-inactive">
         <td class="auto-id">493350968 / 493351900<span class="auto-badge-ia">Inactive</span></td>
         <td class="auto-trigger">Form 470 / RFP Documents changes + item is in Accepted Leads</td>
@@ -2597,7 +2623,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <td class="auto-id">493355183 / 493355373</td>
         <td class="auto-trigger">Form 470 / RFP Documents changes + item is in the Rejected group</td>
         <td class="auto-action">Move item to New Leads + notify Sales Executive</td>
-        <td class="auto-note">Still active — a rejected lead that gets an addendum comes back to New Leads: "New addendum for {District} - 470#: {name}"</td>
+        <td class="auto-note">Still active — a rejected lead that gets an addendum comes back to New Leads: "New addendum for {District} - 470#: {name}". Its Status is then cleared by 7924220688.</td>
       </tr>
       <tr>
         <td class="auto-id">566810401 / 566810403</td>
@@ -2656,7 +2682,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <tr><td class="auto-id">566854668 / 566856009 / 566856718 (integrations)</td><td class="auto-trigger">Blueprint column → Wireless/Fiber Optic/BMIC</td><td class="auto-action">Overwrite item with matching item template</td><td class="auto-note">Three project-type templates applied when Blueprint is set on Bids #3 items<span class="auto-badge-ai">App</span></td></tr>
       <tr><td class="auto-id">545905802 / 545905803 (AI)</td><td class="auto-trigger">New item created / Item name changes</td><td class="auto-action">AI: extract "470#:" from item name → text_mkqz3hww</td><td class="auto-note">monday AI extraction automation<span class="auto-badge-ai">AI</span></td></tr>
       <tr><td class="auto-id">578063979 / 578063986 (AI)</td><td class="auto-trigger">Item created (if Project Year empty) / text_mkqz3hww changes</td><td class="auto-action">AI: categorize into Project Year dropdown (dropdown_mkqz1ay)</td><td class="auto-note">Sets Project Year dropdown by AI-categorizing the 470# text column<span class="auto-badge-ai">AI</span></td></tr>
-      <tr><td class="auto-id">634060163</td><td class="auto-trigger">Generate SOW button (button_mm70vvrb) clicked on Bids #3 item</td><td class="auto-action">Send webhook to vtg-scopestack-doc-sync /generate endpoint</td><td class="auto-note">Live Sep 8 2026 — triggers programmatic SOW generation in ScopeStack; webhook auto-delivers the .docx back to Bids #3 SOW Document column (file_mm6wm4hn)</td></tr>
+      <tr><td class="auto-id">634060163</td><td class="auto-trigger">Generate SOW button (button_mm70vvrb) clicked on Bids #3 item</td><td class="auto-action">Send webhook to vtg-scopestack-doc-sync /generate endpoint</td><td class="auto-note">Live Sep 8 2026 — triggers programmatic SOW generation in ScopeStack; webhook auto-delivers the .docx back to Bids #3 SOW Document column (file_mm6wm4hn). 19 failures logged since Sep 29, all bids with no ScopeStack project (see gap).</td></tr>
       <tr><td class="auto-id">636065801</td><td class="auto-trigger">Generate Proposal button (button_mm732fyx) clicked</td><td class="auto-action">Send webhook to vtg-proposal-builder /generate</td><td class="auto-note">Live Sep 14 2026 — puts the client logo and bid due date on the ScopeStack SOW cover</td></tr>
       <tr><td class="auto-id">622380216 / 622381001</td><td class="auto-trigger">Item created / any column changes</td><td class="auto-action">Send webhook to vtg-monday-sf-sync (keyed connection)</td><td class="auto-note">Salesforce Opportunity upsert · switched to the keyed connection Oct 1 2026</td></tr>
       <tr><td class="auto-id">641680795 / 641680804</td><td class="auto-trigger">Item created / Bid Stage (deal_stage) changes</td><td class="auto-action">Send webhook to vtg-sp-folders</td><td class="auto-note">Live Sep 24 2026 — creates the SharePoint bid folder at Folder Creation, writes SharePoint Link, closes both Folder Creation subitems</td></tr>
@@ -2747,12 +2773,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
   <div class="auto-board-header">
     <div class="auto-board-name">📝 Process Map Requests</div>
     <div class="auto-board-id">ID: 18433839739</div>
-    <div class="auto-board-count">1 workflow</div>
+    <div class="auto-board-count">4 workflows</div>
   </div>
   <table class="auto-table">
     <thead><tr><th>ID</th><th>Trigger</th><th>Action</th><th>Notes</th></tr></thead>
     <tbody>
       <tr><td class="auto-id">7924145960 (workflow)</td><td class="auto-trigger">New item created</td><td class="auto-action">Notify Jon: “New process map request”</td><td class="auto-note">Items are created by vtg-process-requests from the map’s Requests tab</td></tr>
+      <tr><td class="auto-id">7924398808 (workflow)</td><td class="auto-trigger">New item created</td><td class="auto-action">Notify the Requested by person: “Request received”</td><td class="auto-note">Live Oct 7 2026</td></tr>
+      <tr><td class="auto-id">7924398754 (workflow)</td><td class="auto-trigger">Status changes</td><td class="auto-action">Notify the Requested by person: “Your request was updated … is now {Status}”</td><td class="auto-note">Live Oct 7 2026</td></tr>
+      <tr><td class="auto-id">7924398782 (workflow)</td><td class="auto-trigger">Reply changes</td><td class="auto-action">Notify the Requested by person with Jon’s reply</td><td class="auto-note">Live Oct 7 2026</td></tr>
     </tbody>
   </table>
 </div>
@@ -2958,7 +2987,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <span class="dash-audience aud-ops">Jon</span>
       </div>
-      <div class="dash-desc">Requests and questions sent from this map’s Requests tab. Jon triages here: Status and Reply show on the map; <em>Hide from map</em> removes an item from the public list. A new item notifies Jon.</div>
+      <div class="dash-desc">Requests and questions sent from this map’s Requests tab. Jon triages here: Status and Reply show on the map; <em>Hide from map</em> removes an item from the public list. A new item notifies Jon; the <em>Requested by</em> person is notified on receipt, on every Status change and when Jon writes a Reply.</div>
       <div class="dash-feeds">
         <div class="dash-feed">vtg-process-requests — creates items from the Requests tab</div>
       </div>
@@ -3032,7 +3061,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <span class="dash-audience aud-ops">All Staff</span>
       </div>
-      <div class="dash-desc">A Cloudflare Worker-hosted internal hub with four sections: <strong>Home</strong> (quick links), <strong>Tools</strong> (sales, finance, field, admin — links to all Workers and tools), <strong>Docs</strong> (markdown-backed documentation replacing OneNote — covers VES, integrations, troubleshooting, automation, E-Rate), and <strong>Admin</strong> (manage tool entries, doc pages). Config lives in GitHub: vtg-portal/vtg-portal (private repo), <code>config/tools.json</code>. Admin is currently password-gated; Azure AD SSO is planned.</div>
+      <div class="dash-desc">A Cloudflare Worker-hosted internal hub with four sections: <strong>Home</strong> (quick links), <strong>Tools</strong> (sales, finance, field, admin — links to all Workers and tools), <strong>Docs</strong> (markdown-backed documentation replacing OneNote — covers VES, integrations, troubleshooting, automation, E-Rate), and <strong>Admin</strong> (manage tool entries, doc pages). Config lives in GitHub: vtg-portal/vtg-portal (private repo), <code>config/tools.json</code>. <strong>Since Oct 6 2026</strong> it sits behind Cloudflare Access (staff sign-in), Docs can be edited by any signed-in staff member in a rich-text editor (sections → pages → subpages), and there is a light / dark toggle. 31 tool tiles, including one Ruckus tools tile and this map. Entra ID (Azure AD) sign-in is planned.</div>
       <div class="dash-feeds">
         <div class="dash-feed">GitHub vtg-portal/vtg-portal — tools.json + docs/ markdown files</div>
         <div class="dash-feed">All vtg-* Workers — linked from Tools section</div>
@@ -3117,12 +3146,12 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
 </style>
   <div class="rq-head">
     <h2>Requests</h2>
-    <p>Ask for a change or ask a question about anything on this map. No monday account needed — Jon reviews every request, and the status and reply show up here.</p>
+    <p>Ask for a change or ask a question about anything on this map. Pick your name and Jon reviews every request — you get a monday notification when it’s received, when the status changes and when he replies, and everything shows up here too.</p>
   </div>
   <div class="rq-wrap">
     <form class="rq-form" id="rq-form" novalidate>
       <h3>New request</h3>
-      <div class="rq-field"><label for="rq-name">Your name</label><input class="rq-in" id="rq-name" maxlength="80" autocomplete="name" required></div>
+      <div class="rq-field"><label for="rq-name">Your name</label><select class="rq-in" id="rq-name" required><option value="">Loading names…</option></select></div>
       <div class="rq-field"><label for="rq-area">Area <span>(optional)</span></label>
         <select class="rq-in" id="rq-area">
           <option value="">—</option>
@@ -3148,7 +3177,7 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
       <div class="rq-ts" id="rq-ts" hidden></div>
       <button class="rq-btn" id="rq-send" type="submit">Send request</button>
       <div class="rq-msg" id="rq-msg" role="status" aria-live="polite"></div>
-      <div class="rq-note">Requests and replies are visible to everyone who can open this map.</div>
+      <div class="rq-note">Names come from the E-Rate team in monday. Requests and replies are visible to everyone who can open this map.</div>
     </form>
     <div>
       <div class="rq-bar" role="group" aria-label="Filter requests">
@@ -3194,7 +3223,7 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.18</div>
+  <div class="cl-version-pill">Current: v2.20</div>
 </div>
 
 <table class="cl-table">
@@ -3214,6 +3243,57 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
     <!-- ── Sep 29 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">October 7, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 7</td>
+      <td class="cl-ver">v2.20</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Requests: pick your name, get notified</strong> — Your name on the Requests tab is now a dropdown of the monday <strong>E-Rate</strong> team instead of a typed name. The request is linked to that person (new <em>Requested by</em> column), and they get a monday notification when it’s received, when its Status changes and when Jon replies (workflows 7924398808, 7924398754, 7924398782). The six earlier requests were linked to their senders. Asked for on the Requests tab by Alan Daron.</td>
+    </tr>
+
+    <tr class="cl-section-row"><td colspan="4">October 6, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 6</td>
+      <td class="cl-ver">v2.19</td>
+      <td><span class="cl-badge cl-new">New</span></td>
+      <td class="cl-desc"><strong>vtg-portal v2 — editable docs, staff sign-in, light/dark</strong> — The portal is behind Cloudflare Access (Vector Tech Staff Only). Docs is now a repository any signed-in staff member can edit in a rich-text editor (sections → pages → subpages, drag to reorder), saved as Markdown in GitHub with one commit per change under the editor’s email; deleted pages can be restored. Source now lives in VTG Flows\vtg-portal. Tool tiles went from 23 to 31: the five SmartZone tiles became one Ruckus tools tile, the deleted ns-compare and a duplicate bid-import tile were removed, and Materials Log, this map, Requests and the other live Workers were added.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 6</td>
+      <td class="cl-ver">v2.19</td>
+      <td><span class="cl-badge cl-fix">Fix</span></td>
+      <td class="cl-desc"><strong>Proposals include the SOV again</strong> — vtg-proposal-builder took the last file in the SOV PDF column, which has been the Excel file since Sep 30, so the merge failed and proposals went out as SOW only while showing Done. It now takes the newest PDF. Verified on Olmsted Falls. Still open: Proposal Status should go to Stuck when the merge fails.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 6</td>
+      <td class="cl-ver">v2.19</td>
+      <td><span class="cl-badge cl-gap">Gap</span></td>
+      <td class="cl-desc"><strong>Generate SOW failures traced to missing ScopeStack projects</strong> — El Nova stopped creating the ScopeStack project when a lead is accepted (between Sep 24 and 25); 19 Generate SOW failures since Sep 29, 16 FY27 bids without a project on Oct 6. New key-protected lookup report in vtg-scopestack-doc-sync confirmed its own project search is correct. A fallback that creates the project is written, not deployed. New High gap.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 6</td>
+      <td class="cl-ver">v2.19</td>
+      <td><span class="cl-badge cl-gap">Gap</span></td>
+      <td class="cl-desc"><strong>ScopeStack SOW template defects</strong> — footer date frozen at the template’s save date (9/11/2026), and the per-location scope section prints placeholder text. Found in the SOP walkthrough. New Medium gap.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 6</td>
+      <td class="cl-ver">v2.19</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc">Portal references updated: the LLDP tile now links to this map; the SmartZone gap notes the tiles were replaced but the old Workers still run; the portal sign-in card notes Access is live and Entra ID is still planned.</td>
+    </tr>
+
+    <tr class="cl-section-row"><td colspan="4">October 4, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 4</td>
+      <td class="cl-ver">v2.19</td>
+      <td><span class="cl-badge cl-process">Process Change</span></td>
+      <td class="cl-desc"><strong>Reject 470 now sets Status → Rejected</strong> — Rejected leads used to keep a blank Status. New Leads workflow 7924220684 sets Rejected when Reject 470 is clicked, and 7924220688 clears it if an addendum sends the lead back to New Leads. The 60 existing rejected leads were set by hand; first live reject confirmed Oct 5.</td>
+    </tr>
+
     <tr class="cl-section-row"><td colspan="4">October 3, 2026</td></tr>
 
     <tr>
@@ -4196,7 +4276,7 @@ const D = {
     inputs:['Reviewed lead — Opportunity Score, District, 470#'],
     outputs:['Status → Pending Intake (automation 7920733007)','Webhook 632506055 → vtg-bid-intake writes the 📋 Intake Form link on the lead','Rep opens the form from that link (webhook 608965294 on Status → Accepted is deactivated)'],
     workers:['vtg-bid-intake (patched Sep 3 2026)'],
-    notes:['Rep judgment is the gate — automation cannot replace this','Rejected leads move to Rejected group only — no Bids item, no Monitor item']},
+    notes:['Rep judgment is the gate — automation cannot replace this','Rejected leads move to Rejected group only — no Bids item, no Monitor item','Reject 470 sets Status → Rejected (workflow 7924220684, Oct 4 2026); back in New Leads after an addendum, Status is cleared (7924220688)']},
   intakeform:{title:'Fill Intake Form (incl. Sales Exec + Blueprints)',phase:'E-Rate · Phase 1 · Lead Intake',status:'live',
     triggers:['accept_470 clicked → vtg-bid-intake opens form in new browser tab'],
     inputs:['Sales Executive','ScopeStack Blueprint(s)','Delivery method','Partner','Manufacturer','Distributor','Bid due date','Bond required?'],
@@ -4440,7 +4520,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
   const local = /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
   const qApi = new URLSearchParams(location.search).get('reqapi');
   const API = (local && qApi) ? qApi : PROD_API;          // override only for local testing
-  const NAME_KEY = 'vtg-req-name', FILTER_KEY = 'vtg-req-filter';
+  const NAME_KEY = 'vtg-req-person', FILTER_KEY = 'vtg-req-filter';
   const OPEN = ['New', 'Reviewing', 'Planned'];
   const ST = { 'New': 'st-new', 'Reviewing': 'st-rev', 'Planned': 'st-plan', 'Done': 'st-done', "Won't fix": 'st-wont' };
   const $ = id => document.getElementById(id);
@@ -4452,7 +4532,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
   let items = [], loadedAt = 0, loading = null, sending = false, tsToken = '', tsWidget = null;
   let filt = { open: true, done: true, wont: true };
   try { const s = JSON.parse(localStorage.getItem(FILTER_KEY) || 'null'); if (s) for (const k in filt) if (typeof s[k] === 'boolean') filt[k] = s[k]; } catch (e) {}
-  try { nameIn.value = localStorage.getItem(NAME_KEY) || ''; } catch (e) {}
   const newId = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
     : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10) + '-' + Math.random().toString(36).slice(2, 10);
   let rid = newId();
@@ -4526,32 +4605,47 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
     s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=__rqTsReady'; s.async = true; document.head.append(s);
   }).catch(() => {});
 
+  // Your name = the monday "E-Rate" team, served by the Worker. The person picked is set on the
+  // monday item, and board automations notify them (received / status changes / replies).
+  function loadPeople() {
+    nameIn.replaceChildren(new Option('Loading names…', '')); nameIn.disabled = true;
+    fetch(API + '/api/people').then(r => r.ok ? r.json() : Promise.reject(new Error('HTTP ' + r.status))).then(d => {
+      const people = Array.isArray(d.people) ? d.people : [];
+      nameIn.replaceChildren(new Option('Pick your name', ''));
+      people.forEach(p => nameIn.append(new Option(String(p.name), String(p.id))));   // Option() sets text, never HTML
+      let saved = ''; try { saved = localStorage.getItem(NAME_KEY) || ''; } catch (e) {}
+      if (saved && people.some(p => String(p.id) === saved)) nameIn.value = saved;
+      nameIn.disabled = false;
+    }).catch(() => { nameIn.replaceChildren(new Option('Couldn’t load names — reload the page', '')); });
+  }
+  loadPeople();
+
   function say(text, kind) { msg.textContent = text; msg.className = 'rq-msg' + (kind ? ' ' + kind : ''); }
   askIn.addEventListener('input', () => { count.textContent = askIn.value.length + ' / 2000'; });
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
     if (sending) return;
-    const requester = nameIn.value.trim(), ask = askIn.value.trim(), area = areaIn.value;
-    if (requester.length < 2) { say('Please enter your name.', 'err'); nameIn.focus(); return; }
+    const requesterId = nameIn.value, ask = askIn.value.trim(), area = areaIn.value;
+    if (!requesterId) { say('Please pick your name.', 'err'); nameIn.focus(); return; }
     if (ask.length < 5) { say('Please describe the ask.', 'err'); askIn.focus(); return; }
     if (!tsBox.hidden && !tsToken) { say('Please complete the check above the button.', 'err'); return; }
     sending = true; sendBtn.disabled = true; sendBtn.textContent = 'Sending…'; say('');
     try {
       const r = await fetch(API + '/api/requests', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ requester, ask, area, requestId: rid, website: hpIn.value, turnstileToken: tsToken }),
+        body: JSON.stringify({ requesterId, ask, area, requestId: rid, website: hpIn.value, turnstileToken: tsToken }),
       });
       const d = await r.json().catch(() => ({}));
       if (!r.ok || !d.ok) throw new Error(d.error || 'Couldn’t send that. Please try again.');
-      try { localStorage.setItem(NAME_KEY, requester); } catch (e2) {}
+      try { localStorage.setItem(NAME_KEY, requesterId); } catch (e2) {}
       if (d.request && !items.some(x => x.id === d.request.id)) items.unshift(d.request);
       filt.open = true; render();
       const first = list.querySelector('.rq-card[data-id="' + (d.id || '') + '"]');
       if (first) first.classList.add('rq-new-flash');
       askIn.value = ''; areaIn.value = ''; count.textContent = '0 / 2000';
       rid = newId();
-      say('Thanks — your request is in. Jon’s reply will show here.', 'ok');
+      say('Thanks — your request is in. You’ll get a monday notification as it moves, and Jon’s reply will show here.', 'ok');
     } catch (err) {
       say(err.message || 'Couldn’t send that. Please try again.', 'err');   // same rid kept, so a retry can't duplicate
     } finally {
