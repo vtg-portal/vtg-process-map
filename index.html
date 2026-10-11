@@ -368,7 +368,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="hdr">
   <div>
     <div class="hdr-title">VTG · Lead → Invoice Process Map</div>
-    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Oct 10 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
+    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Oct 11 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
   </div>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
     <div class="legend">
@@ -1133,6 +1133,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
           <div class="auto-row">⚡ Leads webhooks 645545831 (RFP Documents) + 645545840 (Form 470) → vtg-bid-intake /lead-files-changed · Bids #3 webhook 645561102 → vtg-sp-folders /addenda</div>
         </div>
         <div class="sop-step">
+          <div class="sop-step-hdr"><span class="sop-step-title">1.1c · RFP Estimate and Bond Baseline Written to the Lead</span><span class="sop-owner">Automation</span><span class="badge b-live">Live — Oct 11 2026</span></div>
+          <div class="sop-body">About 2 minutes after a lead lands on the Leads board (or its RFP Documents change), <strong>vtg-rfp-estimator</strong> reads the attached RFP and prices every item with VTG’s equivalent part from the SOV Builder catalog — for example, a Cisco Wi-Fi 7 AP is priced as a RUCKUS R670. It writes <strong>Est. Bid Total</strong>, <strong>Bond %</strong> (5% unless the RFP states its own), <strong>Est. Bond</strong> and <strong>Estimate Basis</strong> (each item and its price, what was left out, and any flags) to the lead. Category 1-only leads, MIBS / maintenance services and renewals on a district’s existing third-party gear aren’t priced; the Estimate Basis says why. It’s a <strong>bond baseline, not the bid price</strong>: MSRP with catalog labor, and the more expensive option wherever the RFP leaves a choice open, so it runs high on purpose. The bid itself is still built in the SOV Builder. Part picks marked “unconfirmed pick” in the Estimate Basis go to Jon for correction.</div>
+          <div class="auto-row">⚡ vtg-rfp-estimator · Leads webhooks 651320922 (create_item) + 651327457 (RFP Documents) · writes numeric_mm81g2p2 / numeric_mm81yjkz / numeric_mm81nep4 / long_text_mm81pkvm</div>
+        </div>
+        <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">1.2 · Rep Clicks accept_470 → vtg-bid-intake Form Opens</span><span class="sop-owner">Sales Rep (Alan / Jake / Kevin)</span><span class="badge b-man">Manual</span></div>
           <div class="sop-body">Rep clicks <strong>accept_470</strong>. Automation 7920733007 sets Status → <strong>Pending Intake</strong>, which fires webhook 632506055 to vtg-bid-intake; the Worker writes the <strong>📋 Intake Form</strong> link onto the lead and the rep opens the form from it in a new tab. Rejected leads simply close the lead — no webhook fires, no Bids item created. <strong>Since Oct 4 2026</strong> Reject 470 also sets Status → <strong>Rejected</strong> (workflow 7924220684), and a rejected lead that an addendum sends back to New Leads gets a blank Status again (7924220688).</div>
           <div class="auto-row">⚡ Automation 7920733007 → Status → Pending Intake → webhook 632506055 → vtg-bid-intake · webhook 608965294 (Status → Accepted) is deactivated</div>
@@ -1162,7 +1167,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">1.5 · Rep Fills Bid Intake Form</span><span class="sop-owner">Sales Rep</span><span class="badge b-man">Manual</span></div>
-          <div class="sop-body">Rep opens the form link and completes: <strong>delivery method, partner, manufacturer, distributor, bid due date, bond required</strong>. Worker patches all columns. If bond required, subitem created and email fires to bonds@vtgus.com + CHC-Surety@alliant.com.</div>
+          <div class="sop-body">Rep opens the form link and completes: <strong>delivery method, partner, manufacturer, distributor, bid due date, bond required</strong>. Worker patches all columns. If bond required, subitem created and email fires to bonds@vtgus.com + CHC-Surety@alliant.com. <strong>Since Oct 11</strong>, turning on <em>Bid bond required?</em> prefills the bond at the lead’s Bond % (5% unless the RFP states its own) with <strong>Not-to-exceed</strong> set to the lead’s Est. Bond, so Alliant gets a ceiling to underwrite against; a blue line shows where the numbers came from. Every field stays editable and the toggle never turns itself on.</div>
           <div class="auto-row">⚡ vtg-bid-intake · dual jsPDF (intake + Alliant bond forms)</div>
           <div class="auto-row sopm">📘 User SOP: <a href="https://vtg-portal.vectorfi-admin.workers.dev/docs/p/sopmaner20" target="_blank" rel="noopener">ER-20 · Complete the Intake Form and Create the Bid Folder</a></div>
         </div>
@@ -1742,6 +1747,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 
     <div class="worker-card">
       <div class="worker-card-hdr">
+        <div><div class="worker-name">vtg-rfp-estimator</div><div class="worker-url">vectorfi-admin.workers.dev</div></div>
+        <span class="badge b-live worker-status">Live — Oct 11 2026</span>
+      </div>
+      <div class="worker-desc">Automatic RFP estimate and bid-bond baseline for every new lead. About 2 minutes after a lead lands on the El Nova Leads board, it reads the attached RFP and prices every item with VTG’s equivalent part from the SOV Builder catalog (a Cisco Wi-Fi 7 AP is priced as a RUCKUS R670), then writes four Leads columns: <strong>Est. Bid Total</strong>, <strong>Bond %</strong> (5% unless the RFP states its own), <strong>Est. Bond</strong> and <strong>Estimate Basis</strong> — each item and its price, what was left out, and any flags. vtg-bid-intake uses Bond % and Est. Bond to prefill the bond on the intake form. It is a bond baseline, not VTG’s bid price: MSRP with catalog labor, and the more expensive option wherever the RFP leaves a choice open, so it runs high on purpose.</div>
+      <div class="worker-meta">
+        <div class="worker-meta-row"><strong>Trigger</strong><span>Leads webhooks 651320922 (item created) · 651327457 (RFP Documents change)</span></div>
+        <div class="worker-meta-row"><strong>Leads columns</strong><span><code>numeric_mm81g2p2</code> Est. Bid Total · <code>numeric_mm81yjkz</code> Bond % · <code>numeric_mm81nep4</code> Est. Bond · <code>long_text_mm81pkvm</code> Estimate Basis</span></div>
+        <div class="worker-meta-row"><strong>Not priced</strong><span>Category 1-only leads, MIBS / maintenance services, and renewals on a district’s existing third-party gear — the Estimate Basis says why</span></div>
+        <div class="worker-meta-row"><strong>Part picks</strong><span>VTG equivalents for other manufacturers’ specs are kept in <code>crosswalk.md</code>. A pick marked “unconfirmed pick” in the Estimate Basis goes to Jon, who corrects the crosswalk so future estimates get it right.</span></div>
+        <div class="worker-meta-row"><strong>Downstream</strong><span>vtg-bid-intake prefills the bond (Amount = Bond %, Not-to-exceed = Est. Bond) when the rep turns on Bid bond required?</span></div>
+        <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-rfp-estimator\ · crosswalk.md</span></div>
+      </div>
+    </div>
+    <div class="worker-card">
+      <div class="worker-card-hdr">
         <div><div class="worker-name">vtg-bid-intake</div><div class="worker-url">vtg-bid-intake.vectorfi-admin.workers.dev</div></div>
         <span class="badge b-live worker-status">Live</span>
       </div>
@@ -1762,6 +1782,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Oct 8 2026</strong><span>Deploy 2b6ca62b: the intake form’s Distributor list now matches the Bids #3 column (Wave and Tech Data removed, WAV kept) · the bond request’s obligee address falls back to the lead’s Applicant Location. From the SOP gap review.</span></div>
         <div class="worker-meta-row"><strong>Test bonds</strong><span>Districts or bond names starting “ZZ TEST” send “[TEST – DO NOT ISSUE]” bond emails; any other name goes to Alliant as a real request</span></div>
         <div class="worker-meta-row"><strong>Won bids</strong><span>No won handler — nothing notifies Alliant or closes the Bid Bonds item when a bid reaches Post-Sale. Automating the release is on the SOP fix list.</span></div>
+        <div class="worker-meta-row"><strong>Bond prefill</strong><span><em>Live Oct 11 2026.</em> Turning on Bid bond required? fills the bond Amount with the lead’s Bond % (5% or the RFP’s percentage) and Not-to-exceed with the lead’s Est. Bond from vtg-rfp-estimator, so Alliant gets a ceiling to underwrite against. A blue line shows where the numbers came from. Every field stays editable, the toggle doesn’t turn itself on, and a lead with no estimate behaves as before (checked on Lakewood and on a lead with no estimate). Pre-change copy: <code>worker.pre-bond-prefill.js</code>.</span></div>
         <div class="worker-meta-row"><strong>Addendum on an existing lead</strong><span><strong>Live Oct 1 2026.</strong> The 470 feed adds an addendum to the existing lead's RFP Documents / Form 470 rather than creating a new lead. Leads webhooks 645545831 (RFP Documents) and 645545840 (Form 470) → <code>POST /lead-files-changed</code>. If the lead's 470 belongs to exactly one live bid, only the <strong>new</strong> files are copied to the bid's Addenda column, the bid is flagged, the bid owner and the lead's Sales Executive are notified, and the lead goes back to Accepted Leads. Leads with no live bid are left alone. Dylan's two "Accepted Leads → New Leads" addendum automations (493350968, 493351900) were deactivated Oct 1. Pre-change copy: <code>worker.pre-lead-files.js</code>.</span></div>
       </div>
     </div>
@@ -2642,6 +2663,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <td class="auto-id">642139356</td><td class="auto-trigger">El Nova Leads · create_item (webhook)</td><td class="auto-action">POST /lead-created on vtg-bid-intake — addendum screen</td><td class="auto-note">Live Sep 24 2026 — matches lead name (470#) against Bids #3 470__; on a single live-stage match attaches the addendum, stamps the addendum columns and posts a courtesy update. Never moves the bid stage. Behind ADDENDUM_DRY_RUN</td>
       </tr>
       <tr>
+        <td class="auto-id">651320922 / 651327457</td><td class="auto-trigger">El Nova Leads · create_item / RFP Documents (file_mkw3ykdq) change (webhooks)</td><td class="auto-action">vtg-rfp-estimator — reads the RFP, writes Est. Bid Total, Bond %, Est. Bond, Estimate Basis</td><td class="auto-note">Live Oct 11 2026 — bond baseline for the intake form’s bond prefill</td>
+      </tr>
+      <tr>
         <td class="auto-id">645545831 / 645545840</td><td class="auto-trigger">RFP Documents (file_mkw3ykdq) / Form 470 (file_mkw3w1z6) changes (webhook)</td><td class="auto-action">POST /lead-files-changed on vtg-bid-intake</td><td class="auto-note">Live Oct 1 2026 — a new file on a lead whose 470 has one live bid is copied to that bid’s Addenda, the bid is flagged, owner + Sales Executive notified, lead returned to Accepted Leads</td>
       </tr>
       <tr>
@@ -3309,6 +3333,21 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
     <!-- ── Sep 29 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">October 11, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 11</td>
+      <td class="cl-ver">v2.22</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>Automatic RFP estimate on new leads</strong> — New <strong>vtg-rfp-estimator</strong>: about 2 minutes after a lead lands, it reads the attached RFP and prices every item with VTG’s equivalent part from the SOV Builder catalog (a Cisco Wi-Fi 7 AP is priced as a RUCKUS R670). Four new Leads columns: Est. Bid Total, Bond % (5% unless the RFP states its own), Est. Bond, and Estimate Basis (each item and its price, what was left out, flags). Category 1-only leads, MIBS / maintenance services and renewals on existing third-party gear aren’t priced. It’s a bond baseline, not the bid price — MSRP with catalog labor and the more expensive option when the RFP leaves a choice open, so it runs high on purpose. New step 1.1c.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 11</td>
+      <td class="cl-ver">v2.22</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Bond prefill on the intake form</strong> — Turning on <em>Bid bond required?</em> now fills the bond at 5% (or the RFP’s percentage) with Not-to-exceed set to the lead’s Est. Bond, so Alliant gets a ceiling to underwrite against. A blue line shows where the numbers came from; every field stays editable and the toggle doesn’t turn itself on.</td>
+    </tr>
+
     <tr class="cl-section-row"><td colspan="4">October 10, 2026</td></tr>
 
     <tr>
@@ -4383,8 +4422,8 @@ const D = {
   elnova:{title:'El Nova Leads → Bids #3',phase:'E-Rate · Phase 1 · Lead Intake',status:'live',
     triggers:['El Nova pushes 470# opportunity','accept_470 clicked → Status → Pending Intake → webhook 632506055 → 📋 Intake Form link written on the lead'],
     inputs:['District name','470 number','Opportunity Score (USAC PDF)'],
-    outputs:['Bids #3 item in New Bid Folder Creation group','Account + Contact auto-linked','📋 Intake Form link written'],
-    workers:['vtg-bid-intake (vectorfi-admin.workers.dev)','vtg-lead-score (Customer Summary PDF → Opportunity Score)'],
+    outputs:['RFP estimate on the lead ~2 min after it lands: Est. Bid Total, Bond %, Est. Bond, Estimate Basis (since Oct 11 2026)','Bids #3 item in New Bid Folder Creation group','Account + Contact auto-linked','📋 Intake Form link written'],
+    workers:['vtg-bid-intake (vectorfi-admin.workers.dev)','vtg-lead-score (Customer Summary PDF → Opportunity Score)','vtg-rfp-estimator (RFP → bond baseline, webhooks 651320922 / 651327457)'],
     notes:['5s retry loop for El Nova timing on Account/Contact match','Item name = district only (not district + 470#)']},
   leadaccept:{title:'Click accept_470 → Intake Form Opens',phase:'E-Rate · Phase 1 · Lead Intake',status:'manual',
     triggers:['Rep reviews lead on El Nova Leads board and clicks accept_470'],
@@ -4394,7 +4433,7 @@ const D = {
     notes:['Rep judgment is the gate — automation cannot replace this','Rejected leads move to Rejected group only — no Bids item, no Monitor item','Reject 470 sets Status → Rejected (workflow 7924220684, Oct 4 2026); back in New Leads after an addendum, Status is cleared (7924220688)']},
   intakeform:{title:'Fill Intake Form (incl. Sales Exec + Blueprints)',phase:'E-Rate · Phase 1 · Lead Intake',status:'live',
     triggers:['accept_470 clicked → vtg-bid-intake opens form in new browser tab'],
-    inputs:['Sales Executive','ScopeStack Blueprint(s)','Delivery method','Partner','Manufacturer','Distributor','Bid due date','Bond required?'],
+    inputs:['Sales Executive','ScopeStack Blueprint(s)','Delivery method','Partner','Manufacturer','Distributor','Bid due date','Bond required? (prefilled from the lead’s Bond % and Est. Bond since Oct 11)'],
     outputs:['ScopeStack proposal auto-created via API on Blueprint selection','Bids #3 columns patched','Account + Contact auto-linked (items_page + contains_text lookup)','SOV Builder link written to link_mm6vbks','Bond subitem + email if required (bonds@vtgus.com + CHC-Surety@alliant.com)'],
     workers:['vtg-bid-intake (patched Sep 3 2026)'],
     notes:['Sep 3 2026: form now includes Sales Exec + Blueprint entry — no longer done pre-accept','Sep 3 2026: fixed Account/Contact lookup API bug (items_by_multiple_column_values replaced with items_page + contains_text)','Sep 3 2026: SOV Builder link now written on submit (was previously missing)','Bond type read-only locked to Surety bond']},
