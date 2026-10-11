@@ -1231,7 +1231,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">3.3 · PO / Funding Confirmed</span><span class="sop-owner">Sales Rep / Kevin</span><span class="badge b-man">Manual</span></div>
-          <div class="sop-body">Rep or Kevin confirms customer PO and E-Rate funding. <strong>vtg-po-sync</strong> (live Aug 25 2026) syncs the NetSuite <strong>Vendor PO #</strong> and PO Status back to Projects #4 via cron every 4h + webhook on NS SO# column change.</div>
+          <div class="sop-body">Rep or Kevin confirms customer PO and E-Rate funding. <strong>vtg-po-sync</strong> (live Aug 25 2026) syncs the NetSuite <strong>Vendor PO #</strong> and PO Status back to Projects #4 via cron every 4h + webhook on NS SO# column change. <strong>Since Oct 11</strong> it also writes <strong>PO Issued Date</strong> (the earliest NetSuite PO date) for the Accounting KPIs, and reads every SO on a project that has several (e.g. “SO9510, SO9511”).</div>
           <div class="auto-row">⚡ vtg-po-sync · KV: PO_SYNC_KV (2c487e21…)</div>
           <div class="auto-row sopm">📘 User SOP: <a href="https://vtg-portal.vectorfi-admin.workers.dev/docs/p/sopmaner110" target="_blank" rel="noopener">ER-110 · Submit the Customer Service Order Form</a></div>
         </div>
@@ -1426,6 +1426,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="sec-title">🔴 Active Gaps — Need Resolution</div>
     <div class="gap-grid">
       <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">El Nova stopped creating ScopeStack projects — resolved</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
+        <div class="gap-body"><strong>Resolved Oct 11 2026.</strong> Found Oct 6: Generate SOW needs the bid’s ScopeStack project, which El Nova used to create when a lead was accepted. That stopped between Sep 24 and 25, and by Oct 6 Generate SOW had logged 19 failures with 16 FY27 bids missing a project. Since Oct 6 (about 6 PM ET) vtg-scopestack-doc-sync creates the missing project itself from the bid and its lead’s blueprints, for every bid — verified on Lowell, Grand Haven Christian and the Sable Ridge test bid — so Generate SOW no longer depends on El Nova. If El Nova starts creating projects again, it must check the 470# first so a bid the fallback covered doesn’t get a second project.</div>
+        <div class="gap-worker">El Nova · ScopeStack · vtg-scopestack-doc-sync · Leads Accept 470 webhooks · Bids #3 Generate SOW</div>
+      </div>
+      <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">Subitem task schedule never activated — resolved</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
         <div class="gap-body">✅ <strong>Fixed by vtg-bid-task-dates, live Sep 24 2026.</strong> The seven reminder and auto-assign automations trigger on <code>date3</code> Task Due Date, which nothing used to fill — monday formula columns cannot fire automations. The Worker now writes <code>date3</code> on every new subitem, counting <strong>business days</strong> back from Bid Due Date and skipping weekends and federal holidays. Applies to bids created after Sep 24 2026 21:07 UTC; older bids were deliberately left alone. Verified on Kent ISD and Lincoln Township.</div>
         <div class="gap-worker">vtg-bid-task-dates · date3 · webhooks 642315663 / 642315682 / 642315687</div>
@@ -1474,11 +1479,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-card-hdr"><div class="gap-title">vtg-ns-mcp-sync cron fails on every run</div><div class="pri pri-m">Medium</div></div>
         <div class="gap-body">Observed Sep 18 2026: the 15-minute cron fails each run with SuiteQL <em>Record 'transaction' was not found</em> — the NetSuite integration role cannot read <code>transaction</code> (the same limit was recorded again Sep 30). That is roughly 96 failures a day, and none of the six coded flows reaches a monday write. The source has not changed since Sep 17. An older build, <strong>vtg-ns-mcp-sync-staging</strong>, still runs its own 15-minute cron (Sep 19 2026 snapshot). <strong>Side effect (found Oct 2 2026):</strong> the same run is meant to refresh the inventory cache, and the location-41 key was empty, so the Materials Log On Hand column showed “—” on every row. vtg-materials-log now refreshes that key itself; the all-locations key behind the vtg-inventory dashboard still relies on this cron or a live fetch on a miss.</div>
         <div class="gap-worker">vtg-ns-mcp-sync · vtg-ns-mcp-sync-staging · NS role permissions</div>
-      </div>
-      <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">El Nova stopped creating ScopeStack projects — fallback live since Oct 6</div><div class="pri pri-h">High</div></div>
-        <div class="gap-body"><strong>Found Oct 6 2026.</strong> Generate SOW needs the bid’s ScopeStack project, which El Nova creates when a lead is accepted. That stopped between Sep 24 and Sep 25: El Nova still acknowledges the Accept 470 webhook (every delivery succeeded), but no project appears. By Oct 6 the Generate SOW automation had logged 19 failures and 16 FY27 bids had no project. <strong>Since Oct 6 (about 6 PM ET) vtg-scopestack-doc-sync creates the missing project itself</strong> from the bid and its lead’s blueprints, for every bid — verified on Lowell, Grand Haven Christian and the Sable Ridge test bid. A bid still without a project gets one on its next Generate SOW click. Still open: why El Nova stopped (with Austin), and El Nova must check the 470# before creating, or a bid the fallback covered gets a second project. <em>Priority left at High for Jon to confirm.</em></div>
-        <div class="gap-worker">El Nova · ScopeStack · vtg-scopestack-doc-sync · Leads webhooks 615218876 / 615223909 · Bids #3 Generate SOW</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">CS Order form: duplicate projects, false “Order Submitted!”, project not linked to the bid</div><div class="pri pri-m">Medium</div></div>
@@ -1940,15 +1940,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="worker-card">
       <div class="worker-card-hdr">
         <div><div class="worker-name">vtg-po-sync</div><div class="worker-url">vectorfi-admin.workers.dev</div></div>
-        <span class="badge b-live worker-status">Live — Aug 25 2026</span>
+        <span class="badge b-live worker-status">Live — Aug 25 2026 · updated Oct 11</span>
       </div>
       <div class="worker-desc">Syncs NetSuite PO numbers and approval status back to the <strong>Projects #4</strong> board. Runs on a webhook triggered by changes to the NS Sales Order # column, plus a cron every 4 hours as a safety net. Writes <strong>Vendor PO #</strong> (<code>text_mm76antg</code>) and <strong>PO Status</strong> (<code>color_mm766mdj</code>) on the Projects #4 item. (Customer PO, <code>text_mm7dxvwd</code>, is a separate column written by vtg-cs-form.)</div>
       <div class="worker-meta">
         <div class="worker-meta-row"><strong>Trigger</strong><span>NS SO# column change webhook + cron every 4h</span></div>
         <div class="worker-meta-row"><strong>KV</strong><span class="worker-kv">PO_SYNC_KV (2c487e21b1324f5b8dbfc754db7b2622)</span></div>
-        <div class="worker-meta-row"><strong>Outputs</strong><span>Projects #4: Vendor PO # (text_mm76antg) + PO Status (color_mm766mdj)</span></div>
-        <div class="worker-meta-row"><strong>Pending deploy</strong><span>Written Oct 2 2026, not yet deployed: also writes PO Issued Date (date_mm7s4n0m) — the earliest NetSuite date across the project's vendor POs — for Accounting KPIs, plus a one-off backfill that covers Closed projects. Old version kept as worker.pre-podate.js</span></div>
-        <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-po-sync\</span></div>
+        <div class="worker-meta-row"><strong>Outputs</strong><span>Projects #4: Vendor PO # (text_mm76antg) + PO Status (color_mm766mdj) + PO Issued Date (date_mm7s4n0m, since Oct 11 2026)</span></div>
+        <div class="worker-meta-row"><strong>PO Issued Date</strong><span><em>Live Oct 11 2026 (deploy bc0c3bf2).</em> Writes the earliest NetSuite date across the project’s vendor POs to PO Issued Date for the Accounting KPIs (Days to PO). The date lookup is a separate query, so if it fails the PO numbers and statuses still sync. Open projects are filled on every run; a one-off backfill covered Closed projects (149 scanned, 115 dates written), and a blank PO Issued Date on a Closed project is filled with the date only — no PO #, status or notification. Safe to rerun.</span></div>
+        <div class="worker-meta-row"><strong>Multi-SO fix</strong><span><em>Oct 11 2026.</em> The NS Sales Order # cell used to be looked up as one SO, so values like “SO9510, SO9511”, “SO9841 / SO9842” or a lowercase “so7873” matched nothing and showed “Not in NS Yet”. Every SO&lt;digits&gt; in the cell is now read; a project’s POs are the union across its SOs and PO Issued Date is the earliest. Grand Action 2.0, Homer, Mona Shores and Holland Public now show their vendor POs and PO dates. Non-SO text (e.g. “RevIO”) is ignored.</span></div>
+        <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-po-sync\ · test.mjs · backups worker.pre-podate.js, worker.pre-multiso.js, worker.pre-closedfill.js</span></div>
       </div>
     </div>
     <div class="worker-card">
@@ -2922,7 +2923,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="dash-feed">Projects #4 — Ready for Invoicing Date (date_mm54qwps, automation 7920569056) · Last Invoice Date (date_mm7d365w, vtg-ns-so-backfill billing sync) · Closed Date (date_mm7scanx, automation 7924141707)</div>
         <div class="dash-feed">Formulas: Days to PO (formula_mm7s252p) · Days to Invoice (formula_mm7s1r59) · Days to Close (formula_mm7sjt7h)</div>
       </div>
-      <div class="dash-note">⚠ Days to PO stays empty until the vtg-po-sync PO Issued Date change is deployed (written Oct 2 2026). Last Invoice Date is the most recent NetSuite invoice, so on progress-billed jobs it can move after Closed.</div>
+      <div class="dash-note">Days to PO has data since Oct 11 2026, when the vtg-po-sync PO Issued Date change was deployed and backfilled. Projects with no NS Sales Order # still get no PO date. Last Invoice Date is the most recent NetSuite invoice, so on progress-billed jobs it can move after Closed.</div>
     </div>
 
     <div class="dash-card">
@@ -3335,6 +3336,24 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
     <!-- ── Oct 1 2026 ── -->
     <tr class="cl-section-row"><td colspan="4">October 11, 2026</td></tr>
 
+    <tr>
+      <td class="cl-date">Oct 11</td>
+      <td class="cl-ver">v2.22</td>
+      <td><span class="cl-badge cl-fix">Fix</span></td>
+      <td class="cl-desc"><strong>Days to PO now has data</strong> — vtg-po-sync writes <strong>PO Issued Date</strong> (the earliest NetSuite PO date) on every run, and a one-off backfill filled 115 projects, so the Accounting KPIs’ Days to PO is live. Deploy bc0c3bf2.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 11</td>
+      <td class="cl-ver">v2.22</td>
+      <td><span class="cl-badge cl-fix">Fix</span></td>
+      <td class="cl-desc"><strong>vtg-po-sync reads projects with several SOs</strong> — An NS Sales Order # like “SO9510, SO9511” or “SO9841 / SO9842” used to match nothing and show “Not in NS Yet”. Every SO in the cell is now read; Grand Action 2.0, Homer, Mona Shores and Holland Public now show their vendor POs and PO dates.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 11</td>
+      <td class="cl-ver">v2.22</td>
+      <td><span class="cl-badge cl-fix">Resolved</span></td>
+      <td class="cl-desc"><strong>El Nova / ScopeStack gap closed</strong> — Generate SOW creates a missing ScopeStack project itself (since Oct 6), so it no longer depends on El Nova. Gap marked resolved.</td>
+    </tr>
     <tr>
       <td class="cl-date">Oct 11</td>
       <td class="cl-ver">v2.22</td>
@@ -4483,8 +4502,8 @@ const D = {
   posync:{title:'NS PO Sync to Projects #4',phase:'E-Rate · Phase 3–4 · Post-Sale / Delivery',status:'live',
     triggers:['NS Sales Order # column change (webhook)','Cron every 4 hours'],
     inputs:['NetSuite PO number','PO approval status'],
-    outputs:['"Vendor PO #" (text_mm76antg) + "PO Status" (color_mm766mdj) written to Projects #4 (board 18176626554)'],
-    workers:['vtg-po-sync'],notes:['KV namespace: PO_SYNC_KV (2c487e21b1324f5b8dbfc754db7b2622)','Live Aug 25 2026']},
+    outputs:['"Vendor PO #" (text_mm76antg) + "PO Status" (color_mm766mdj) written to Projects #4 (board 18176626554)','PO Issued Date (date_mm7s4n0m) — earliest NetSuite PO date, for Days to PO (since Oct 11 2026)'],
+    workers:['vtg-po-sync'],notes:['KV namespace: PO_SYNC_KV (2c487e21b1324f5b8dbfc754db7b2622)','Live Aug 25 2026','Oct 11 2026: reads every SO in a multi-SO cell (“SO9510, SO9511”); POs are the union across them']},
   projsetup:{title:'Project Setup on Projects #4',phase:'E-Rate · Phase 4 · Delivery',status:'manual',
     triggers:['Winning bid handed to delivery (Post-Monday stage)'],
     inputs:['Winning bid details','Customer PO','Schedule'],
