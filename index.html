@@ -368,7 +368,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="hdr">
   <div>
     <div class="hdr-title">VTG · Lead → Invoice Process Map</div>
-    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Oct 11 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
+    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Oct 12 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
   </div>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
     <div class="legend">
@@ -1426,6 +1426,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="sec-title">🔴 Active Gaps — Need Resolution</div>
     <div class="gap-grid">
       <div class="gap-card">
+        <div class="gap-card-hdr"><div class="gap-title">El Nova’s hourly sync deleted leads it didn’t send — resolved</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
+        <div class="gap-body"><strong>Resolved Oct 12 2026.</strong> Found Oct 7: the Sable Ridge test lead, created on the Leads board by API, was deleted by the El Nova integration account at one minute past the hour, several times. Deleting a lead clears the bid’s Leads link, which empties the bid’s blueprint mirror that Generate SOW’s ScopeStack fallback reads. Leads El Nova sent itself weren’t affected. Restores go through monday’s Recycle bin, because the API can’t restore items.</div>
+        <div class="gap-worker">El Nova · Leads board 18181651809 · vtg-scopestack-doc-sync fallback</div>
+      </div>
+      <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">El Nova stopped creating ScopeStack projects — resolved</div><div class="pri" style="background:var(--green-dim);color:var(--green);">Resolved</div></div>
         <div class="gap-body"><strong>Resolved Oct 11 2026.</strong> Found Oct 6: Generate SOW needs the bid’s ScopeStack project, which El Nova used to create when a lead was accepted. That stopped between Sep 24 and 25, and by Oct 6 Generate SOW had logged 19 failures with 16 FY27 bids missing a project. Since Oct 6 (about 6 PM ET) vtg-scopestack-doc-sync creates the missing project itself from the bid and its lead’s blueprints, for every bid — verified on Lowell, Grand Haven Christian and the Sable Ridge test bid — so Generate SOW no longer depends on El Nova. If El Nova starts creating projects again, it must check the 470# first so a bid the fallback covered doesn’t get a second project.</div>
         <div class="gap-worker">El Nova · ScopeStack · vtg-scopestack-doc-sync · Leads Accept 470 webhooks · Bids #3 Generate SOW</div>
@@ -1494,11 +1499,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-card-hdr"><div class="gap-title">Bids #3: stale Bid Due Date Mirror, doubled 470# in Bid Name Formula, Create SOV / SOW never closed</div><div class="pri pri-l">Low</div></div>
         <div class="gap-body"><strong>Found Oct 7 2026 (SOP recording) — priority for Jon to confirm.</strong> After a Bid Due Date change the subitems’ Bid Due Date Mirror kept the old date — automation 483152942 copies it only on creation, and the value reads an hour early (DST) — so Task Due Date Formula, which counts from it, went stale. vtg-bid-task-dates reads the bid’s own date, so Task Due Date is right. Bid Name Formula (<code>CONCATENATE({name}, " - 470#: ", {470 #})</code>) doubles the 470# because item names already end in it. Save &amp; Submit in the SOV Builder doesn’t close the Create SOV subitem, and Generate SOW doesn’t close Create SOW. All are on the SOP fix list.</div>
         <div class="gap-worker">Bids #3 · automations 483152942, 483296416 · vtg-sov-builder · vtg-scopestack-doc-sync</div>
-      </div>
-      <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">El Nova’s hourly sync deletes leads it didn’t send</div><div class="pri pri-l">Low</div></div>
-        <div class="gap-body"><strong>Found Oct 7 2026 — priority for Jon to confirm.</strong> The Sable Ridge test lead, created on the Leads board by API, was deleted by the El Nova integration account at one minute past the hour, several times on Oct 7. Deleting a lead clears the bid’s Leads link, which empties the bid’s blueprint mirror, and Generate SOW’s ScopeStack fallback needs that link to read the blueprints. Leads El Nova sent itself aren’t affected — it appears to remove leads whose 470# it doesn’t have — so test leads need El Nova to skip them (with Austin). Restores go through monday’s Recycle bin, because the API can’t restore items.</div>
-        <div class="gap-worker">El Nova · Leads board 18181651809 · vtg-scopestack-doc-sync fallback</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">ScopeStack SOW template: frozen footer date and empty per-location scope</div><div class="pri pri-m">Medium</div></div>
@@ -3314,7 +3314,7 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.22</div>
+  <div class="cl-version-pill">Current: v2.23</div>
 </div>
 
 <table class="cl-table">
@@ -3334,6 +3334,15 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
     <!-- ── Sep 29 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">October 12, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 12</td>
+      <td class="cl-ver">v2.23</td>
+      <td><span class="cl-badge cl-fix">Resolved</span></td>
+      <td class="cl-desc"><strong>El Nova test-lead deletions gap closed</strong> — The Low gap about El Nova’s hourly sync deleting leads it didn’t send (found on the Sable Ridge test lead, Oct 7) is marked resolved.</td>
+    </tr>
+
     <tr class="cl-section-row"><td colspan="4">October 11, 2026</td></tr>
 
     <tr>
