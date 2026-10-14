@@ -368,7 +368,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="hdr">
   <div>
     <div class="hdr-title">VTG · Lead → Invoice Process Map</div>
-    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Oct 12 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
+    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Oct 14 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
   </div>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
     <div class="legend">
@@ -1482,7 +1482,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">vtg-ns-mcp-sync cron fails on every run</div><div class="pri pri-m">Medium</div></div>
-        <div class="gap-body">Observed Sep 18 2026: the 15-minute cron fails each run with SuiteQL <em>Record 'transaction' was not found</em> — the NetSuite integration role cannot read <code>transaction</code> (the same limit was recorded again Sep 30). That is roughly 96 failures a day, and none of the six coded flows reaches a monday write. The source has not changed since Sep 17. An older build, <strong>vtg-ns-mcp-sync-staging</strong>, still runs its own 15-minute cron (Sep 19 2026 snapshot). <strong>Side effect (found Oct 2 2026):</strong> the same run is meant to refresh the inventory cache, and the location-41 key was empty, so the Materials Log On Hand column showed “—” on every row. vtg-materials-log now refreshes that key itself; the all-locations key behind the vtg-inventory dashboard still relies on this cron or a live fetch on a miss.</div>
+        <div class="gap-body">Observed Sep 18 2026: the 15-minute cron fails each run with SuiteQL <em>Record 'transaction' was not found</em> — the NetSuite integration role cannot read <code>transaction</code> (the same limit was recorded again Sep 30). That is roughly 96 failures a day, and none of the six coded flows reaches a monday write. The source has not changed since Sep 17. An older build, <strong>vtg-ns-mcp-sync-staging</strong>, still runs its own 15-minute cron (Sep 19 2026 snapshot). <strong>Side effect (found Oct 2 2026):</strong> the same run is meant to refresh the inventory cache, and the location-41 key was empty, so the Materials Log On Hand column showed “—” on every row. vtg-materials-log now refreshes that key itself; the all-locations key behind the vtg-inventory dashboard still relies on this cron or a live fetch on a miss. <strong>Built Oct 14 (deploy to confirm):</strong> the cron runs the inventory refreshes separately from the poll, so once deployed the all-locations refresh no longer depends on it. The poll itself still fails.</div>
         <div class="gap-worker">vtg-ns-mcp-sync · vtg-ns-mcp-sync-staging · NS role permissions</div>
       </div>
       <div class="gap-card">
@@ -1511,8 +1511,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">vtg-cs-form · Projects #4 · NetSuite order verification</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">The UID has not proved stable — reference only, no longer a match key</div><div class="pri pri-h">High</div></div>
-        <div class="gap-body"><strong>Sep 28 2026.</strong> The UID (Salesforce <code>UID__c</code> auto-number) was adopted as the cross-system key. Salesforce duplicates contacts — <strong>69 SF duplicate accounts sent to Merlin for review</strong> — the UID has not been stable, and SF requirements keep changing. Two problems: legacy Accounts, Bids and Projects rows carry a blank or stale UID (<strong>17 Projects #4 rows "Cannot verify"</strong> as of Sep 28; fuzzy-name fallback is off), and a newly issued UID can’t be trusted either. The UID also <strong>does not match NetSuite’s <code>custentity_acs_unique_entity_identifier</code></strong> — different numbering.<br><br><strong>Current state:</strong> the <strong>NS Customer Internal ID is the matching key</strong>. New NS customers created from the CS form use <code>externalId mon-&lt;monday item id&gt;</code>, live since Sep 28. <strong>Remaining dependency:</strong> vtg-ns-so-backfill’s auto-sync still links project → account via UID.</div>
+        <div class="gap-card-hdr"><div class="gap-title">Projects still find their account by UID, and new rows don’t get one</div><div class="pri pri-h">High</div></div>
+        <div class="gap-body"><strong>Sep 28 2026:</strong> the UID (Salesforce <code>UID__c</code> auto-number) stopped being the account match key. Salesforce duplicates accounts (69 sent to Merlin), the UID isn’t stable, and it doesn’t match NetSuite’s <code>custentity_acs_unique_entity_identifier</code>. Accounts now match NetSuite on the NS Customer Internal ID. Customers created from the CS form use externalId <code>mon-&lt;monday item id&gt;</code> (working since backfill v20, Oct 2).<br><br><strong>Still on UID:</strong> Projects #4 has no Accounts link, so vtg-ns-so-backfill’s auto-sync and SO Check find a project’s account by UID. No UID means “Cannot verify” and no billing. As of Oct 11: 29 Cannot verify (23 with no UID); 66 of 284 projects have no UID; none of the 20 accounts created since Sep 15 has one; none of the 9 CS Order projects created since Sep 28 has one, even where the account does.</div>
         <div class="gap-worker">UID · Accounts text_mm6s8adk · Projects #4 text_mm76zvbz · NS ID Accounts text_mm7m8z67</div>
       </div>
       <div class="gap-card">
@@ -1556,9 +1556,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">Projects #4 automations 7920172818, 7920172789, 7924141714</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">Pipeline dashboard: two widgets misreport</div><div class="pri pri-m">Medium</div></div>
-        <div class="gap-body">On 📊 E-Rate Pipeline &amp; Project Delivery (37086241), checked Oct 2 2026: <strong>Total Active Bids</strong> shows 0, while Bids #3 has 17 pre-award bids (Folder Creation 1, Bid Building 13, Bid Compilation 1, Awaiting Results 2). <strong>Active Post-Sale Pipeline</strong> ($12.15M) sums every bid not in Lost or Wins Archive stage, so it includes $1.80M of pre-award bids, the ZZ TEST bond-test bid ($9,999) and Shelby Public Schools ($151K, in the Wins Archive group with stage Bid Submittal); Post-Sale + Post-Monday alone is $10.20M. Widget settings can't be read or changed through the API — fix in the monday UI.</div>
-        <div class="gap-worker">Dashboard 37086241 · Bids #3 deal_stage / deal_value</div>
+        <div class="gap-card-hdr"><div class="gap-title">Pipeline dashboards: two widgets still misreport, Merlin still filters on FY26</div><div class="pri pri-m">Medium</div></div>
+        <div class="gap-body"><strong>Reviewed Oct 11 2026.</strong> Root causes across the monday dashboards: the season hardcoded in widget filters (470# contains “2600”), widgets with no filters at all, filter logic bugs, and dead sources (deleted boards and columns). The same day’s cleanup deleted, retired or fixed the rest (see Dashboards). Still to fix in the monday UI, because the API can’t edit widget filters. On 📊 E-Rate Pipeline &amp; Project Delivery (37086241), <strong>Total Active Bids</strong> ANDs five single-stage rules and always shows 0 — replace them with one rule, stage any of Folder Creation, Bid Building, Bid Compilation, Bid Submittal, Awaiting Results (expect 29). <strong>Active Post-Sale Pipeline</strong> ($13.21M) counts every bid not Lost or Wins Archive — filter it to Post-Sale ($4.29M, 73 wins waiting on PO) and rename it. On 🧙 Merlin (37290789), drop the “2600” rule from the pending widgets and count wins as Post-Sale + Post-Monday + Wins Archive (expect 136 bids / $10.02M for FY26).</div>
+        <div class="gap-worker">Dashboards 37086241 · 37290789 · Bids #3 deal_stage / deal_value</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">E-Rate Historical Awards import never ran</div><div class="pri pri-l">Low</div></div>
@@ -1840,6 +1840,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Catalog</strong><span>5,395 parts live in <code>SKU_CATALOG</code> (Oct 2 2026): Ruckus 3,801 (Feb 2026 E-Rate list) · VTG Cabling 1,031 · Fortinet 318 · TP-Link 132 (with Omada labor rates) · N1C 62 · Vertiv 48 · VectorFi 3 (VES) · 54 parts tagged <code>nms</code></span></div>
         <div class="worker-meta-row"><strong>SharePoint</strong><span>Every SOV version copied to <code>Base Bid Docs/3 -SOV</code> by vtg-sp-folders (webhook 645821765 on <code>file_mm749nna</code>) — nothing in this Worker changed for that</span></div>
         <div class="worker-meta-row"><strong>Oct 8 2026</strong><span>Deploy 33514e7c: pressing Enter on a pasted part number now picks the matching catalog part (exact part #, then a -US variant, then a single list hit), so the row gets its description and price instead of a $0 row. Not yet browser-tested; Tab or click-away after a paste still leaves the raw text.</span></div>
+        <div class="worker-meta-row"><strong>Oct 12 2026</strong><span>Typed unit prices stay put (reported by Alan on Ubly). Two fixes, both live and confirmed: the bond toggle and Bond % only redraw totals instead of re-pricing every row, and typing a unit price locks the row (amber) so markup, Bidder/Driver and bond changes leave it alone. Right-click, clearing the box, a row markup or picking a new part unlocks it. Editing the cost on a locked row keeps the typed price and only moves margin. Old drafts get a one-time check that locks prices that don’t match the calculated price. Current build 153,006 bytes; backups <code>worker-combined.pre-bond-reprice.js</code> and <code>worker-combined.pre-price-lock.js</code>.</span></div>
         <div class="worker-meta-row"><strong>Not done</strong><span>Save &amp; Submit doesn’t close the bid’s Create SOV subitem</span></div>
       </div>
     </div>
@@ -1957,7 +1958,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div><div class="worker-name">vtg-materials-log</div><div class="worker-url">vtg-materials-log.vectorfi-admin.workers.dev</div></div>
         <span class="badge b-live worker-status">Live — Oct 2 2026</span>
       </div>
-      <div class="worker-desc">Cabling materials accounting tool for Projects #4. PM opens via a link column on a Projects #4 item (auto-populated when stage → Installing by automation 7922447604). <strong>Oct 2 2026:</strong> refreshes NetSuite On Hand itself — a 30-minute cron, plus a live fetch when nothing is cached. Same INVENTORY_CACHE key (<code>ns_inventory_loc41</code>, location 41 Cabling Warehouse), now kept 3 hours and never overwritten by an empty result. The page shows the as-of time, or “On Hand unavailable” if NetSuite can’t be reached. It no longer depends on vtg-ns-mcp-sync, whose cron never kept that key filled. <strong>v4 (Sep 16 2026):</strong> NS SO writeback live — cabling lines are PATCHed onto the NetSuite Sales Order and an Item Fulfillment is created on submit. Drop-ship SOs skip fulfillment and leave a warehouse note. Re-push to NS button on locked page for retries. NS result (IF# or lines-added confirmation) posted to monday thread. <strong>v3 (Sep 15):</strong> NS Inventory On Hand badges (green/yellow/red) from NS location 41 via INVENTORY_CACHE KV; UID + NS SO# on project card. <strong>v2:</strong> Save Draft system with daily accumulation, running totals, confirmation modal.</div>
+      <div class="worker-desc">Cabling materials accounting tool for Projects #4. PM opens via a link column on a Projects #4 item (auto-populated when stage → Installing by automation 7922447604). <strong>Oct 2 2026:</strong> refreshes NetSuite On Hand itself — a 30-minute cron, plus a live fetch when nothing is cached. Same INVENTORY_CACHE key (<code>ns_inventory_loc41</code>, location 41 — Freeland in NetSuite; the Materials Log calls it Cabling Warehouse), now kept 3 hours and never overwritten by an empty result. The page shows the as-of time, or “On Hand unavailable” if NetSuite can’t be reached. It no longer depends on vtg-ns-mcp-sync, whose cron never kept that key filled. <strong>v4 (Sep 16 2026):</strong> NS SO writeback live — cabling lines are PATCHed onto the NetSuite Sales Order and an Item Fulfillment is created on submit. Drop-ship SOs skip fulfillment and leave a warehouse note. Re-push to NS button on locked page for retries. NS result (IF# or lines-added confirmation) posted to monday thread. <strong>v3 (Sep 15):</strong> NS Inventory On Hand badges (green/yellow/red) from NS location 41 via INVENTORY_CACHE KV; UID + NS SO# on project card. <strong>v2:</strong> Save Draft system with daily accumulation, running totals, confirmation modal.</div>
       <div class="worker-meta">
         <div class="worker-meta-row"><strong>Trigger</strong><span>Manual — PM opens from Projects #4 link column (link_mm6mhdcx) · cron every 30 min (On Hand refresh)</span></div>
         <div class="worker-meta-row"><strong>KV</strong><span class="worker-kv">MATERIALS_LOG (7694ae82ef4540799e64aa3ade3ad10e) · SKU_CATALOG (17083b01a7524801a236dd4a71f50164) · INVENTORY_CACHE (0233a14225194cbd81a49601f448963b) — key <code>ns_inventory_loc41</code> written by this Worker since Oct 2; vtg-ns-mcp-sync uses the same namespace</span></div>
@@ -2088,14 +2089,29 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     </div>
     <div class="worker-card">
       <div class="worker-card-hdr">
+        <div><div class="worker-name">vtg-dashboard-summaries</div><div class="worker-url">vtg-dashboard-summaries.vectorfi-admin.workers.dev</div></div>
+        <span class="badge b-live worker-status">Live — Oct 11 2026</span>
+      </div>
+      <div class="worker-desc">Writes a plain-English summary and today’s numbers for five monday dashboards — 📊 E-Rate Pipeline &amp; Project Delivery, L10, Accounting KPIs, 🌎 My Bids and 🧙 Merlin — to the <strong>📌 Dashboard Summaries</strong> board (18434999869), one fixed row per dashboard, so each dashboard can show its summary at the top. Runs every morning after the L10 snapshot. The funding year comes from the 470# prefix, so nothing changes at season rollover (Merlin’s project year is a setting).</div>
+      <div class="worker-meta">
+        <div class="worker-meta-row"><strong>Trigger</strong><span>Cron daily 9:15 AM EDT (13:15 UTC)</span></div>
+        <div class="worker-meta-row"><strong>Writes</strong><span>Today’s numbers (<code>long_text_mm81cmf4</code>), Last refreshed (<code>date_mm81zk4q</code>), Refresh status (<code>text_mm81av7f</code>). What this shows (<code>long_text_mm81z6s1</code>) is the editable explainer and isn’t overwritten.</span></div>
+        <div class="worker-meta-row"><strong>Duplicates</strong><span>Only the five fixed rows are ever written. On an error the old text stays and the error goes to Refresh status.</span></div>
+        <div class="worker-meta-row"><strong>Verified</strong><span>Oct 11 dry run matched the seeded numbers: open bids 29 / $3.03M · Post-Sale 73 / $4.29M · open projects 66 / $4.43M · Remaining to Bill $1.94M · FY26 wins 136 / $10.02M. Business-day math matched the Accounting KPIs formulas on 12 projects.</span></div>
+        <div class="worker-meta-row"><strong>Still to do</strong><span>On each dashboard, add a Table widget filtered to its row (monday UI)</span></div>
+        <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-dashboard-summaries\ · README</span></div>
+      </div>
+    </div>
+    <div class="worker-card">
+      <div class="worker-card-hdr">
         <div><div class="worker-name">vtg-inventory</div><div class="worker-url">vtg-inventory.pages.dev</div></div>
         <span class="badge b-live worker-status">Live — Sep 15 2026</span>
       </div>
-      <div class="worker-desc">Company-wide NetSuite inventory dashboard hosted on Cloudflare Pages (GitHub repo vtg-portal/vtg-inventory). Fetches live from vtg-ns-mcp-sync <code>/api/inventory/all</code> and displays all NS locations: 41 Cabling Warehouse (blue), 42 Secondary Warehouse (green), 4 Grand Rapids Office (yellow). Protected by a shared access code (Azure AD SSO planned). Features: search, location filter pills, sortable columns, light/dark mode toggle, CSV export.</div>
+      <div class="worker-desc">Company-wide NetSuite inventory dashboard hosted on Cloudflare Pages (GitHub repo vtg-portal/vtg-inventory). Fetches live from vtg-ns-mcp-sync <code>/api/inventory/all</code> and shows every NetSuite location in the feed. The live page names locations from a hardcoded list (“Grand Rapids Office”, “Cabling Warehouse”, “Secondary Warehouse”) that doesn’t exist in NetSuite: location 4 is <strong>Walbridge</strong>, 41 <strong>Freeland</strong> and 42 <strong>Holland</strong>. <em>Built Oct 14 2026, deploy to confirm.</em> One row per part, location and bin, with location and bin names from NetSuite; location pills plus All Locations, a bin dropdown, search and CSV that include the bin, the NetSuite as-of time, and a location view that can be bookmarked. Protected by a shared access code (Azure AD SSO planned). Features: search, location filter pills, sortable columns, light/dark mode toggle, CSV export.</div>
       <div class="worker-meta">
-        <div class="worker-meta-row"><strong>Data source</strong><span>vtg-ns-mcp-sync /api/inventory/all · served from INVENTORY_CACHE KV (0233a14225194cbd81a49601f448963b, key <code>ns_inventory_all</code>) or fetched live from NetSuite on a miss and cached 30 min · the 15-minute cron refresh is unconfirmed (it runs with the failing poll)</span></div>
+        <div class="worker-meta-row"><strong>Data source</strong><span>vtg-ns-mcp-sync /api/inventory/all · served from INVENTORY_CACHE KV (0233a14225194cbd81a49601f448963b, key <code>ns_inventory_all</code>) or fetched live from NetSuite on a miss and cached 30 min · the 15-minute cron refresh is unconfirmed (it runs with the failing poll) · <em>Built Oct 14 2026, deploy to confirm.</em> new key <code>ns_inventory_all_v2</code> (3 h, as-of time in its metadata and an <code>X-Inventory-As-Of</code> header); the cron refresh no longer waits on the failing poll — expected, confirm after deploy</span></div>
         <div class="worker-meta-row"><strong>Auth</strong><span>Shared access code (placeholder) · Azure AD SSO planned</span></div>
-        <div class="worker-meta-row"><strong>Files</strong><span>GitHub: vtg-portal/vtg-inventory · single index.html, auto-deploys on push to main</span></div>
+        <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-inventory\index.html (local source since Oct 14, rebuilt from the live page) · GitHub: vtg-portal/vtg-inventory · single index.html, auto-deploys on push to main</span></div>
         <div class="worker-meta-row"><strong>Note</strong><span>No manual seeding needed after a vtg-ns-mcp-sync redeploy: on a cache miss the endpoint fetches live from NetSuite (slower first load) and saves the result.</span></div>
       </div>
     </div>
@@ -2172,6 +2188,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Cron</strong><span>Every 15 min + webhook on stage changes</span></div>
         <div class="worker-meta-row"><strong>Blocked by</strong><span>NS service item ID from Kevin/Cari · NS role cannot read <code>transaction</code></span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-ns-mcp-sync\ · wrangler.toml + worker.js</span></div>
+        <div class="worker-meta-row"><strong>Inventory bins</strong><span><em>Built Oct 14 2026, deploy to confirm.</em> <code>/api/inventory/all</code> becomes bin-level: one row per item, location and bin, with NetSuite’s location and bin names. New key <code>ns_inventory_all_v2</code> (3 h, never overwritten by an empty result); if the bin query fails it falls back to location-only rows. The cron runs the inventory refreshes with <code>Promise.allSettled</code>, so the failing NetSuite poll can’t cut them short, and location-41 writes now carry an as-of time. Tested with mocks, not yet against live NetSuite. Backup <code>worker.pre-bins.js</code>.</span></div>
         <div class="worker-meta-row"><strong>Cron result</strong><span>Observed Sep 18 2026: the 15-minute cron fails on every run with SuiteQL <em>Record 'transaction' was not found</em> — the NetSuite integration role cannot read <code>transaction</code> (the same limit was recorded again Sep 30). None of the six flows reach a monday write. Source unchanged since Sep 17. The inventory-cache refresh runs in the same job; on Oct 2 the location-41 key was empty (most likely the failing poll ends the run before it saves — read from the code, not confirmed in Cloudflare logs).</span></div>
         <div class="worker-meta-row"><strong>Customer mapping</strong><span>vtg-ns-compare was deleted Oct 1 2026. The NetSuite Customer Internal ID now on Accounts #1 (<code>text_mm7m8z67</code>, filled by vtg-ns-so-backfill) is the customer mapping; this Worker does not read it yet.</span></div>
       </div>
@@ -2273,6 +2290,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="glossary-section">
   <div class="glossary-section-title">📋 E-Rate Program Terms</div>
   <div class="glossary-grid">
+    <div class="glossary-card">
+      <div class="glossary-term">Bin</div>
+      <div class="glossary-def">A NetSuite storage spot inside a location, e.g. S10-A-02-A at Walbridge. NetSuite’s inventory locations: 4 Walbridge, 41 Freeland, 42 Holland, 23 Walbridge - CC, 32 Drop Ship, 39 Drop Ship - CC, 6 Maumee (plus 7 Columbia, 22 Events Management / Projects and 44 Whitlock, with no stock).</div>
+    </div>
 
     <div class="glossary-card">
       <div class="glossary-term">E-Rate <span class="glossary-abbr">E-Rate</span></div>
@@ -2922,6 +2943,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="dash-feed">Projects #4 — PO Issued Date (date_mm7s4n0m), earliest NetSuite PO date, written by vtg-po-sync</div>
         <div class="dash-feed">Projects #4 — Ready for Invoicing Date (date_mm54qwps, automation 7920569056) · Last Invoice Date (date_mm7d365w, vtg-ns-so-backfill billing sync) · Closed Date (date_mm7scanx, automation 7924141707)</div>
         <div class="dash-feed">Formulas: Days to PO (formula_mm7s252p) · Days to Invoice (formula_mm7s1r59) · Days to Close (formula_mm7sjt7h)</div>
+        <div class="dash-feed">📌 Dashboard Summaries row — plain-English summary and today’s numbers, refreshed daily by vtg-dashboard-summaries (since Oct 11 2026)</div>
       </div>
       <div class="dash-note">Days to PO has data since Oct 11 2026, when the vtg-po-sync PO Issued Date change was deployed and backfilled. Projects with no NS Sales Order # still get no PO date. Last Invoice Date is the most recent NetSuite invoice, so on progress-billed jobs it can move after Closed.</div>
     </div>
@@ -2934,10 +2956,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <span class="dash-audience aud-exec">Executive</span>
       </div>
-      <div class="dash-desc">Pipeline and delivery dashboard on Bids #3 and Projects #4. Top widgets: <strong>Active Post-Sale Pipeline</strong>, <strong>Total Active Project Value</strong>, <strong>Total Active Bids</strong> and <strong>Bids by Stage</strong>. Checked Oct 2 2026: Total Active Project Value ($4.45M) matches the sum of non-Closed Projects #4 exactly; Total Active Bids shows 0 and Active Post-Sale Pipeline counts more than post-sale bids (see gap).</div>
+      <div class="dash-desc">Pipeline and delivery dashboard on Bids #3 and Projects #4 — kept as the one ops dashboard. Dashboard filter: bids not Lost or Wins Archive; projects not Closed and not Project Year 2023 or 2024. <strong>Oct 11 2026 cleanup:</strong> deleted the duplicate Gantt and the one-series “Forecast vs Actual Revenue”; the two “Confirmed Revenue … (Timeline End)” charts became <strong>Open Project Revenue by Month</strong> and <strong>by Quarter (Revenue Month)</strong>; new counter <strong>🧾 Remaining to Bill (open projects)</strong>, $1.94M on Oct 11, matching the board. Total Active Project Value ($4.43M) matches non-Closed Projects #4. Still wrong until fixed in the monday UI: <strong>Total Active Bids</strong> (shows 0, should be 29) and <strong>Active Post-Sale Pipeline</strong> (see gap). Its summary row on 📌 Dashboard Summaries is refreshed every morning.</div>
       <div class="dash-feeds">
         <div class="dash-feed">Bids #3 (18176633000) — Bid Value (deal_value), Bid Stage (deal_stage)</div>
-        <div class="dash-feed">Projects #4 (18176626554) — Total Project Amount (numeric_mkqzrk8y), Project Stage</div>
+        <div class="dash-feed">Projects #4 (18176626554) — Total Project Amount (numeric_mkqzrk8y), Project Stage, Remaining to Bill (numeric_mm7db7yk)</div>
       </div>
     </div>
 
@@ -2949,13 +2971,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <span class="dash-audience aud-exec">Various</span>
       </div>
-      <div class="dash-desc">Listed from monday Oct 2 2026; widget contents not reviewed. <strong>CRM:</strong> 🧙 Merlin – E-Rate Revenue (37290789), 🦅 THE Dashboard (33629663), Carmen Tech &amp; Ops (37400773), 🌎 "My" Bids (33629661), and two private ones — E-Rate Pipeline &amp; Projects (36597174) and eRate Pipeline &amp; Budget (36598780). <strong>E-Rate OS:</strong> Sales Dashboard (36369270) and E-Rate Executive Dashboard (36392597).</div>
+      <div class="dash-desc">Reviewed Oct 11 2026 (30 dashboards across 8 workspaces) and cleaned up. <strong>Kept:</strong> L10 (39672257, leadership scorecard; its L10 Live board refreshes weekday mornings), 🌎 "My" Bids (33629661, healthy), 🧙 Merlin – E-Rate Revenue (37290789; its pending and won widgets still filter on 470# containing “2600”, so FY27 bids fall outside — fix in the UI, see gap) and Historical Bid Update (35223636, Dylan’s). <strong>Retired</strong> (renamed “⚠️ RETIRED”, to delete once followers move): eRate Pipeline &amp; Budget (36598780 → L10), Carmen Tech &amp; Ops (37400773) and Schall (37901574) → 📊 Pipeline, 🦅 THE Dashboard (33629663) → My Bids. <strong>Deleted</strong> (restorable from monday Trash): Sales Dashboard and E-Rate Executive Dashboard (E-Rate OS), Project Timeline and Project Calendar (their board was deleted), E-Rate Pipeline &amp; Projects (private) and three template Sales Dashboards. Ten old dashboards in the Testing/Archive workspace still need deleting from the UI as admin.</div>
       <div class="dash-feeds">
         <div class="dash-feed">📈 E-Rate Revenue Forecast board (18419943586) — 12 monthly forecast rows, Jan–Dec 2026; no 2027 rows yet</div>
         <div class="dash-feed">Projects #4 — Actual Revenue Month (date_mm4tatyy): set at Ready for Invoicing (7920172789); at Closed only if blank (7924141714)</div>
         <div class="dash-feed">Projects #4 — Revenue Month (date_mm39fh8x): vtg-revenue-month, locked at Ready for Invoicing</div>
       </div>
       <div class="dash-note">⚠ Actual Revenue Month has no values before July 2026 (the stamp automations started Jun 30); Revenue Month covers March onward. 7920172818 still overwrites Actual Revenue Month at Closed until it is paused — see gap.</div>
+    </div>
+
+    <div class="dash-card">
+      <div class="dash-card-hdr">
+        <div>
+          <div class="dash-name">📌 Dashboard Summaries</div>
+          <div class="dash-workspace">CRM Workspace · Board 18434999869</div>
+        </div>
+        <span class="dash-audience aud-exec">Executive</span>
+      </div>
+      <div class="dash-desc">Built Oct 11 2026. One row per dashboard — Pipeline, L10, Accounting KPIs, My Bids and Merlin — with a plain-English “What this shows” and “Today’s numbers”, refreshed every morning by vtg-dashboard-summaries. Meant to sit at the top of each dashboard as a Table widget filtered to its row; adding those widgets is still to do in the monday UI.</div>
+      <div class="dash-feeds">
+        <div class="dash-feed">What this shows (long_text_mm81z6s1, edit freely) · Today’s numbers (long_text_mm81cmf4) · Last refreshed (date_mm81zk4q) · Dashboard link (link_mm81pa1) · Refresh status (text_mm81av7f)</div>
+      </div>
     </div>
 
     <div class="dash-card">
@@ -3132,12 +3168,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <span class="dash-audience aud-ops">Ops / Warehouse</span>
       </div>
-      <div class="dash-desc">Company-wide NetSuite inventory dashboard. Fetches live from vtg-ns-mcp-sync /api/inventory/all and displays every NetSuite location in the feed — on Oct 2 2026 that was 822 rows across 7 location IDs (4, 6, 23, 32, 39, 41, 42), including <strong>41 Cabling Warehouse</strong>, <strong>42 Secondary Warehouse</strong> and <strong>4 Grand Rapids Office</strong>. Color-coded by location. Protected by a shared access code (Azure AD SSO planned). Features: search, location filter pills, sortable columns, light/dark mode, CSV export. The page says it refreshes every 15 min; data comes from INVENTORY_CACHE or a live NetSuite fetch on a miss, and whether the vtg-ns-mcp-sync cron keeps it refreshed is unconfirmed.</div>
+      <div class="dash-desc">Company-wide NetSuite inventory dashboard. Fetches live from vtg-ns-mcp-sync /api/inventory/all and displays every NetSuite location in the feed — on Oct 14 2026 that was <strong>846 rows across 7 NetSuite locations</strong>: 4 Walbridge, 41 Freeland, 42 Holland, 23 Walbridge - CC, 32 Drop Ship, 39 Drop Ship - CC and 6 Maumee. (“Grand Rapids Office”, “Cabling Warehouse” and “Secondary Warehouse” were labels hardcoded in the page; none exists in NetSuite.) The bin-level version — one row per part, location and bin, with NetSuite names — is built and waiting on deploy. Color-coded by location. Protected by a shared access code (Azure AD SSO planned). Features: search, location filter pills, sortable columns, light/dark mode, CSV export. The page says it refreshes every 15 min; data comes from INVENTORY_CACHE or a live NetSuite fetch on a miss, and whether the vtg-ns-mcp-sync cron keeps it refreshed is unconfirmed.</div>
       <div class="dash-feeds">
         <div class="dash-feed">vtg-ns-mcp-sync /api/inventory/all · INVENTORY_CACHE KV (0233a14225194cbd81a49601f448963b)</div>
         <div class="dash-feed">GitHub: vtg-portal/vtg-inventory · Cloudflare Pages auto-deploy on push</div>
       </div>
-      <div class="dash-note">On a cache miss the endpoint fetches live from NetSuite and saves the result for 30 min — no manual seeding needed after a redeploy.</div>
+      <div class="dash-note">On a cache miss the endpoint fetches live from NetSuite and saves the result for 30 min — no manual seeding needed after a redeploy. <em>Built Oct 14 2026, deploy to confirm.</em> The bin-level feed uses key ns_inventory_all_v2 (3 h), and its refresh no longer depends on the failing poll; refresh still unconfirmed until it’s seen working.</div>
     </div>
 
   </div>
@@ -3314,7 +3350,7 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.23</div>
+  <div class="cl-version-pill">Current: v2.24</div>
 </div>
 
 <table class="cl-table">
@@ -3334,8 +3370,29 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
     <!-- ── Sep 29 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">October 14, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 14</td>
+      <td class="cl-ver">v2.24</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>vtg-inventory: bin column and NetSuite location names</strong> — <em>Built Oct 14, deploy to confirm.</em> The dashboard’s location names were hardcoded and wrong: “Grand Rapids Office”, “Cabling Warehouse” and “Secondary Warehouse” don’t exist in NetSuite (4 is Walbridge, 41 Freeland, 42 Holland). The new page shows one row per part, location and bin with NetSuite’s names, a bin dropdown, bin in search and CSV, and the NetSuite as-of time. Its source is now kept in VTG Flows\vtg-inventory.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 14</td>
+      <td class="cl-ver">v2.24</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>vtg-ns-mcp-sync: bin-level inventory feed</strong> — <em>Built Oct 14, deploy to confirm.</em> /api/inventory/all returns one row per item, location and bin with NetSuite names (key ns_inventory_all_v2, 3 h), falls back to location-only rows if the bin query fails, and the cron no longer lets the failing NetSuite poll cut the inventory refreshes short. Oct 14 feed: 846 rows across 7 NetSuite locations.</td>
+    </tr>
+
     <tr class="cl-section-row"><td colspan="4">October 12, 2026</td></tr>
 
+    <tr>
+      <td class="cl-date">Oct 12</td>
+      <td class="cl-ver">v2.24</td>
+      <td><span class="cl-badge cl-fix">Fix</span></td>
+      <td class="cl-desc"><strong>SOV Builder keeps typed unit prices</strong> — Reported by Alan on Ubly: prices he typed and saved came back at catalog × markup when he reopened the bid, because the bond controls (and reopening a draft with bond off) re-priced every row. Two fixes, live and confirmed: bond changes only redraw totals, and a typed unit price locks the row (amber) until it’s right-clicked, cleared, given a row markup or re-picked. Old drafts get a one-time check that locks prices that don’t match the calculated price.</td>
+    </tr>
     <tr>
       <td class="cl-date">Oct 12</td>
       <td class="cl-ver">v2.23</td>
@@ -3345,6 +3402,24 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
 
     <tr class="cl-section-row"><td colspan="4">October 11, 2026</td></tr>
 
+    <tr>
+      <td class="cl-date">Oct 11</td>
+      <td class="cl-ver">v2.24</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>monday dashboards cleaned up</strong> — All 30 dashboards reviewed. On 📊 E-Rate Pipeline &amp; Project Delivery: duplicate Gantt and the one-series forecast chart deleted, the revenue charts renamed to what they show, and a Remaining to Bill counter added. Eight dead or duplicate dashboards deleted (restorable from Trash); four retired by name until their followers move. Total Active Bids, Active Post-Sale Pipeline and Merlin’s FY filters still need fixing in the UI (gap updated).</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 11</td>
+      <td class="cl-ver">v2.24</td>
+      <td><span class="cl-badge cl-new-worker">New Worker</span></td>
+      <td class="cl-desc"><strong>vtg-dashboard-summaries</strong> — Every morning at 9:15 AM ET it writes a plain-English summary and today’s numbers for the Pipeline, L10, Accounting KPIs, My Bids and Merlin dashboards to the new 📌 Dashboard Summaries board, one fixed row each. Adding the summary widget to each dashboard is still to do.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 11</td>
+      <td class="cl-ver">v2.24</td>
+      <td><span class="cl-badge cl-gap">Gap</span></td>
+      <td class="cl-desc"><strong>UID gap card refreshed</strong> — Retitled “Projects still find their account by UID, and new rows don’t get one” with the Oct 11 figures: 29 projects Cannot verify (23 with no UID), 66 of 284 projects with no UID, and no UID on any account created since Sep 15 or any CS Order project created since Sep 28.</td>
+    </tr>
     <tr>
       <td class="cl-date">Oct 11</td>
       <td class="cl-ver">v2.22</td>
@@ -4036,7 +4111,7 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
       <td class="cl-date">Sep 17</td>
       <td class="cl-ver">v2.2</td>
       <td><span class="cl-badge cl-infra">Infrastructure</span></td>
-      <td class="cl-desc"><strong>E-Rate Deals → Projects handoff is not running</strong> — Live counts make gap #7 concrete: 📁 E-Rate Deals holds <strong>102 items</strong> while E-Rate Projects holds <strong>1</strong>. Automation 7917669964 only fires on Status → Awarded, and nobody sets it, so the downstream board is effectively empty. Also noted: five Workers on this map (vtg-portal, vtg-sow-builder, vtg-inventory, vtg-logo-backfill, vtg-sku-catalog) have no local source folder, so there is no redeploy path for them.</td>
+      <td class="cl-desc"><strong>E-Rate Deals → Projects handoff is not running</strong> — Live counts make gap #7 concrete: 📁 E-Rate Deals holds <strong>102 items</strong> while E-Rate Projects holds <strong>1</strong>. Automation 7917669964 only fires on Status → Awarded, and nobody sets it, so the downstream board is effectively empty. Also noted: five Workers on this map (vtg-portal, vtg-sow-builder, vtg-inventory, vtg-logo-backfill, vtg-sku-catalog) have no local source folder, so there is no redeploy path for them. <em>[vtg-inventory has a local source folder since Oct 14]</em></td>
     </tr>
 
     <!-- ── Sep 14–16 2026 ── -->
@@ -4237,11 +4312,11 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
     </tr>
     <tr>
       <td class="cl-date">Sep 15 2026</td>
-      <td class="cl-desc"><strong>vtg-inventory dashboard live</strong> — Company-wide NS inventory dashboard at vtg-inventory.pages.dev (Cloudflare Pages, GitHub repo vtg-portal/vtg-inventory). Protected by a shared access code (Azure AD SSO planned). All NS locations: 41 Cabling Warehouse, 42 Secondary Warehouse, 4 Grand Rapids Office. Features: search, location filter pills, sortable columns, light/dark mode toggle, CSV export. Fetches live from vtg-ns-mcp-sync /api/inventory/all.</td>
+      <td class="cl-desc"><strong>vtg-inventory dashboard live</strong> — Company-wide NS inventory dashboard at vtg-inventory.pages.dev (Cloudflare Pages, GitHub repo vtg-portal/vtg-inventory). Protected by a shared access code (Azure AD SSO planned). All NS locations: 41 Cabling Warehouse, 42 Secondary Warehouse, 4 Grand Rapids Office. <em>[location names corrected Oct 14: 4 Walbridge, 41 Freeland, 42 Holland]</em> Features: search, location filter pills, sortable columns, light/dark mode toggle, CSV export. Fetches live from vtg-ns-mcp-sync /api/inventory/all.</td>
     </tr>
     <tr>
       <td class="cl-date">Sep 15 2026</td>
-      <td class="cl-desc"><strong>vtg-materials-log v3</strong> — NS Inventory On Hand column added to parts table; color-coded badges (green/yellow/red) from NS location 41 (Cabling Warehouse) via shared INVENTORY_CACHE KV; UID (text_mm76zvbz) and NS Sales Order # (text_mm6hv20b) added to project card; On Hand loading from KV — no direct NS API call on page load.</td>
+      <td class="cl-desc"><strong>vtg-materials-log v3</strong> — NS Inventory On Hand column added to parts table; color-coded badges (green/yellow/red) from NS location 41 (Cabling Warehouse <em>[location names corrected Oct 14: 41 is Freeland in NetSuite]</em>) via shared INVENTORY_CACHE KV; UID (text_mm76zvbz) and NS Sales Order # (text_mm6hv20b) added to project card; On Hand loading from KV — no direct NS API call on page load.</td>
     </tr>
     <tr>
       <td class="cl-date">Aug 27</td>
