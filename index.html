@@ -368,7 +368,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
 <div class="hdr">
   <div>
     <div class="hdr-title">VTG · Lead → Invoice Process Map</div>
-    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Oct 14 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
+    <div class="hdr-sub">E-Rate + Commercial tracks · All swim lanes · Workers included · Updated Oct 17 2026 · <a href="https://vtg-process-map.pages.dev" target="_blank" style="color:var(--cyan);text-decoration:none;">vtg-process-map.pages.dev ↗</a></div>
   </div>
   <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap;">
     <div class="legend">
@@ -1157,7 +1157,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">1.4 · vtg-bid-intake Creates Bids #3 Item</span><span class="sop-owner">Automation</span><span class="badge b-live">Live</span></div>
-          <div class="sop-body">Worker creates a new item in Bids #3 (board 18176633000) under <strong>New Bid Folder Creation</strong>. Auto-links Account (18176632844) and Contact (18176633260) via district name search with 5s retry. Writes the "📋 Open Intake Form" link and the 📊 SOV Builder link (<code>link_mm6vbks</code>) to the bid item.</div>
+          <div class="sop-body">Worker creates a new item in Bids #3 (board 18176633000) under <strong>New Bid Folder Creation</strong>. Auto-links Account (18176632844) and Contact (18176633260) via district name search with 5s retry. Writes the "📋 Open Intake Form" link and the 📊 SOV Builder link (<code>link_mm6vbks</code>) to the bid item. <strong>Since Oct 15</strong> the item is created already named “District - 470#: N”.</div>
           <div class="auto-row">⚡ vtg-bid-intake · vectorfi-admin.workers.dev</div>
         </div>
         <div class="sop-step">
@@ -1186,7 +1186,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <div class="sop-step">
           <div class="sop-step-hdr"><span class="sop-step-title">2.2 · Subitem Task System Activated on New Bid</span><span class="sop-owner">Automation</span><span class="badge b-live">Live</span></div>
-          <div class="sop-body">When a bid item is created, automation 482374765 immediately creates <strong>23 subitems</strong> covering every stage from Folder Creation through Awaiting Results. Each task is pre-tagged with its Bid Stage, pre-assigned to the relevant person, and given a due date counted back from the bid due date in <strong>business days</strong> by vtg-bid-task-dates (bids created after Sep 24 2026). Since Oct 9 no task is dated before the day the bid was created, and since Oct 8 the <strong>Mail:</strong> or <strong>Email:</strong> task set that the bid’s Bid Delivery Method rules out is deleted automatically. Tasks are never re-created per stage — the full lifecycle checklist exists from day one, with future tasks in "Still To Do" or "Create Item" status until needed. The three per-person parent columns (Alan / Jake / Dylan Subitem Status) are driven by automations: they flip to <strong>Due Today</strong> at 11am ET when a task's date arrives, and clear when the task is marked Complete.</div>
+          <div class="sop-body">When a bid item is created, automation 482374765 immediately creates <strong>23 subitems</strong> covering every stage from Folder Creation through Awaiting Results. Each task is pre-tagged with its Bid Stage, pre-assigned to the relevant person, and given a due date counted back from the bid due date in <strong>business days</strong> by vtg-bid-task-dates (bids created after Sep 24 2026). Since Oct 9 no task is dated before the day the bid was created, and since Oct 8 the <strong>Mail:</strong> or <strong>Email:</strong> task set that the bid’s Bid Delivery Method rules out is deleted automatically. Since Oct 15 it also keeps each subitem’s Bid Due Date Mirror equal to the bid’s due date. Tasks are never re-created per stage — the full lifecycle checklist exists from day one, with future tasks in "Still To Do" or "Create Item" status until needed. The three per-person parent columns (Alan / Jake / Dylan Subitem Status) are driven by automations: they flip to <strong>Due Today</strong> at 11am ET when a task's date arrives, and clear when the task is marked Complete.</div>
           <div class="auto-row">⚡ automation 482374765 · subitem board 18176633598 · due dates written to date3 by vtg-bid-task-dates (business days, federal holidays skipped)</div>
           <div class="auto-row sopm">📘 User SOP: <a href="https://vtg-portal.vectorfi-admin.workers.dev/docs/p/sopmaner30" target="_blank" rel="noopener">ER-30 · Review the New Bid</a></div>
         </div>
@@ -1482,7 +1482,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">vtg-ns-mcp-sync cron fails on every run</div><div class="pri pri-m">Medium</div></div>
-        <div class="gap-body">Observed Sep 18 2026: the 15-minute cron fails each run with SuiteQL <em>Record 'transaction' was not found</em> — the NetSuite integration role cannot read <code>transaction</code> (the same limit was recorded again Sep 30). That is roughly 96 failures a day, and none of the six coded flows reaches a monday write. The source has not changed since Sep 17. An older build, <strong>vtg-ns-mcp-sync-staging</strong>, still runs its own 15-minute cron (Sep 19 2026 snapshot). <strong>Side effect (found Oct 2 2026):</strong> the same run is meant to refresh the inventory cache, and the location-41 key was empty, so the Materials Log On Hand column showed “—” on every row. vtg-materials-log now refreshes that key itself; the all-locations key behind the vtg-inventory dashboard still relies on this cron or a live fetch on a miss. <strong>Built Oct 14 (deploy to confirm):</strong> the cron runs the inventory refreshes separately from the poll, so once deployed the all-locations refresh no longer depends on it. The poll itself still fails.</div>
+        <div class="gap-body">Observed Sep 18 2026: the 15-minute cron fails each run with SuiteQL <em>Record 'transaction' was not found</em> — the NetSuite integration role cannot read <code>transaction</code> (the same limit was recorded again Sep 30). That is roughly 96 failures a day, and none of the six coded flows reaches a monday write. The source has not changed since Sep 17. An older build, <strong>vtg-ns-mcp-sync-staging</strong>, still runs its own 15-minute cron (Sep 19 2026 snapshot). <strong>Side effect (found Oct 2 2026):</strong> the same run is meant to refresh the inventory cache, and the location-41 key was empty, so the Materials Log On Hand column showed “—” on every row. vtg-materials-log now refreshes that key itself; the all-locations key behind the vtg-inventory dashboard still relies on this cron or a live fetch on a miss. <strong>Since Oct 14</strong> the cron runs the inventory refreshes separately from the poll, so the all-locations refresh no longer depends on it. The poll itself still fails.</div>
         <div class="gap-worker">vtg-ns-mcp-sync · vtg-ns-mcp-sync-staging · NS role permissions</div>
       </div>
       <div class="gap-card">
@@ -1496,9 +1496,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="gap-worker">Bids #3 automation 482374746 · workflow 7917794784 · vtg-cs-form</div>
       </div>
       <div class="gap-card">
-        <div class="gap-card-hdr"><div class="gap-title">Bids #3: stale Bid Due Date Mirror, doubled 470# in Bid Name Formula, Create SOV / SOW never closed</div><div class="pri pri-l">Low</div></div>
-        <div class="gap-body"><strong>Found Oct 7 2026 (SOP recording) — priority for Jon to confirm.</strong> After a Bid Due Date change the subitems’ Bid Due Date Mirror kept the old date — automation 483152942 copies it only on creation, and the value reads an hour early (DST) — so Task Due Date Formula, which counts from it, went stale. vtg-bid-task-dates reads the bid’s own date, so Task Due Date is right. Bid Name Formula (<code>CONCATENATE({name}, " - 470#: ", {470 #})</code>) doubles the 470# because item names already end in it. Save &amp; Submit in the SOV Builder doesn’t close the Create SOV subitem, and Generate SOW doesn’t close Create SOW. All are on the SOP fix list.</div>
-        <div class="gap-worker">Bids #3 · automations 483152942, 483296416 · vtg-sov-builder · vtg-scopestack-doc-sync</div>
+        <div class="gap-card-hdr"><div class="gap-title">Bids #3: Create SOV / SOW subitems never close</div><div class="pri pri-l">Low</div></div>
+        <div class="gap-body"><strong>Found Oct 7 2026 (SOP recording) — priority for Jon to confirm.</strong> Save &amp; Submit in the SOV Builder doesn’t close the Create SOV subitem, and Generate SOW doesn’t close Create SOW. On the SOP fix list. <strong>Fixed Oct 15:</strong> the stale, hour-early Bid Due Date Mirror (vtg-bid-task-dates now copies the exact due date and refreshes it when the date changes) and the bid name (vtg-bid-intake names the bid “District - 470#: N” when it creates it; the Bid Name Formula column still repeats the 470#, but nothing uses it for naming any more).</div>
+        <div class="gap-worker">Bids #3 · vtg-sov-builder · vtg-scopestack-doc-sync</div>
       </div>
       <div class="gap-card">
         <div class="gap-card-hdr"><div class="gap-title">ScopeStack SOW template: frozen footer date and empty per-location scope</div><div class="pri pri-m">Medium</div></div>
@@ -1783,6 +1783,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Test bonds</strong><span>Districts or bond names starting “ZZ TEST” send “[TEST – DO NOT ISSUE]” bond emails; any other name goes to Alliant as a real request</span></div>
         <div class="worker-meta-row"><strong>Won bids</strong><span>No won handler — nothing notifies Alliant or closes the Bid Bonds item when a bid reaches Post-Sale. Automating the release is on the SOP fix list.</span></div>
         <div class="worker-meta-row"><strong>Bond prefill</strong><span><em>Live Oct 11 2026.</em> Turning on Bid bond required? fills the bond Amount with the lead’s Bond % (5% or the RFP’s percentage) and Not-to-exceed with the lead’s Est. Bond from vtg-rfp-estimator, so Alliant gets a ceiling to underwrite against. A blue line shows where the numbers came from. Every field stays editable, the toggle doesn’t turn itself on, and a lead with no estimate behaves as before (checked on Lakewood and on a lead with no estimate). Pre-change copy: <code>worker.pre-bond-prefill.js</code>.</span></div>
+        <div class="worker-meta-row"><strong>Bid name</strong><span><em>Live Oct 15 2026 (deploy 8f47dc01).</em> The bid is created already named “District - 470#: N” — the district alone if there’s no 470, the 470 alone if there’s no district, never the 470 twice. This replaced the Autoboost app’s naming recipe (483296416, turned off). vtg-sp-folders reads the name later and strips the colon, so folder names are unchanged. Bids added to Bids #3 by hand no longer get the full name automatically. Rollback copy: <code>worker.pre-bidname.js</code>.</span></div>
         <div class="worker-meta-row"><strong>Addendum on an existing lead</strong><span><strong>Live Oct 1 2026.</strong> The 470 feed adds an addendum to the existing lead's RFP Documents / Form 470 rather than creating a new lead. Leads webhooks 645545831 (RFP Documents) and 645545840 (Form 470) → <code>POST /lead-files-changed</code>. If the lead's 470 belongs to exactly one live bid, only the <strong>new</strong> files are copied to the bid's Addenda column, the bid is flagged, the bid owner and the lead's Sales Executive are notified, and the lead goes back to Accepted Leads. Leads with no live bid are left alone. Dylan's two "Accepted Leads → New Leads" addendum automations (493350968, 493351900) were deactivated Oct 1. Pre-change copy: <code>worker.pre-lead-files.js</code>.</span></div>
       </div>
     </div>
@@ -1817,7 +1818,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Delivery rules</strong><span>Email bids: compile can be the day before the bid is emailed · Mailed bids: mail out 5 days before due, Appendix C on the day of or the day after SOV/SOW</span></div>
         <div class="worker-meta-row"><strong>Short-fuse floor</strong><span><em>Oct 9 2026.</em> No task is dated before the day its subitem was created (rolled to the next business day), capped at the Bid Due Date so post-award tasks never move. It is keyed to the subitem’s own creation date, so a recalc gives the same answer whenever it runs. Prompted by Chippewa Hills (470# 270001664), whose first five tasks landed the day before intake; its existing dates were left as they are. Federal holidays stay in, Columbus Day and Veterans Day included.</span></div>
         <div class="worker-meta-row"><strong>Delivery trim</strong><span><em>Oct 8 2026.</em> On a new bid’s first batch of subitems (within 10 minutes of the bid), the <strong>Mail:</strong> or <strong>Email:</strong> task set that the bid’s Bid Delivery Method rules out is deleted, so reps no longer delete it by hand. Blank, portal-only or both kinds named → nothing is deleted; subitems added later by hand are never touched. Switch <code>PRUNE_DELIVERY = "on"</code>.</span></div>
-        <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-bid-task-dates\ · worker.js + test.mjs · backups worker.pre-delivery-trim.js, worker.pre-floor.js</span></div>
+        <div class="worker-meta-row"><strong>Due date mirror</strong><span><em>Live Oct 15 2026 (deploy e97ab75e).</em> Every new subitem on any bid gets an exact copy of the bid’s Bid Due Date in its <strong>Bid Due Date Mirror</strong> column, and a Bid Due Date change refreshes the mirror on all of that bid’s subitems. This replaced the Autoboost app’s recipe (483152942, turned off), which copied the date only at creation and an hour early across DST (midnight showed as 11 PM the day before). It never clears a mirror and writes only when the value differs. Existing mirrors keep the old value until their bid’s due date changes or the bid is recalculated. Switch <code>MIRROR = "on"</code>.</span></div>
+        <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-bid-task-dates\ · worker.js + test.mjs · backups worker.pre-delivery-trim.js, worker.pre-floor.js, worker.pre-mirror.js</span></div>
       </div>
     </div>
     <div class="worker-card">
@@ -1841,6 +1843,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>SharePoint</strong><span>Every SOV version copied to <code>Base Bid Docs/3 -SOV</code> by vtg-sp-folders (webhook 645821765 on <code>file_mm749nna</code>) — nothing in this Worker changed for that</span></div>
         <div class="worker-meta-row"><strong>Oct 8 2026</strong><span>Deploy 33514e7c: pressing Enter on a pasted part number now picks the matching catalog part (exact part #, then a -US variant, then a single list hit), so the row gets its description and price instead of a $0 row. Not yet browser-tested; Tab or click-away after a paste still leaves the raw text.</span></div>
         <div class="worker-meta-row"><strong>Oct 12 2026</strong><span>Typed unit prices stay put (reported by Alan on Ubly). Two fixes, both live and confirmed: the bond toggle and Bond % only redraw totals instead of re-pricing every row, and typing a unit price locks the row (amber) so markup, Bidder/Driver and bond changes leave it alone. Right-click, clearing the box, a row markup or picking a new part unlocks it. Editing the cost on a locked row keeps the typed price and only moves margin. Old drafts get a one-time check that locks prices that don’t match the calculated price. Current build 153,006 bytes; backups <code>worker-combined.pre-bond-reprice.js</code> and <code>worker-combined.pre-price-lock.js</code>.</span></div>
+        <div class="worker-meta-row"><strong>Oct 14 2026</strong><span><strong>ADD-ALTS alternates.</strong> On an ADD-ALTS tab each named Label row starts its own alternate, and the rows below it belong to it until the next named Label. Each alternate shows its own total (with bond) and there’s no combined total, because alternates are often either/or (3-year vs 5-year). The grid header, Summary tab, PDF and Excel all group alternates the same way, so they always agree. Also header and spacing fixes in the grid, PDF and Excel. Live (confirmed Oct 17).</span></div>
         <div class="worker-meta-row"><strong>Not done</strong><span>Save &amp; Submit doesn’t close the bid’s Create SOV subitem</span></div>
       </div>
     </div>
@@ -1867,6 +1870,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Future</strong><span>vtg-sow-builder pricing sheet integration · blueprint → datasheet auto-selection</span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-scopestack-doc-sync\</span></div>
         <div class="worker-meta-row"><strong>SOW Status</strong><span><code>color_mm7f9qc2</code> — Working on it on click, then Done, or Stuck with a reason posted as an update (since Sep 24 2026). The doubled district name in the filename is stripped (<code>dedupeFilename</code>).</span></div>
+        <div class="worker-meta-row"><strong>Oct 17 2026</strong><span><strong>Word SOW, newest only.</strong> Generate SOW now asks ScopeStack for the SOW as a Word file (not PDF), so sales can edit it; Generate Proposal turns it into the PDF. Before uploading, the Worker checks the download really is a Word or PDF file — if not, SOW Status goes to Stuck and the previous SOW stays — then clears the SOW Document column so only the newest SOW is kept (monday can’t remove a single file). Live (confirmed Oct 17). Backup <code>worker.pre-docx.js</code>.</span></div>
+        <div class="worker-meta-row"><strong>Watch</strong><span><em>Flagged for Jon:</em> because Generate SOW clears the column, a Word SOW that a salesperson edited and re-uploaded is replaced the next time anyone clicks Generate SOW. Make SOW edits in ScopeStack, or click Generate SOW before editing, not after.</span></div>
         <div class="worker-meta-row"><strong>Not done</strong><span>Does not close the bid's Create SOW subitem</span></div>
       </div>
     </div>
@@ -1875,18 +1880,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div><div class="worker-name">vtg-proposal-builder</div><div class="worker-url">vtg-proposal-builder.vectorfi-admin.workers.dev</div></div>
         <span class="badge b-live worker-status">Live — Sep 14 2026</span>
       </div>
-      <div class="worker-desc">Triggered by "Generate Proposal" button on Bids #3. Fetches the ScopeStack SOW PDF via assets API, fetches the client logo from Accounts #1, and injects the logo + bid due date onto the SOW cover page using pdf-lib. If a SOV PDF exists in column file_mm749nna, fetches it and merges SOW+SOV via iLoveAPI (it picks the newest <strong>.pdf</strong> in that column — fixed Oct 6 2026). Uploads final PDF to Proposal PDF column (<code>file_mm739vxe</code>). Updates a Proposal Status column (orange → green/red) so reps can see progress without re-clicking.<br><br>
+      <div class="worker-desc">Triggered by "Generate Proposal" button on Bids #3. Fetches the SOW from the SOW Document column via assets API — since Oct 17 2026 the newest Word or PDF file there, with a Word SOW converted to PDF through iLoveAPI first — fetches the client logo from Accounts #1, and injects the logo + bid due date onto the SOW cover page using pdf-lib. If a SOV PDF exists in column file_mm749nna, fetches it and merges SOW+SOV via iLoveAPI (it picks the newest <strong>.pdf</strong> in that column — fixed Oct 6 2026). Uploads final PDF to Proposal PDF column (<code>file_mm739vxe</code>). Updates a Proposal Status column (orange → green/red) so reps can see progress without re-clicking.<br><br>
       <strong>Trigger:</strong> button_mm732fyx → automation 636065801 → POST /generate<br>
       <strong>Logo box:</strong> 192×144pt, centered between district name and "Statement of Work" on cover<br>
       <strong>Status column:</strong> color_mm74qsfe ("Working on it" / "Done" / "Stuck")<br>
       <strong>Vector logo:</strong> hardcoded base64 JPEG in Worker — no network dependency<br>
       <strong>SOV PDF:</strong> uploads to file_mm749nna via SOV Builder submit &nbsp;|&nbsp; <strong>Phase 3:</strong> SharePoint standard docs + data sheets</div>
       <div class="worker-meta">
-        <div class="meta-row"><span class="meta-k">Secrets</span><span class="meta-v">MONDAY_TOKEN, ILOVEAPI_SECRET_KEY, SHAREPOINT_CLIENT_ID/TENANT_ID/SECRET</span></div>
         <div class="meta-row"><span class="meta-k">KV</span><span class="meta-v">SOV_FORMS (7a5b99d8bc134fd6959cc481752ede56)</span></div>
         <div class="meta-row"><span class="meta-k">Deps</span><span class="meta-v">pdf-lib 1.17.1 (bundled, 847KB)</span></div>
         <div class="meta-row"><span class="meta-k">Output</span><span class="meta-v">Bids #3 → file_mm739vxe (Proposal PDF)</span></div>
-        <div class="meta-row"><span class="meta-k">Version</span><span class="meta-v">4.0.0 — ef64840c</span></div>
+        <div class="meta-row"><span class="meta-k">Version</span><span class="meta-v">4.1.0 (Oct 17 2026; was 4.0.0 — ef64840c)</span></div>
+        <div class="meta-row"><span class="meta-k">Oct 17 2026</span><span class="meta-v"><strong>Word SOW.</strong> Generate SOW now leaves a Word file, so Generate Proposal converts it to PDF (iLoveAPI, the same login as the SOV merge) before adding the logo and due date. It takes the newest .docx or .pdf in SOW Document, so a Word SOW a salesperson edited and re-uploaded is used; older bids that still hold a PDF work as before. The SOW, logo and SOV are downloaded side by side to stay inside the Worker’s 30-second limit. Live (confirmed Oct 17). Backup <code>worker.pre-docx.js</code>.</span></div>
         <div class="meta-row"><span class="meta-k">Oct 6 2026 fix</span><span class="meta-v">Proposals had been going out <strong>without the SOV</strong>: since the SOV Builder started adding an Excel file to the SOV PDF column (Sep 30), the Worker took the last file — the .xlsx — the merge failed and it fell back to SOW only. It now takes the newest PDF. Verified on Olmsted Falls (12 pages = 9 SOW + 3 SOV). Still open: Proposal Status shows Done, not Stuck, if the SOV merge fails.</span></div>
       </div>
     </div>
@@ -2105,11 +2110,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
     <div class="worker-card">
       <div class="worker-card-hdr">
         <div><div class="worker-name">vtg-inventory</div><div class="worker-url">vtg-inventory.pages.dev</div></div>
-        <span class="badge b-live worker-status">Live — Sep 15 2026</span>
+        <span class="badge b-live worker-status">Live — Sep 15 2026 · updated Oct 14</span>
       </div>
-      <div class="worker-desc">Company-wide NetSuite inventory dashboard hosted on Cloudflare Pages (GitHub repo vtg-portal/vtg-inventory). Fetches live from vtg-ns-mcp-sync <code>/api/inventory/all</code> and shows every NetSuite location in the feed. The live page names locations from a hardcoded list (“Grand Rapids Office”, “Cabling Warehouse”, “Secondary Warehouse”) that doesn’t exist in NetSuite: location 4 is <strong>Walbridge</strong>, 41 <strong>Freeland</strong> and 42 <strong>Holland</strong>. <em>Built Oct 14 2026, deploy to confirm.</em> One row per part, location and bin, with location and bin names from NetSuite; location pills plus All Locations, a bin dropdown, search and CSV that include the bin, the NetSuite as-of time, and a location view that can be bookmarked. Protected by a shared access code (Azure AD SSO planned). Features: search, location filter pills, sortable columns, light/dark mode toggle, CSV export.</div>
+      <div class="worker-desc">Company-wide NetSuite inventory dashboard hosted on Cloudflare Pages (GitHub repo vtg-portal/vtg-inventory). Fetches live from vtg-ns-mcp-sync <code>/api/inventory/all</code> and shows every NetSuite location in the feed. <strong>Since Oct 14 2026:</strong> one row per part, location and bin, with location and bin names from NetSuite (4 <strong>Walbridge</strong>, 41 <strong>Freeland</strong>, 42 <strong>Holland</strong> and the rest); location pills plus All Locations, a bin dropdown, search and CSV that include the bin, the NetSuite as-of time, and a location view that can be bookmarked. The old hardcoded labels (“Grand Rapids Office”, “Cabling Warehouse”, “Secondary Warehouse”) didn’t exist in NetSuite. Protected by a shared access code (Azure AD SSO planned). Features: search, location filter pills, sortable columns, light/dark mode toggle, CSV export.</div>
       <div class="worker-meta">
-        <div class="worker-meta-row"><strong>Data source</strong><span>vtg-ns-mcp-sync /api/inventory/all · served from INVENTORY_CACHE KV (0233a14225194cbd81a49601f448963b, key <code>ns_inventory_all</code>) or fetched live from NetSuite on a miss and cached 30 min · the 15-minute cron refresh is unconfirmed (it runs with the failing poll) · <em>Built Oct 14 2026, deploy to confirm.</em> new key <code>ns_inventory_all_v2</code> (3 h, as-of time in its metadata and an <code>X-Inventory-As-Of</code> header); the cron refresh no longer waits on the failing poll — expected, confirm after deploy</span></div>
+        <div class="worker-meta-row"><strong>Data source</strong><span>vtg-ns-mcp-sync /api/inventory/all · INVENTORY_CACHE KV (0233a14225194cbd81a49601f448963b), key <code>ns_inventory_all_v2</code> since Oct 14 (3 h, as-of time in its metadata and an <code>X-Inventory-As-Of</code> header), or fetched live from NetSuite on a miss · the cron refresh no longer waits on the failing NetSuite poll</span></div>
         <div class="worker-meta-row"><strong>Auth</strong><span>Shared access code (placeholder) · Azure AD SSO planned</span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-inventory\index.html (local source since Oct 14, rebuilt from the live page) · GitHub: vtg-portal/vtg-inventory · single index.html, auto-deploys on push to main</span></div>
         <div class="worker-meta-row"><strong>Note</strong><span>No manual seeding needed after a vtg-ns-mcp-sync redeploy: on a cache miss the endpoint fetches live from NetSuite (slower first load) and saves the result.</span></div>
@@ -2188,7 +2193,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         <div class="worker-meta-row"><strong>Cron</strong><span>Every 15 min + webhook on stage changes</span></div>
         <div class="worker-meta-row"><strong>Blocked by</strong><span>NS service item ID from Kevin/Cari · NS role cannot read <code>transaction</code></span></div>
         <div class="worker-meta-row"><strong>Files</strong><span>VTG Flows\vtg-ns-mcp-sync\ · wrangler.toml + worker.js</span></div>
-        <div class="worker-meta-row"><strong>Inventory bins</strong><span><em>Built Oct 14 2026, deploy to confirm.</em> <code>/api/inventory/all</code> becomes bin-level: one row per item, location and bin, with NetSuite’s location and bin names. New key <code>ns_inventory_all_v2</code> (3 h, never overwritten by an empty result); if the bin query fails it falls back to location-only rows. The cron runs the inventory refreshes with <code>Promise.allSettled</code>, so the failing NetSuite poll can’t cut them short, and location-41 writes now carry an as-of time. Tested with mocks, not yet against live NetSuite. Backup <code>worker.pre-bins.js</code>.</span></div>
+        <div class="worker-meta-row"><strong>Inventory bins</strong><span><em>Live Oct 14 2026.</em> <code>/api/inventory/all</code> is bin-level: one row per item, location and bin, with NetSuite’s location and bin names. New key <code>ns_inventory_all_v2</code> (3 h, never overwritten by an empty result); if the bin query fails it falls back to location-only rows. The cron runs the inventory refreshes with <code>Promise.allSettled</code>, so the failing NetSuite poll can’t cut them short, and location-41 writes now carry an as-of time. Tested with mocks before the deploy. Backup <code>worker.pre-bins.js</code>.</span></div>
         <div class="worker-meta-row"><strong>Cron result</strong><span>Observed Sep 18 2026: the 15-minute cron fails on every run with SuiteQL <em>Record 'transaction' was not found</em> — the NetSuite integration role cannot read <code>transaction</code> (the same limit was recorded again Sep 30). None of the six flows reach a monday write. Source unchanged since Sep 17. The inventory-cache refresh runs in the same job; on Oct 2 the location-41 key was empty (most likely the failing poll ends the run before it saves — read from the code, not confirmed in Cloudflare logs).</span></div>
         <div class="worker-meta-row"><strong>Customer mapping</strong><span>vtg-ns-compare was deleted Oct 1 2026. The NetSuite Customer Internal ID now on Accounts #1 (<code>text_mm7m8z67</code>, filled by vtg-ns-so-backfill) is the customer mapping; this Worker does not read it yet.</span></div>
       </div>
@@ -2763,8 +2768,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <tr><td class="auto-id">482374702</td><td class="auto-trigger">New item created</td><td class="auto-action">Set Bid Creation Date (deal_creation_date) to today</td><td class="auto-note">Timestamps every new bid automatically</td></tr>
       <tr><td class="auto-id">482374703</td><td class="auto-trigger">New item created</td><td class="auto-action">Set Bid Stage → Folder Creation</td><td class="auto-note">All new bids start at stage Folder Creation (index 15)</td></tr>
       <tr><td class="auto-id">482374765</td><td class="auto-trigger">New item created</td><td class="auto-action">Create 23 subitems (full bid lifecycle task list)</td><td class="auto-note">The backbone of the bid task system — creates all tasks from Folder Creation through Awaiting Results in one shot, each pre-tagged by stage and pre-dated from Bid Due Date</td></tr>
-      <tr><td class="auto-id">483152942</td><td class="auto-trigger">New item created</td><td class="auto-action">Mirror Bid Due Date to subitem "Bid Due Date Mirror" column</td><td class="auto-note">Keeps subitem task due date formula in sync from the parent bid due date</td></tr>
-      <tr><td class="auto-id">483296416</td><td class="auto-trigger">New item created</td><td class="auto-action">Refresh Bid Name Formula column (formula_mkwrhcw)</td><td class="auto-note">Forces the formula "District - 470#: XXXXXXXXX" to populate on creation</td></tr>
+      <tr><td class="auto-id">483152942</td><td class="auto-trigger">New item created</td><td class="auto-action">Mirror Bid Due Date to subitem "Bid Due Date Mirror" column</td><td class="auto-note"><strong>Off Oct 15 2026</strong> (Autoboost app) — replaced by vtg-bid-task-dates, which also refreshes the mirror when the due date changes and fixes the one-hour DST shift</td></tr>
+      <tr><td class="auto-id">483296416</td><td class="auto-trigger">New item created</td><td class="auto-action">Refresh Bid Name Formula column (formula_mkwrhcw)</td><td class="auto-note"><strong>Off Oct 15 2026</strong> (Autoboost app) — vtg-bid-intake now names the bid “District - 470#: N” when it creates it</td></tr>
       <tr><td class="auto-id">482374704</td><td class="auto-trigger">Stage → Deal Reg</td><td class="auto-action">Create linked item on Deal Reg board (18176632827)</td><td class="auto-note">Auto-creates the Deal Reg record when stage changes; links back via connect_boards1 relation</td></tr>
       <tr><td class="auto-id">482374714</td><td class="auto-trigger">Stage → Deal Reg</td><td class="auto-action">Move item to Deal Reg group</td><td class="auto-note">Group = physical location of the item in the board view</td></tr>
       <tr><td class="auto-id">482374721</td><td class="auto-trigger">Stage → Bid Building</td><td class="auto-action">Move item to Bid Building group</td><td></td></tr>
@@ -2777,7 +2782,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
       <tr><td class="auto-id">482374717</td><td class="auto-trigger">Stage → Wins Archive</td><td class="auto-action">Post completion update + move to Wins Archive group</td><td class="auto-note">Message: "This Bid has been completed and billed in full! Congrats! Bid Creation Date: {date} Bid Close Date: {date}"</td></tr>
       <tr><td class="auto-id">482374723</td><td class="auto-trigger">Stage → Lost</td><td class="auto-action">Post update + move to Lost group + rename item</td><td class="auto-note">Message: "This Bid was lost. Please update all attached Boards, and fill in final amounts and results."</td></tr>
       <tr><td class="auto-id">562741747</td><td class="auto-trigger">Stage → Post-Sale (status index 12)</td><td class="auto-action">Send webhook to vtg-cs-form</td><td class="auto-note">One of two vtg-cs-form webhook triggers</td></tr>
-      <tr><td class="auto-id">483153616</td><td class="auto-trigger">Subitem created (any subitem)</td><td class="auto-action">Send webhook (target not readable from the monday API)</td><td class="auto-note">Not a Post-Sale trigger — monday lists it as a create_subitem webhook. If it points at vtg-cs-form, the Worker skips it (no Post-Sale value), so 562741747 is the only working Post-Sale trigger.</td></tr>
+      <tr><td class="auto-id">483153616</td><td class="auto-trigger">Subitem created (any subitem)</td><td class="auto-action">Send webhook (target not readable from the monday API)</td><td class="auto-note">The Autoboost app’s own webhook (its two Bids #3 recipes were turned off Oct 15; this one was still on at the cutover — turn it off or uninstall the app). Not a Post-Sale trigger — monday lists it as a create_subitem webhook. If it points at vtg-cs-form, the Worker skips it (no Post-Sale value), so 562741747 is the only working Post-Sale trigger.</td></tr>
       <tr><td class="auto-id">482374706</td><td class="auto-trigger">Subitem status → ARCHIVE</td><td class="auto-action">Archive the subitem</td><td class="auto-note">Manual archive — hides completed/irrelevant tasks from the active subitem view</td></tr>
       <tr><td class="auto-id">482374707</td><td class="auto-trigger">Subitem status → You're Up!</td><td class="auto-action">Notify assignee</td><td class="auto-note">"You're Up! {task} is due {date} for {bid name}. You're not waiting on anyone."</td></tr>
       <tr><td class="auto-id">482374711</td><td class="auto-trigger">Subitem status → N/A</td><td class="auto-action">Clear assignee, due date, and Bid Stage Subitem</td><td class="auto-note">Effectively removes the task from the active queue; used for inapplicable BEAR/SPI tasks</td></tr>
@@ -3168,12 +3173,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size
         </div>
         <span class="dash-audience aud-ops">Ops / Warehouse</span>
       </div>
-      <div class="dash-desc">Company-wide NetSuite inventory dashboard. Fetches live from vtg-ns-mcp-sync /api/inventory/all and displays every NetSuite location in the feed — on Oct 14 2026 that was <strong>846 rows across 7 NetSuite locations</strong>: 4 Walbridge, 41 Freeland, 42 Holland, 23 Walbridge - CC, 32 Drop Ship, 39 Drop Ship - CC and 6 Maumee. (“Grand Rapids Office”, “Cabling Warehouse” and “Secondary Warehouse” were labels hardcoded in the page; none exists in NetSuite.) The bin-level version — one row per part, location and bin, with NetSuite names — is built and waiting on deploy. Color-coded by location. Protected by a shared access code (Azure AD SSO planned). Features: search, location filter pills, sortable columns, light/dark mode, CSV export. The page says it refreshes every 15 min; data comes from INVENTORY_CACHE or a live NetSuite fetch on a miss, and whether the vtg-ns-mcp-sync cron keeps it refreshed is unconfirmed.</div>
+      <div class="dash-desc">Company-wide NetSuite inventory dashboard. Fetches live from vtg-ns-mcp-sync /api/inventory/all and displays every NetSuite location in the feed — on Oct 14 2026 that was <strong>846 rows across 7 NetSuite locations</strong>: 4 Walbridge, 41 Freeland, 42 Holland, 23 Walbridge - CC, 32 Drop Ship, 39 Drop Ship - CC and 6 Maumee. (“Grand Rapids Office”, “Cabling Warehouse” and “Secondary Warehouse” were labels hardcoded in the page; none exists in NetSuite.) Since Oct 14 the page is bin-level: one row per part, location and bin, with NetSuite names. Color-coded by location. Protected by a shared access code (Azure AD SSO planned). Features: search, location filter pills, sortable columns, light/dark mode, CSV export. The page says it refreshes every 15 min; data comes from INVENTORY_CACHE or a live NetSuite fetch on a miss, and since Oct 14 the vtg-ns-mcp-sync cron refreshes it separately from the failing NetSuite poll.</div>
       <div class="dash-feeds">
         <div class="dash-feed">vtg-ns-mcp-sync /api/inventory/all · INVENTORY_CACHE KV (0233a14225194cbd81a49601f448963b)</div>
         <div class="dash-feed">GitHub: vtg-portal/vtg-inventory · Cloudflare Pages auto-deploy on push</div>
       </div>
-      <div class="dash-note">On a cache miss the endpoint fetches live from NetSuite and saves the result for 30 min — no manual seeding needed after a redeploy. <em>Built Oct 14 2026, deploy to confirm.</em> The bin-level feed uses key ns_inventory_all_v2 (3 h), and its refresh no longer depends on the failing poll; refresh still unconfirmed until it’s seen working.</div>
+      <div class="dash-note">On a cache miss the endpoint fetches live from NetSuite and saves the result for 30 min — no manual seeding needed after a redeploy. Since Oct 14 the bin-level feed uses key ns_inventory_all_v2 (3 h), and its refresh no longer depends on the failing poll.</div>
     </div>
 
   </div>
@@ -3350,7 +3355,7 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
     <h2>Changelog</h2>
     <p>A record of all process changes, new Workers, and infrastructure updates to the VTG Lead → Invoice system.</p>
   </div>
-  <div class="cl-version-pill">Current: v2.24</div>
+  <div class="cl-version-pill">Current: v2.26</div>
 </div>
 
 <table class="cl-table">
@@ -3370,19 +3375,49 @@ textarea.rq-in{min-height:110px;resize:vertical;line-height:1.5;}
     <!-- ── Sep 29 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
     <!-- ── Oct 1 2026 ── -->
+    <tr class="cl-section-row"><td colspan="4">October 17, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 17</td>
+      <td class="cl-ver">v2.26</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>The SOW is now a Word file</strong> — Generate SOW (vtg-scopestack-doc-sync) asks ScopeStack for a Word SOW so sales can edit it, checks the download is a real document, and clears the SOW Document column first so only the newest SOW is kept. Generate Proposal (vtg-proposal-builder 4.1) converts the Word SOW to PDF before adding the logo, due date and SOV, and uses a re-uploaded edited Word SOW if there is one; older bids with a PDF SOW work as before. Watch: clicking Generate SOW again replaces an edited Word SOW. Also removed a list of secret names from the vtg-proposal-builder card.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 17</td>
+      <td class="cl-ver">v2.25</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Inventory bins and NetSuite location names confirmed deployed</strong> — The Oct 14 vtg-inventory and vtg-ns-mcp-sync changes are live: the dashboard shows one row per part, location and bin with NetSuite’s names, and the all-locations refresh no longer depends on the failing NetSuite poll. Cards updated and the “unconfirmed” notes removed.</td>
+    </tr>
+
+    <tr class="cl-section-row"><td colspan="4">October 15, 2026</td></tr>
+
+    <tr>
+      <td class="cl-date">Oct 15</td>
+      <td class="cl-ver">v2.25</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>Autoboost replaced on Bids #3</strong> — The third-party Autoboost app’s two Bids #3 recipes are off. <strong>vtg-bid-intake</strong> now creates each bid already named “District - 470#: N” (deploy 8f47dc01), and <strong>vtg-bid-task-dates</strong> keeps each subitem’s Bid Due Date Mirror equal to the bid’s due date (deploy e97ab75e) — refreshing it when the due date changes and fixing Autoboost’s one-hour DST shift. Bids added by hand no longer get the full name automatically; existing mirrors update when their bid’s due date changes. The Bids #3 gap now covers only the Create SOV / SOW subitems.</td>
+    </tr>
+
     <tr class="cl-section-row"><td colspan="4">October 14, 2026</td></tr>
 
     <tr>
       <td class="cl-date">Oct 14</td>
-      <td class="cl-ver">v2.24</td>
+      <td class="cl-ver">v2.25</td>
       <td><span class="cl-badge cl-update">Update</span></td>
-      <td class="cl-desc"><strong>vtg-inventory: bin column and NetSuite location names</strong> — <em>Built Oct 14, deploy to confirm.</em> The dashboard’s location names were hardcoded and wrong: “Grand Rapids Office”, “Cabling Warehouse” and “Secondary Warehouse” don’t exist in NetSuite (4 is Walbridge, 41 Freeland, 42 Holland). The new page shows one row per part, location and bin with NetSuite’s names, a bin dropdown, bin in search and CSV, and the NetSuite as-of time. Its source is now kept in VTG Flows\vtg-inventory.</td>
+      <td class="cl-desc"><strong>SOV Builder: ADD-ALTS alternates priced separately</strong> — On an ADD-ALTS tab each named Label row now starts its own alternate with its own total (with bond), and there’s no combined total, because alternates are often either/or. The grid header, Summary tab, PDF and Excel all group alternates the same way. Plus header and spacing fixes in the grid, PDF and Excel.</td>
     </tr>
     <tr>
       <td class="cl-date">Oct 14</td>
       <td class="cl-ver">v2.24</td>
       <td><span class="cl-badge cl-update">Update</span></td>
-      <td class="cl-desc"><strong>vtg-ns-mcp-sync: bin-level inventory feed</strong> — <em>Built Oct 14, deploy to confirm.</em> /api/inventory/all returns one row per item, location and bin with NetSuite names (key ns_inventory_all_v2, 3 h), falls back to location-only rows if the bin query fails, and the cron no longer lets the failing NetSuite poll cut the inventory refreshes short. Oct 14 feed: 846 rows across 7 NetSuite locations.</td>
+      <td class="cl-desc"><strong>vtg-inventory: bin column and NetSuite location names</strong> — <em>Deployed (confirmed Oct 17).</em> The dashboard’s location names were hardcoded and wrong: “Grand Rapids Office”, “Cabling Warehouse” and “Secondary Warehouse” don’t exist in NetSuite (4 is Walbridge, 41 Freeland, 42 Holland). The new page shows one row per part, location and bin with NetSuite’s names, a bin dropdown, bin in search and CSV, and the NetSuite as-of time. Its source is now kept in VTG Flows\vtg-inventory.</td>
+    </tr>
+    <tr>
+      <td class="cl-date">Oct 14</td>
+      <td class="cl-ver">v2.24</td>
+      <td><span class="cl-badge cl-update">Update</span></td>
+      <td class="cl-desc"><strong>vtg-ns-mcp-sync: bin-level inventory feed</strong> — <em>Deployed (confirmed Oct 17).</em> /api/inventory/all returns one row per item, location and bin with NetSuite names (key ns_inventory_all_v2, 3 h), falls back to location-only rows if the bin query fails, and the cron no longer lets the failing NetSuite poll cut the inventory refreshes short. Oct 14 feed: 846 rows across 7 NetSuite locations.</td>
     </tr>
 
     <tr class="cl-section-row"><td colspan="4">October 12, 2026</td></tr>
@@ -4512,14 +4547,14 @@ const D = {
     notes:['Parallel watchdog — does NOT gate or block the main Bids #3 flow','Rejected leads do not appear here','Funding confirmation or denial is informational only in the current flow']},
   proposalbuilder:{title:'Generate Proposal → Proposal PDF',phase:'E-Rate · Phase 2 · Bid Building',status:'live',
     triggers:['Rep clicks "Generate Proposal" button on Bids #3 item'],
-    inputs:['ScopeStack SOW PDF (fetched from Bids #3 via monday.com assets API)','Client logo (fetched from Accounts #1 logo column)','Bid due date (from Bids #3 due date column)'],
+    inputs:['SOW from Bids #3 SOW Document (assets API) — the newest Word file, converted to PDF via iLoveAPI (since Oct 17 2026), or a PDF on older bids','Client logo (fetched from Accounts #1 logo column)','Bid due date (from Bids #3 due date column)'],
     outputs:['Merged Proposal PDF uploaded to Bids #3 Proposal PDF column (file_mm739vxe)','Proposal Status column updated (orange → green on success, red on failure)'],
     workers:['vtg-proposal-builder (vtg-proposal-builder.vectorfi-admin.workers.dev)'],
     notes:['Injects client logo + bid due date directly onto page 1 of the SOW PDF using pdf-lib','Proposal Status column lets reps track progress without re-clicking the button','Worker is LIVE — button on Bids #3 triggers it']},
   scopestack:{title:'ScopeStack Proposal + SOW Auto-Delivery',phase:'E-Rate · Phase 1 · Lead Intake',status:'live',
     triggers:['Blueprint(s) selected inside the vtg-bid-intake intake form (after accept_470)','Generate SOW button clicked on Bids #3 item (button_mm70vvrb)'],
     inputs:['ScopeStack Blueprint(s) from intake form','470# from Bids #3 item (column: 470__)'],
-    outputs:['ScopeStack proposal auto-created via API','SOW .docx auto-generated and uploaded to Bids #3 SOW Document column (file_mm6wm4hn)'],
+    outputs:['ScopeStack proposal auto-created via API','SOW .docx auto-generated and uploaded to Bids #3 SOW Document column (file_mm6wm4hn) — Word since Oct 17 2026, only the newest kept'],
     workers:['ScopeStack API (live)','vtg-scopestack-doc-sync (LIVE Sep 8 2026)'],
     notes:['Blueprint entry is in the intake form — no longer done pre-accept (changed Sep 3 2026)','Two delivery paths: (1) rep selects blueprint in intake form → ScopeStack auto-generates → webhook delivers; (2) rep clicks Generate SOW button on Bids #3 → Worker triggers generation → webhook delivers','Template name \"Vector eRate SOW\" (ID 7085) → routes to Bids #3; other templates → El Nova Leads','~55 ScopeStack blueprints; account slug: vector; service account: worker-service@vtgus.com','Oct 6 2026: if the bid has no ScopeStack project, Generate SOW creates it from the lead’s blueprints (El Nova stopped creating them Sep 24–25)','Repeat-click guard: clicks are ignored while SOW Status has been Working on it under 3 minutes; later clicks still create another document']},
   elnova:{title:'El Nova Leads → Bids #3',phase:'E-Rate · Phase 1 · Lead Intake',status:'live',
@@ -4554,7 +4589,7 @@ const D = {
     triggers:['Opened from link_mm6vbks (📊 SOV Builder) on Bids #3','vtg-sov-builder.vectorfi-admin.workers.dev/?item={id}'],
     inputs:['470# + district from item name formula','SKU_CATALOG KV (5,395 parts, Oct 2 2026)','Buildings / sections / quantities'],
     outputs:['SOV JSON → SOV_FORMS KV (key: form:item-{monday item id} since Oct 1 2026)','SOV PDF + Excel, versioned _V{n} → Bids #3 SOV PDF column (newest 2 kept)','Each version copied to SharePoint Base Bid Docs/3 -SOV by vtg-sp-folders','Thread update posted'],
-    workers:['vtg-sov-builder'],notes:['vendorPOs array pre-grouped by vendor — ready for NS PO creation','Bond auto-enables from board_relation0 column','ADD-ALTS tab + Summary tab included']},
+    workers:['vtg-sov-builder'],notes:['vendorPOs array pre-grouped by vendor — ready for NS PO creation','Bond auto-enables from board_relation0 column','ADD-ALTS tab: each named Label is its own alternate, priced with bond, no combined total (Oct 14 2026)','Summary tab included']},
   sfSync:{title:'Salesforce Opportunity Sync',phase:'E-Rate · Phase 2 · Bid Building',status:'live',
     triggers:['Any Bids #3 stage, value, or date change'],
     inputs:['Any column on the Bids #3 item — not just deal_stage, deal_value, deal_creation_date','Monday_Item_ID__c as upsert key'],
@@ -4640,7 +4675,7 @@ const D = {
     inputs:['Bid Due Date','Subitem Days to Subtract (numbers0)'],
     outputs:['Task Due Date (date3) on each subitem'],
     workers:['vtg-bid-task-dates'],
-    notes:['Weekends and US federal holidays skipped','Bids created after Sep 24 2026 21:07 UTC only','date3 drives the due-today, highlight and auto-assign automations','Oct 9 2026: no task dated before the day the bid was created (short-fuse floor)','Oct 8 2026: deletes the Mail:/Email: task set the Bid Delivery Method rules out, on the first batch only']},
+    notes:['Weekends and US federal holidays skipped','Bids created after Sep 24 2026 21:07 UTC only','date3 drives the due-today, highlight and auto-assign automations','Oct 9 2026: no task dated before the day the bid was created (short-fuse floor)','Oct 8 2026: deletes the Mail:/Email: task set the Bid Delivery Method rules out, on the first batch only','Oct 15 2026: keeps each subitem’s Bid Due Date Mirror equal to the bid’s due date (replaced the Autoboost recipe)']},
   revmonth:{title:'Revenue Month',phase:'E-Rate · Phase 4 · Delivery',status:'live',
     triggers:['Timeline or Project Stage changes on Projects #4 (webhooks 639640003 / 639640004)','Daily cron 15 6 * * *'],
     inputs:['Timeline end date','Project Stage'],
